@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🥜 DouDou.代理管理系統</title>
+<title>🥜 DouDou 代理管理系統</title>
 <style>
 /* ════════════════════════════════════════
    DouDou 代理管理系統 — style.css
@@ -464,6 +464,9 @@ input[type="number"] { -moz-appearance: textfield; }
       </div>
     </div>
     <div class="dash-history-label">最近交易紀錄</div>
+    <div id="balance-warning" style="display:none; background:rgba(216,67,21,0.18); border:1px solid rgba(216,67,21,0.5); border-radius:8px; padding:8px 12px; margin-bottom:10px; font-size:12.5px; color:#ffccbc; font-weight:600; text-align:center;">
+      ⚠️ 餘額不足了，請儘速儲值。
+    </div>
     <div class="history-box" id="history-box">
       <div class="history-empty">載入中...</div>
     </div>
@@ -802,12 +805,24 @@ function renderDashboard(data) {
   const label = data.agentName ? data.agentCode + '（' + data.agentName + '）' : data.agentCode;
   _$('dash-name').textContent    = label;
   _$('dash-balance').textContent = fmtNum(data.balance);
+  checkBalanceWarning(Number(data.balance));
   renderHistory(data.history || []);
 }
 
 function updateBalance(v) {
   currentBalance = Number(v);
   _$('dash-balance').textContent = fmtNum(v);
+  checkBalanceWarning(currentBalance);
+}
+
+function checkBalanceWarning(bal) {
+  const el = _$('balance-warning');
+  if (!el) return;
+  if (bal < 0) {
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'none';
+  }
 }
 
 function renderHistory(list) {
