@@ -649,67 +649,118 @@ async function callScript(payload) {
 }
 function fmtNum(n) { return Number(n || 0).toLocaleString(); }
 
-/* ── Init ── */
+/* ── Init 初始化設定與自動登入檢查 ── */
 (function init() {
-  const sel = document.getElementById('login-select');
-  for (let i = 1; i <= 30; i++) {
-    const code = 'doudou' + String(i).padStart(3, '0');
-    const opt  = document.createElement('option');
-    opt.value = code; opt.textContent = code;
-    sel.appendChild(opt);
-  }
-  const today = new Date().toISOString().slice(0, 10);
-  ['dep-date','ck-date','batch-date','online-date'].forEach(id => {
-    if (_$(id)) _$(id).value = today;
-  });
-})();
+  const sel = document.getElementById('login-select');
+  for (let i = 1; i <= 30; i++) {
+    const code = 'doudou' + String(i).padStart(3, '0');
+    const opt  = document.createElement('option');
+    opt.value = code; opt.textContent = code;
+    sel.appendChild(opt);
+  }
+  const today = new Date().toISOString().slice(0, 10);
+  document.getElementById('dep-date').value      = today;
+  document.getElementById('ck-date').value       = today;
+  document.getElementById('admin-ck-date').value = today;
 
+  // 🔍 自動登入檢查：先看有沒有管理員紀錄，再看有沒有代理紀錄
+  const savedAdminUser = localStorage.getItem('doudouAdminUser');
+  const savedAdminPass = localStorage.getItem('doudouAdminPass');
+  const savedAgent     = localStorage.getItem('doudouAgent');
+  const savedPhone     = localStorage.getItem('doudouPhone');
+
+  if (savedAdminUser && savedAdminPass) {
+    // 自動登入管理員
+    hide('login-section'); show('admin-login-section');
+    _$('admin-username').value = savedAdminUser;
+    _$('admin-password').value = savedAdminPass;
+    doAdminLogin(savedAdminUser, savedAdminPass);
+  } else if (savedAgent && savedPhone) {
+    // 自動登入代理
+    _$('login-select').value = savedAgent;
+    _$('login-phone').value = savedPhone;
+    doLogin(savedAgent, savedPhone);
+  }
+})();
+  
 /* ── 登入切換 ── */
 function showAdminLogin() { hide('login-section'); show('admin-login-section'); }
 function showAgentLogin()  { hide('admin-login-section'); show('login-section'); }
 
-/* ── 代理登入 / 登出 ── */
-async function doLogin() {
-  clearAlert('login-alert');
-  const agentCode = _$('login-select').value;
-  const phone     = _$('login-phone').value.trim();
-  if (!agentCode) { showAlert('login-alert', '請選擇代理代碼'); return; }
-  if (!phone)     { showAlert('login-alert', '請輸入手機後六碼'); return; }
-  showLoading();
-  try {
-    const data = await callScript({ action: 'login', agentCode, phone });
-    if (data.success) {
-      currentAgent   = data.agentCode;
-      currentBalance = Number(data.balance);
-      renderDashboard(data);
-      hide('login-section'); show('dashboard'); show('notice-banner'); show('main-section');
-    } else { showAlert('login-alert', data.message || '登入失敗'); }
-  } catch { showAlert('login-alert', '⚠️ 無法連線至伺服器，請稍後再試'); }
-  finally  { hideLoading(); }
+/* ── 代理登入 / 登出 (自動記憶版) ── */
+async function doLogin(savedCode, savedPhone) {
+  clearAlert('login-alert');
+  const agentCode = savedCode || _$('login-select').value;
+  const phone     = savedPhone || _$('login-phone').value.trim();
+  
+  if (!agentCode) { showAlert('login-alert', '請選擇代理代碼'); return; }
+  if (!phone)     { showAlert('login-alert', '請輸入手機後六碼'); return; }
+  
+  showLoading();
+  try {
+    const data = await callScript({ action: 'login', agentCode, phone });
+    if (data.success) {
+      currentAgent   = data.agentCode;
+      currentBalance = Number(data.balance);
+      
+      // ✅ 登入成功，將資料存入瀏覽器記憶
+      localStorage.setItem('doudouAgent', agentCode);
+      localStorage.setItem('doudouPhone', phone);
+
+      renderDashboard(data);
+      hide('login-section'); show('dashboard'); show('notice-banner'); show('main-section');
+    } else {
+      showAlert('login-alert', data.message || '登入失敗，請確認代理代碼與手機後六碼');
+      // ❌ 登入失敗（例如密碼被改了），清除錯誤的記憶
+      localStorage.removeItem('doudouAgent');
+      localStorage.removeItem('doudouPhone');
+    }
+  } catch { showAlert('login-alert', '⚠️ 無法連線至伺服器，請稍後再試'); }
+  finally  { hideLoading(); }
 }
 
 function doLogout() {
-  currentAgent = null; currentBalance = 0;
-  hide('dashboard'); hide('notice-banner'); hide('main-section'); hide('result-section');
-  show('login-section'); clearAlert('global-alert');
+  currentAgent = null; currentBalance = 0;
+  // ✅ 登出時，清除瀏覽器記憶
+  localStorage.removeItem('doudouAgent');
+  localStorage.removeItem('doudouPhone');
+  
+  hide('dashboard'); hide('notice-banner'); hide('main-section'); hide('result-section');
+  show('login-section'); clearAlert('global-alert');
 }
 
-/* ── 管理員登入 / 登出 ── */
-function doAdminLogin() {
-  clearAlert('admin-login-alert');
-  const u = _$('admin-username').value.trim();
-  const p = _$('admin-password').value;
-  if (u !== ADMIN_USER || p !== ADMIN_PASS) { showAlert('admin-login-alert', '❌ 帳號或密碼錯誤'); return; }
-  isAdmin = true;
-  hide('admin-login-section'); show('admin-dashboard'); show('admin-section');
-  loadPendingDeposits(); loadAdminAgents();
+/* ── 管理員登入 / 登出 (自動記憶版) ── */
+function doAdminLogin(savedUser, savedPass) {
+  clearAlert('admin-login-alert');
+  const u = savedUser || _$('admin-username').value.trim();
+  const p = savedPass || _$('admin-password').value;
+  
+  if (u !== ADMIN_USER || p !== ADMIN_PASS) { 
+    showAlert('admin-login-alert', '❌ 帳號或密碼錯誤'); 
+    localStorage.removeItem('doudouAdminUser');
+    localStorage.removeItem('doudouAdminPass');
+    return; 
+  }
+  
+  isAdmin = true;
+  // ✅ 登入成功，存入瀏覽器記憶
+  localStorage.setItem('doudouAdminUser', u);
+  localStorage.setItem('doudouAdminPass', p);
+
+  hide('admin-login-section'); show('admin-dashboard'); show('admin-section');
+  loadPendingDeposits(); loadAdminAgents();
 }
+
 function doAdminLogout() {
-  isAdmin = false;
-  hide('admin-dashboard'); hide('admin-section'); show('login-section');
-  clearAlert('admin-global-alert');
+  isAdmin = false;
+  // ✅ 登出時清除記憶
+  localStorage.removeItem('doudouAdminUser');
+  localStorage.removeItem('doudouAdminPass');
+  
+  hide('admin-dashboard'); hide('admin-section'); show('login-section');
+  clearAlert('admin-global-alert');
 }
-
+  
 /* ── 代理儀表板 ── */
 function renderDashboard(data) {
   const label = data.agentName ? data.agentCode + '（' + data.agentName + '）' : data.agentCode;
