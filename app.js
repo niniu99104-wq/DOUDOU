@@ -2,7 +2,7 @@
    DouDou 代理管理系統 — app.js
 ════════════════════════════════════════ */
 
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyV_39M1osnevt1BY0OrJHIrc4FZpef4NjVZdjpBqcKt6DpIRPLephdr5jc9gMu1B1Iuw/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJWz95XVc21qxMQtGHYF9hIxif0GKRDjbyd7EfoR87_ts8T8cB0GxwkaG9libCUR7y7w/exec';
 const ADMIN_USER = 'doudouNi';
 const ADMIN_PASS = 'nini99104';
 
