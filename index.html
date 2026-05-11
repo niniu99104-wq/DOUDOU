@@ -9,7 +9,6 @@
    DouDou 代理管理系統 — style.css
 ════════════════════════════════════════ */
 
-/* ── Variables ── */
 :root {
   --primary:       #8d6e63;
   --primary-dark:  #6d4c41;
@@ -34,7 +33,6 @@
   --radius-sm:     10px;
 }
 
-/* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -49,9 +47,7 @@ body {
   line-height: 1.5;
 }
 
-/* ────────────────────────────────────────
-   Loading Overlay
-──────────────────────────────────────── */
+/* ── Loading ── */
 #loading-overlay {
   display: none;
   position: fixed; inset: 0;
@@ -63,7 +59,6 @@ body {
   gap: 14px;
 }
 #loading-overlay.active { display: flex; }
-
 .spinner {
   width: 44px; height: 44px;
   border: 4px solid var(--primary-light);
@@ -72,126 +67,80 @@ body {
   animation: spin 0.85s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 13.5px; font-weight: 600; color: var(--primary-dark); letter-spacing: 1px; }
 
-.loading-text {
-  font-size: 13.5px; font-weight: 600;
-  color: var(--primary-dark); letter-spacing: 1px;
-}
+/* ── Layout ── */
+.page-wrapper { max-width: 680px; margin: 0 auto; padding: 0 18px 80px; }
 
-/* ────────────────────────────────────────
-   Layout
-──────────────────────────────────────── */
-.page-wrapper {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 0 18px 80px;
-}
-
-/* ────────────────────────────────────────
-   Header
-──────────────────────────────────────── */
+/* ── Header ── */
 .site-header { text-align: center; padding: 32px 0 20px; }
 .site-header .logo    { font-size: 40px; display: block; margin-bottom: 10px; }
 .site-header h1       { font-size: 20px; font-weight: 700; color: var(--primary-dark); letter-spacing: 2px; }
 .site-header .tagline { font-size: 12px; color: var(--text-light); margin-top: 5px; letter-spacing: 1px; }
 
-/* ────────────────────────────────────────
-   Marquee（無縫輪播版）
-──────────────────────────────────────── */
+/* ── Marquee ── */
 .marquee-wrap {
   background: linear-gradient(90deg, #4e342e 0%, #8d6e63 50%, #4e342e 100%);
-  border-radius: 999px;
-  padding: 9px 0;
-  margin-bottom: 20px;
-  overflow: hidden;
-  white-space: nowrap;
+  border-radius: 999px; padding: 9px 0; margin-bottom: 20px;
+  overflow: hidden; white-space: nowrap;
 }
 .marquee-track {
-  display: flex;
-  width: max-content;
+  display: flex; width: max-content;
   animation: marquee-go 28s linear infinite;
 }
 .marquee-track:hover { animation-play-state: paused; }
 .marquee-item {
   font-size: 12.5px; font-weight: 600;
   color: #ffccbc; letter-spacing: 0.3px;
-  padding: 0 40px;
-  white-space: nowrap;
-  user-select: none;
+  padding: 0 40px; white-space: nowrap; user-select: none;
 }
 @keyframes marquee-go {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
 
-/* ────────────────────────────────────────
-   Card
-──────────────────────────────────────── */
+/* ── Card ── */
 .card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px 24px 22px;
-  box-shadow: var(--shadow);
-  margin-bottom: 16px;
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px 24px 22px;
+  box-shadow: var(--shadow); margin-bottom: 16px;
   animation: fadeUp 0.35s ease both;
 }
 .card-admin { border-color: #b39ddb; }
-
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 .card-title {
-  font-size: 14px; font-weight: 700;
-  color: var(--primary-dark);
-  margin-bottom: 20px;
-  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 700; color: var(--primary-dark);
+  margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
 }
 .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 .admin-color { color: var(--admin) !important; }
 
-/* ────────────────────────────────────────
-   Form Controls
-──────────────────────────────────────── */
+/* ── Form ── */
 label {
-  display: block;
-  font-size: 12.5px; font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 6px; letter-spacing: 0.2px;
+  display: block; font-size: 12.5px; font-weight: 600;
+  color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.2px;
 }
-
-input[type="text"],
-input[type="number"],
-input[type="date"],
-input[type="password"],
-select, textarea {
-  width: 100%;
-  background: #fff;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 11px 13px;
-  font-size: 14px; color: var(--text);
-  font-family: inherit; outline: none;
-  appearance: none; -webkit-appearance: none;
+input[type="text"], input[type="number"], input[type="date"],
+input[type="password"], select, textarea {
+  width: 100%; background: #fff; border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 11px 13px;
+  font-size: 14px; color: var(--text); font-family: inherit;
+  outline: none; appearance: none; -webkit-appearance: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 input:focus, select:focus, textarea:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(141,110,99,0.10);
+  border-color: var(--primary); box-shadow: 0 0 0 3px rgba(141,110,99,0.10);
 }
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 input[type="number"] { -moz-appearance: textfield; }
-
 .form-row    { margin-bottom: 14px; }
 .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 
-/* ────────────────────────────────────────
-   Buttons
-──────────────────────────────────────── */
+/* ── Buttons ── */
 .btn {
   display: inline-flex; align-items: center; justify-content: center;
   gap: 6px; border: none; border-radius: var(--radius-sm);
@@ -200,35 +149,26 @@ input[type="number"] { -moz-appearance: textfield; }
   transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
 }
 .btn:active { transform: scale(0.98) !important; }
-
 .btn-primary { background: var(--primary); color: #fff; }
 .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow); }
-
 .btn-accent  { background: var(--accent); color: #fff; }
 .btn-accent:hover  { background: #bf360c; transform: translateY(-1px); box-shadow: var(--shadow); }
-
 .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
 .btn-outline:hover { background: var(--card-inner); }
-
 .btn-success { background: var(--success); color: #fff; }
 .btn-success:hover { background: #33691e; transform: translateY(-1px); }
-
 .btn-admin   { background: var(--admin); color: #fff; }
 .btn-admin:hover { background: var(--admin-dark); transform: translateY(-1px); box-shadow: var(--shadow); }
-
 .btn-ghost {
   background: transparent; color: rgba(255,255,255,0.82);
   border: 1px solid rgba(255,255,255,0.32); border-radius: 20px;
 }
 .btn-ghost:hover { background: rgba(255,255,255,0.12); }
-
 .btn-sm   { padding: 7px 13px; font-size: 12.5px; }
 .btn-xs   { padding: 5px 10px; font-size: 12px; }
 .btn-full { width: 100%; }
 
-/* ────────────────────────────────────────
-   Alert
-──────────────────────────────────────── */
+/* ── Alert ── */
 .alert {
   display: none; border-radius: var(--radius-sm);
   padding: 11px 15px; font-size: 13px; font-weight: 600;
@@ -238,22 +178,12 @@ input[type="number"] { -moz-appearance: textfield; }
 .alert.success { background: var(--success-bg); border: 1px solid #aed581; color: var(--success); }
 .alert.show    { display: block; animation: fadeUp 0.25s ease; }
 
-/* ────────────────────────────────────────
-   Login
-──────────────────────────────────────── */
-.login-desc {
-  font-size: 13px; color: var(--text-light);
-  line-height: 1.7; margin-bottom: 18px;
-}
-.login-switch {
-  text-align: center; margin-top: 14px;
-  font-size: 12.5px; color: var(--text-light);
-}
+/* ── Login ── */
+.login-desc { font-size: 13px; color: var(--text-light); line-height: 1.7; margin-bottom: 18px; }
+.login-switch { text-align: center; margin-top: 14px; font-size: 12.5px; color: var(--text-light); }
 .login-switch a { color: var(--primary); cursor: pointer; text-decoration: underline; }
 
-/* ────────────────────────────────────────
-   Agent Dashboard
-──────────────────────────────────────── */
+/* ── Dashboard ── */
 #dashboard {
   display: none;
   background: linear-gradient(135deg, #4e342e 0%, #6d4c41 100%);
@@ -261,21 +191,13 @@ input[type="number"] { -moz-appearance: textfield; }
   color: #fff; margin-bottom: 14px;
   box-shadow: var(--shadow-lg); animation: fadeUp 0.35s ease;
 }
-.dash-top {
-  display: flex; justify-content: space-between;
-  align-items: flex-start; gap: 12px; margin-bottom: 14px;
-}
+.dash-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
 .dash-left .greeting  { font-size: 11.5px; opacity: 0.7; margin-bottom: 3px; }
 .dash-left .agentname { font-size: 16px; font-weight: 700; }
 .dash-right            { text-align: right; flex-shrink: 0; }
 .dash-right .bal-label { font-size: 11px; opacity: 0.65; margin-bottom: 3px; }
-.dash-right .bal-amount {
-  font-size: 26px; font-weight: 800;
-  color: #ffccbc; letter-spacing: 0.5px; line-height: 1.15;
-}
-.dash-right .btn-ghost { margin-top: 9px; }
+.dash-right .bal-amount { font-size: 26px; font-weight: 800; color: #ffccbc; letter-spacing: 0.5px; line-height: 1.15; }
 .dash-history-label { font-size: 11px; opacity: 0.6; margin-bottom: 6px; }
-
 .history-box {
   background: rgba(255,255,255,0.09); border-radius: 9px;
   max-height: 144px; overflow-y: auto; padding: 6px 10px;
@@ -283,28 +205,21 @@ input[type="number"] { -moz-appearance: textfield; }
 }
 .history-box::-webkit-scrollbar { width: 3px; }
 .history-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.22); border-radius: 2px; }
-
 .history-row {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 8px; padding: 6px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 12px;
+  gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 12px;
 }
 .history-row:last-child { border-bottom: none; }
 .history-info { flex: 1; }
 .history-type { opacity: 0.85; }
 .history-date { font-size: 10.5px; opacity: 0.5; margin-top: 1px; }
-.history-badge {
-  font-size: 10px; padding: 2px 8px; border-radius: 20px;
-  background: rgba(255,255,255,0.12); white-space: nowrap; flex-shrink: 0;
-}
+.history-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; background: rgba(255,255,255,0.12); white-space: nowrap; flex-shrink: 0; }
 .history-amt   { font-weight: 700; font-size: 12.5px; white-space: nowrap; flex-shrink: 0; }
-.clr-plus      { color: #a5d6a7; }
-.clr-minus     { color: #ffccbc; }
+.clr-plus  { color: #a5d6a7; }
+.clr-minus { color: #ffccbc; }
 .history-empty { font-size: 12px; opacity: 0.48; text-align: center; padding: 10px 0; }
 
-/* ────────────────────────────────────────
-   Notice Banner
-──────────────────────────────────────── */
+/* ── Notice Banner ── */
 #notice-banner {
   display: none;
   background: linear-gradient(135deg, #fff9e6, #fff3e0);
@@ -312,10 +227,7 @@ input[type="number"] { -moz-appearance: textfield; }
   border-radius: var(--radius-sm); padding: 14px 16px;
   margin-bottom: 16px; animation: fadeUp 0.35s ease;
 }
-.notice-title {
-  font-size: 13px; font-weight: 800; color: var(--warning);
-  margin-bottom: 9px; display: flex; align-items: center; gap: 6px;
-}
+.notice-title { font-size: 13px; font-weight: 800; color: var(--warning); margin-bottom: 9px; display: flex; align-items: center; gap: 6px; }
 .notice-body  { font-size: 13px; color: #5d4037; line-height: 1.85; }
 .notice-body strong { color: #bf360c; }
 .notice-tag {
@@ -324,32 +236,24 @@ input[type="number"] { -moz-appearance: textfield; }
   margin-right: 4px; vertical-align: middle;
 }
 
-/* ────────────────────────────────────────
-   Agent Tabs
-──────────────────────────────────────── */
+/* ── Tabs ── */
 #main-section  { display: none; }
 #admin-section { display: none; }
-
 .tab-bar {
-  display: flex; gap: 4px;
-  background: var(--card-inner); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); padding: 4px; margin-bottom: 16px;
+  display: flex; gap: 4px; background: var(--card-inner);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 4px; margin-bottom: 16px;
 }
 .tab-btn {
   flex: 1; padding: 11px 10px; background: transparent; border: none;
   border-radius: 8px; font-size: 13.5px; font-weight: 600;
   color: var(--text-muted); cursor: pointer; font-family: inherit; transition: all 0.2s;
 }
-.tab-btn.active {
-  background: var(--primary); color: #fff;
-  box-shadow: 0 2px 8px rgba(141,110,99,0.26);
-}
+.tab-btn.active { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(141,110,99,0.26); }
 .tab-panel        { display: none; }
 .tab-panel.active { display: block; animation: fadeUp 0.28s ease; }
 
-/* ────────────────────────────────────────
-   Bank Info
-──────────────────────────────────────── */
+/* ── Bank Info ── */
 .bank-info {
   background: var(--warning-bg); border: 1.5px solid #ffccbc;
   border-radius: var(--radius-sm); padding: 13px 15px;
@@ -357,26 +261,17 @@ input[type="number"] { -moz-appearance: textfield; }
 }
 .bank-info strong { color: var(--warning); }
 
-/* ────────────────────────────────────────
-   Checkbox
-──────────────────────────────────────── */
+/* ── Checkbox ── */
 .checkbox-row {
-  display: flex; align-items: center; gap: 10px;
-  padding: 12px 14px; background: #fff;
-  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-  cursor: pointer; transition: border-color 0.2s, background 0.2s;
-  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+  background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  cursor: pointer; transition: border-color 0.2s, background 0.2s; margin-bottom: 16px;
 }
 .checkbox-row:has(input:checked) { border-color: var(--primary); background: var(--card-inner); }
-.checkbox-row input[type="checkbox"] {
-  width: 17px; height: 17px; accent-color: var(--primary);
-  cursor: pointer; flex-shrink: 0;
-}
+.checkbox-row input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0; }
 .checkbox-row span { font-size: 13px; font-weight: 600; color: var(--text-muted); line-height: 1.45; }
 
-/* ────────────────────────────────────────
-   KRW Calculator
-──────────────────────────────────────── */
+/* ── KRW Calc ── */
 .calc-box {
   background: var(--card-inner); border: 1px dashed var(--primary-light);
   border-radius: var(--radius-sm); padding: 15px; margin-bottom: 16px;
@@ -399,31 +294,23 @@ input[type="number"] { -moz-appearance: textfield; }
   font-size: 13px; font-weight: 600; color: var(--primary-dark); line-height: 1.6;
 }
 
-/* ────────────────────────────────────────
-   Result Section
-──────────────────────────────────────── */
-#result-section       { display: none; animation: fadeUp 0.35s ease; }
-.admin-result-hidden  { display: none; animation: fadeUp 0.35s ease; }
-
+/* ── Result ── */
+#result-section      { display: none; animation: fadeUp 0.35s ease; }
+#admin-result-section { display: none; animation: fadeUp 0.35s ease; }
 .result-card {
   background: var(--success-bg); border: 1.5px solid #aed581;
   border-radius: var(--radius); padding: 20px 22px;
 }
-.result-card h3 {
-  font-size: 14px; font-weight: 700; color: var(--success);
-  margin-bottom: 13px; display: flex; align-items: center; gap: 7px;
-}
+.result-card h3 { font-size: 14px; font-weight: 700; color: var(--success); margin-bottom: 13px; display: flex; align-items: center; gap: 7px; }
 .result-textbox {
   background: #fff; border: 1px solid #c5e1a5; border-radius: var(--radius-sm);
-  padding: 15px; font-size: 13px; line-height: 1.95;
-  white-space: pre-wrap; word-break: break-all; color: var(--text);
+  padding: 15px; font-size: 13px; line-height: 1.95; white-space: pre-wrap;
+  word-break: break-all; color: var(--text);
   font-family: 'PingFang TC', 'Microsoft JhengHei', monospace;
   margin-bottom: 14px; max-height: 230px; overflow-y: auto;
 }
 
-/* ────────────────────────────────────────
-   Admin Dashboard
-──────────────────────────────────────── */
+/* ── Admin Dashboard ── */
 #admin-dashboard {
   display: none;
   background: linear-gradient(135deg, #311b92 0%, #4a148c 100%);
@@ -434,17 +321,11 @@ input[type="number"] { -moz-appearance: textfield; }
 .admin-dash-top  { display: flex; justify-content: space-between; align-items: center; }
 .admin-greeting  { font-size: 11.5px; opacity: 0.7; margin-bottom: 3px; }
 .admin-name      { font-size: 18px; font-weight: 700; }
-.admin-badge {
-  background: rgba(255,255,255,0.15); border-radius: 20px;
-  padding: 4px 14px; font-size: 12px; font-weight: 700;
-}
+.admin-badge { background: rgba(255,255,255,0.15); border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 700; }
 
-/* ────────────────────────────────────────
-   Admin Tabs
-──────────────────────────────────────── */
+/* ── Admin Tabs ── */
 .admin-tab-bar {
-  display: flex; gap: 4px;
-  background: #ede7f6; border: 1px solid #b39ddb;
+  display: flex; gap: 4px; background: #ede7f6; border: 1px solid #b39ddb;
   border-radius: var(--radius-sm); padding: 4px; margin-bottom: 16px;
 }
 .admin-tab-btn {
@@ -452,20 +333,14 @@ input[type="number"] { -moz-appearance: textfield; }
   border-radius: 8px; font-size: 13px; font-weight: 600;
   color: var(--admin); cursor: pointer; font-family: inherit; transition: all 0.2s;
 }
-.admin-tab-btn.active {
-  background: var(--admin); color: #fff;
-  box-shadow: 0 2px 8px rgba(74,20,140,0.28);
-}
+.admin-tab-btn.active { background: var(--admin); color: #fff; box-shadow: 0 2px 8px rgba(74,20,140,0.28); }
 
-/* ────────────────────────────────────────
-   Pending Deposits
-──────────────────────────────────────── */
+/* ── Pending ── */
 .pending-list  { display: flex; flex-direction: column; gap: 10px; }
 .pending-item {
-  background: #fff; border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm); padding: 13px 15px;
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; flex-wrap: wrap;
+  background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  padding: 13px 15px; display: flex; align-items: center;
+  justify-content: space-between; gap: 12px; flex-wrap: wrap;
 }
 .pending-item.approved { opacity: 0.45; pointer-events: none; }
 .pending-info   { flex: 1; min-width: 0; }
@@ -474,140 +349,45 @@ input[type="number"] { -moz-appearance: textfield; }
 .pending-amount { font-size: 16px; font-weight: 800; color: var(--success); white-space: nowrap; }
 .pending-empty  { text-align: center; color: var(--text-light); font-size: 13px; padding: 20px 0; }
 
-/* ────────────────────────────────────────
-   Admin Checkout
-──────────────────────────────────────── */
+/* ── Admin Checkout (Simple) ── */
 .balance-display {
   padding: 11px 13px; background: #fff;
   border: 1.5px solid var(--border); border-radius: var(--radius-sm);
   font-weight: 700; color: var(--success); font-size: 15px;
 }
-
-.order-rows-header {
-  display: flex; align-items: center;
-  justify-content: space-between; margin-bottom: 10px;
-}
-.order-rows-title { font-size: 13px; font-weight: 700; color: var(--admin); }
-.order-rows       { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
-
-.order-row {
-  background: #fff; border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm); padding: 14px; position: relative;
-}
-.order-row.discontinued { border-color: #ef9a9a; background: #fff8f8; }
-
-.order-row-header {
-  display: flex; align-items: center;
-  justify-content: space-between; margin-bottom: 10px;
-}
-.order-row-num { font-size: 12px; font-weight: 700; color: var(--text-light); }
-.order-row-del {
-  background: none; border: 1.5px solid #ef9a9a; border-radius: 8px;
-  padding: 4px 10px; color: #c62828; font-size: 12px; cursor: pointer;
-  font-family: inherit; font-weight: 600; transition: all 0.2s;
-}
-.order-row-del:hover { background: #ffebee; }
-
-.order-grid-dates   { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-.order-grid-dates-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-.order-grid-nums    { display: grid; grid-template-columns: 2fr 2fr 2fr 3fr 3fr; gap: 8px; margin-bottom: 10px; align-items: end; }
-
-.order-field label { font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
-.order-field input { padding: 8px 10px; font-size: 13px; }
-
-.auto-field {
-  background: var(--card-inner) !important;
-  color: var(--text-muted) !important;
-  font-weight: 600;
-}
-
-.order-row-subtotal {
-  background: var(--card-inner); border-radius: 8px;
-  padding: 8px 12px; font-size: 12.5px; color: var(--text-muted);
-  display: flex; justify-content: space-between; align-items: center;
-}
-.order-row-subtotal strong { color: var(--primary-dark); font-size: 14px; }
-
-.disc-badge {
-  display: inline-block; background: #ef9a9a; color: #b71c1c;
-  font-size: 10.5px; font-weight: 700; padding: 2px 8px;
-  border-radius: 20px; margin-left: 6px;
-}
-
-/* ────────────────────────────────────────
-   Checkout Summary
-──────────────────────────────────────── */
-.checkout-summary {
+.after-balance-box {
   background: linear-gradient(135deg, #f3e5f5, #ede7f6);
   border: 1.5px solid #b39ddb; border-radius: var(--radius-sm);
-  padding: 16px 18px; margin-bottom: 16px;
+  padding: 14px 16px; margin-bottom: 16px;
+  display: flex; justify-content: space-between; align-items: center;
 }
-.summary-title { font-size: 13px; font-weight: 700; color: var(--admin); margin-bottom: 10px; }
-.summary-row   {
-  display: flex; justify-content: space-between;
-  font-size: 13px; padding: 4px 0; color: var(--text-muted);
-}
-.summary-row.total {
-  border-top: 1px solid #b39ddb; margin-top: 6px; padding-top: 10px;
-  font-weight: 700; font-size: 15px; color: var(--admin);
-}
-.summary-refund { color: var(--success); font-weight: 700; }
-.summary-net    { color: var(--accent); }
+.after-balance-label { font-size: 13px; color: var(--admin); font-weight: 600; }
+.after-balance-value { font-size: 18px; font-weight: 800; color: var(--accent); }
 
-.admin-action-row {
-  display: flex; gap: 10px; flex-wrap: wrap;
-}
-.admin-action-row .btn-admin {
-  flex: 1; min-width: 200px;
-}
-
-/* ────────────────────────────────────────
-   Settings
-──────────────────────────────────────── */
-.settings-card {
-  background: #ede7f6; border: 1.5px solid #b39ddb;
-  border-radius: var(--radius-sm); padding: 16px; margin-bottom: 12px;
-}
-.settings-label {
-  font-size: 13px; font-weight: 700; color: var(--admin);
-  margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
-}
-
+/* ── Settings ── */
+.settings-card { background: #ede7f6; border: 1.5px solid #b39ddb; border-radius: var(--radius-sm); padding: 16px; margin-bottom: 12px; }
+.settings-label { font-size: 13px; font-weight: 700; color: var(--admin); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
 .agent-list-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.agent-list-table th {
-  background: var(--admin); color: #fff; padding: 8px 10px;
-  text-align: left; font-weight: 600; font-size: 12px;
-}
+.agent-list-table th { background: var(--admin); color: #fff; padding: 8px 10px; text-align: left; font-weight: 600; font-size: 12px; }
 .agent-list-table td { padding: 8px 10px; border-bottom: 1px solid #d1c4e9; }
 .agent-list-table tr:last-child td { border-bottom: none; }
 .agent-list-table tr:hover td { background: #f3e5f5; }
-.agent-list-table input {
-  border: 1px solid #b39ddb; border-radius: 6px;
-  padding: 5px 8px; font-size: 13px; width: 100%;
-}
+.agent-list-table input { border: 1px solid #b39ddb; border-radius: 6px; padding: 5px 8px; font-size: 13px; width: 100%; }
 
-/* ────────────────────────────────────────
-   Responsive
-──────────────────────────────────────── */
+/* ── Responsive ── */
 @media (max-width: 520px) {
-  .page-wrapper       { padding: 0 14px 60px; }
-  .card               { padding: 20px 16px 18px; }
-  .form-grid-2        { grid-template-columns: 1fr; gap: 0; }
-  .form-grid-3        { grid-template-columns: 1fr 1fr; }
-  .dash-top           { flex-direction: column; gap: 8px; }
-  .dash-right         { text-align: left; }
-  .calc-actions       { flex-direction: column; }
-  .order-grid-nums    { grid-template-columns: 1fr 1fr; }
-  .order-grid-dates-3 { grid-template-columns: 1fr 1fr; }
-  .admin-tab-btn      { font-size: 11.5px; padding: 9px 5px; }
-  .admin-action-row   { flex-direction: column; }
+  .page-wrapper  { padding: 0 14px 60px; }
+  .card          { padding: 20px 16px 18px; }
+  .form-grid-2   { grid-template-columns: 1fr; gap: 0; }
+  .dash-top      { flex-direction: column; gap: 8px; }
+  .dash-right    { text-align: left; }
+  .calc-actions  { flex-direction: column; }
+  .admin-tab-btn { font-size: 11.5px; padding: 9px 5px; }
 }
-
 </style>
 </head>
 <body>
 
-<!-- ══ Loading ══ -->
 <div id="loading-overlay">
   <div class="spinner"></div>
   <div class="loading-text">⏳ 資料處理中，請稍候...</div>
@@ -615,14 +395,14 @@ input[type="number"] { -moz-appearance: textfield; }
 
 <div class="page-wrapper">
 
-  <!-- ══ Header ══ -->
+  <!-- Header -->
   <div class="site-header">
     <span class="logo">🥜</span>
     <h1>DouDou 代理管理系統</h1>
     <p class="tagline">內部專用 · 儲值 &amp; 結帳平台</p>
   </div>
 
-  <!-- ══ 跑馬燈 ══ -->
+  <!-- 跑馬燈 -->
   <div class="marquee-wrap">
     <div class="marquee-track">
       <span class="marquee-item">📢 儲值入帳時間調整通知 ・ 🗓️ 固定入帳日：每週三 &amp; 週日 ・ ⚠️ 週三入帳→請週三前完成匯款 ・ ⚠️ 週日入帳→請週日前完成匯款 ・ 當天匯款將順延至下一個入帳日 ・ 請提前儲值，避免額度不足 🥹 ・ 謝謝大家的配合與理解 ♡</span>
@@ -630,7 +410,7 @@ input[type="number"] { -moz-appearance: textfield; }
     </div>
   </div>
 
-  <!-- ══ 代理登入 ══ -->
+  <!-- 代理登入 -->
   <div id="login-section">
     <div class="card">
       <div class="card-title">🔐 代理登入</div>
@@ -648,13 +428,11 @@ input[type="number"] { -moz-appearance: textfield; }
       </div>
       <div id="login-alert" class="alert error"></div>
       <button class="btn btn-primary btn-full" onclick="doLogin()">🚀 進入系統</button>
-      <div class="login-switch">
-        <a onclick="showAdminLogin()">管理員入口</a>
-      </div>
+      <div class="login-switch"><a onclick="showAdminLogin()">管理員入口</a></div>
     </div>
   </div>
 
-  <!-- ══ 管理員登入 ══ -->
+  <!-- 管理員登入 -->
   <div id="admin-login-section" style="display:none;">
     <div class="card card-admin">
       <div class="card-title admin-color">👑 管理員登入</div>
@@ -668,13 +446,11 @@ input[type="number"] { -moz-appearance: textfield; }
       </div>
       <div id="admin-login-alert" class="alert error"></div>
       <button class="btn btn-admin btn-full" onclick="doAdminLogin()">👑 進入後台</button>
-      <div class="login-switch">
-        <a onclick="showAgentLogin()">← 返回代理登入</a>
-      </div>
+      <div class="login-switch"><a onclick="showAgentLogin()">← 返回代理登入</a></div>
     </div>
   </div>
 
-  <!-- ══ 代理儀表板 ══ -->
+  <!-- 代理儀表板 -->
   <div id="dashboard">
     <div class="dash-top">
       <div class="dash-left">
@@ -684,7 +460,7 @@ input[type="number"] { -moz-appearance: textfield; }
       <div class="dash-right">
         <div class="bal-label">可用餘額</div>
         <div class="bal-amount">NT$&nbsp;<span id="dash-balance">0</span></div>
-        <button class="btn btn-ghost btn-sm" onclick="doLogout()">登出重選</button>
+        <button class="btn btn-ghost btn-sm" style="margin-top:9px;" onclick="doLogout()">登出重選</button>
       </div>
     </div>
     <div class="dash-history-label">最近交易紀錄</div>
@@ -693,7 +469,7 @@ input[type="number"] { -moz-appearance: textfield; }
     </div>
   </div>
 
-  <!-- ══ 公告欄（登入後）══ -->
+  <!-- 公告欄 -->
   <div id="notice-banner">
     <div class="notice-title">📢 最新公告・阿霓通知</div>
     <div class="notice-body">
@@ -706,16 +482,15 @@ input[type="number"] { -moz-appearance: textfield; }
     </div>
   </div>
 
-  <!-- ══ 代理主系統 ══ -->
+  <!-- 代理主系統 -->
   <div id="main-section">
-
     <div class="tab-bar">
       <button class="tab-btn active" id="tab-btn-deposit"  onclick="switchTab('deposit')">💰 儲值回報</button>
       <button class="tab-btn"        id="tab-btn-checkout" onclick="switchTab('checkout')">🛒 單筆結帳</button>
     </div>
     <div id="global-alert" class="alert error"></div>
 
-    <!-- Tab：儲值回報 -->
+    <!-- 儲值回報 -->
     <div id="tab-deposit" class="tab-panel active">
       <div class="card">
         <div class="card-title">💰 儲值回報</div>
@@ -746,7 +521,7 @@ input[type="number"] { -moz-appearance: textfield; }
       </div>
     </div>
 
-    <!-- Tab：單筆結帳 -->
+    <!-- 單筆結帳 -->
     <div id="tab-checkout" class="tab-panel">
       <div class="card">
         <div class="card-title">🛒 單筆結帳</div>
@@ -765,10 +540,7 @@ input[type="number"] { -moz-appearance: textfield; }
           <input type="text" id="ck-note" placeholder="例：批網4件 ／ 記事本湊單米菲兔">
         </div>
         <div class="calc-box">
-          <div class="calc-title">
-            📊 多品項韓元計價小工具
-            <span>（匯率固定 ×40，無條件進位）</span>
-          </div>
+          <div class="calc-title">📊 多品項韓元計價小工具 <span>（匯率固定 ×40，無條件進位）</span></div>
           <div class="krw-list" id="krw-list">
             <div class="krw-row">
               <input type="number" class="krw-input" placeholder="輸入韓元金額 (KRW)" min="0">
@@ -785,7 +557,6 @@ input[type="number"] { -moz-appearance: textfield; }
       </div>
     </div>
 
-    <!-- 送出結果 -->
     <div id="result-section">
       <div class="result-card">
         <h3>✅ 送出成功！回報單文案</h3>
@@ -793,10 +564,9 @@ input[type="number"] { -moz-appearance: textfield; }
         <button class="btn btn-primary" onclick="copyResult()">📋 點擊複製文案</button>
       </div>
     </div>
+  </div>
 
-  </div><!-- /main-section -->
-
-  <!-- ══ 管理員儀表板 ══ -->
+  <!-- 管理員儀表板 -->
   <div id="admin-dashboard">
     <div class="admin-dash-top">
       <div>
@@ -810,12 +580,11 @@ input[type="number"] { -moz-appearance: textfield; }
     </div>
   </div>
 
-  <!-- ══ 管理員主系統 ══ -->
+  <!-- 管理員主系統 -->
   <div id="admin-section">
-
     <div class="admin-tab-bar">
       <button class="admin-tab-btn active" id="atab-btn-deposit"  onclick="switchAdminTab('deposit')">📥 儲值審核</button>
-      <button class="admin-tab-btn"        id="atab-btn-checkout" onclick="switchAdminTab('checkout')">🛒 幫代理結帳</button>
+      <button class="admin-tab-btn"        id="atab-btn-checkout" onclick="switchAdminTab('checkout')">💳 幫代理結帳</button>
       <button class="admin-tab-btn"        id="atab-btn-settings" onclick="switchAdminTab('settings')">⚙️ 系統設定</button>
     </div>
     <div id="admin-global-alert" class="alert error"></div>
@@ -833,12 +602,13 @@ input[type="number"] { -moz-appearance: textfield; }
       </div>
     </div>
 
-    <!-- 幫代理結帳 -->
+    <!-- ══ 幫代理結帳（簡化版）══ -->
     <div id="atab-checkout" class="tab-panel">
       <div class="card">
-        <div class="card-title admin-color">🛒 幫代理結帳</div>
+        <div class="card-title admin-color">💳 幫代理結帳</div>
 
-        <div class="form-grid-2" style="margin-bottom:14px;">
+        <!-- 選代理 + 餘額 -->
+        <div class="form-grid-2" style="margin-bottom:16px;">
           <div class="form-row" style="margin:0;">
             <label>選擇代理</label>
             <select id="admin-agent-select" onchange="onAdminAgentChange()">
@@ -846,52 +616,39 @@ input[type="number"] { -moz-appearance: textfield; }
             </select>
           </div>
           <div class="form-row" style="margin:0;">
-            <label>代理目前餘額</label>
+            <label>目前可用餘額</label>
             <div id="admin-agent-balance" class="balance-display">－</div>
           </div>
         </div>
 
-        <div class="form-grid-2" style="margin-bottom:14px;">
+        <!-- 日期 + 備註 -->
+        <div class="form-grid-2" style="margin-bottom:16px;">
           <div class="form-row" style="margin:0;">
             <label>📅 結帳日期</label>
             <input type="date" id="admin-ck-date">
           </div>
           <div class="form-row" style="margin:0;">
-            <label>📝 批次備註（如：以上結帳0307）</label>
+            <label>📝 備註（如：以上結帳0307）</label>
             <input type="text" id="admin-ck-note" placeholder="例：以上結帳0307">
           </div>
         </div>
 
-        <div class="order-rows-header">
-          <div class="order-rows-title">📋 訂單明細</div>
-          <button class="btn btn-admin btn-sm" onclick="addOrderRow()">➕ 新增品項</button>
+        <!-- 結帳金額 -->
+        <div class="form-row">
+          <label>💵 結帳台幣總額（NT$）</label>
+          <input type="number" id="admin-ck-amount" placeholder="請輸入本次結帳總金額" min="1">
         </div>
 
-        <div class="order-rows" id="order-rows"></div>
-
-        <div class="checkout-summary" id="checkout-summary" style="display:none;">
-          <div class="summary-title">💰 結帳摘要</div>
-          <div class="summary-row">
-            <span>商品總金額</span><span id="sum-total">NT$ 0</span>
-          </div>
-          <div class="summary-row summary-refund">
-            <span>斷貨退款</span><span id="sum-refund">－NT$ 0</span>
-          </div>
-          <div class="summary-row total">
-            <span>實收金額</span><span id="sum-net" class="summary-net">NT$ 0</span>
-          </div>
-          <div class="summary-row" style="margin-top:8px; font-size:12px; color:var(--text-light);">
-            <span>結帳後預估餘額</span><span id="sum-after-balance">－</span>
-          </div>
+        <!-- 預覽餘額 -->
+        <div class="after-balance-box" id="after-balance-box" style="display:none;">
+          <span class="after-balance-label">結帳後預估餘額</span>
+          <span class="after-balance-value" id="after-balance-value">NT$ 0</span>
         </div>
 
-        <div class="admin-action-row">
-          <button class="btn btn-outline btn-sm" onclick="calcAdminSummary()">🧮 計算合計</button>
-          <button class="btn btn-admin btn-full" onclick="submitAdminCheckout()">✅ 確認送出結帳</button>
-        </div>
+        <button class="btn btn-admin btn-full" onclick="submitAdminCheckout()">✅ 確認扣款送出</button>
       </div>
 
-      <div id="admin-result-section" class="admin-result-hidden">
+      <div id="admin-result-section">
         <div class="result-card">
           <h3>✅ 結帳完成！</h3>
           <div class="result-textbox" id="admin-result-text"></div>
@@ -904,7 +661,6 @@ input[type="number"] { -moz-appearance: textfield; }
     <div id="atab-settings" class="tab-panel">
       <div class="card">
         <div class="card-title admin-color">⚙️ 系統設定</div>
-
         <div class="settings-card">
           <div class="settings-label">📅 公告日期設定（前後台顯示）</div>
           <div class="form-grid-2">
@@ -921,19 +677,13 @@ input[type="number"] { -moz-appearance: textfield; }
             <button class="btn btn-admin btn-sm" onclick="saveAnnounceDates()">💾 儲存公告日期</button>
           </div>
         </div>
-
         <div class="settings-card">
           <div class="settings-label">👥 代理資料管理（匯率 &amp; 手機號碼）</div>
           <div style="overflow-x:auto;">
             <table class="agent-list-table">
               <thead>
                 <tr>
-                  <th>代理代碼</th>
-                  <th>名稱</th>
-                  <th>手機號碼</th>
-                  <th>匯率</th>
-                  <th>餘額</th>
-                  <th>儲存</th>
+                  <th>代理代碼</th><th>名稱</th><th>手機號碼</th><th>匯率</th><th>餘額</th><th>儲存</th>
                 </tr>
               </thead>
               <tbody id="agent-settings-body">
@@ -942,36 +692,24 @@ input[type="number"] { -moz-appearance: textfield; }
             </table>
           </div>
         </div>
-
       </div>
     </div>
 
   </div><!-- /admin-section -->
-
 </div><!-- /page-wrapper -->
 
 <script>
-/* ════════════════════════════════════════
-   DouDou 代理管理系統 — app.js
-════════════════════════════════════════ */
-
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxjZ9cIbj1_Vd0DKZiR-K0t8udcfT4TStA0n8YVoL-6tfMGL7fua7pobTKerw198nYwGA/exec';
 const ADMIN_USER = 'doudouNi';
 const ADMIN_PASS = 'nini99104';
 
-/* ════════════════════════════════════════
-   State
-════════════════════════════════════════ */
 let currentAgent   = null;
 let currentBalance = 0;
 let isAdmin        = false;
 let adminAgentData = [];
-let orderRowCount  = 0;
 
-/* ════════════════════════════════════════
-   Utility Helpers（必須在 init 前定義）
-════════════════════════════════════════ */
-const _$ = id => document.getElementById(id);
+/* ── Helpers ── */
+const _$   = id => document.getElementById(id);
 const show = id => _$(id).style.display = 'block';
 const hide = id => _$(id).style.display = 'none';
 
@@ -979,32 +717,24 @@ function showLoading() { _$('loading-overlay').classList.add('active'); }
 function hideLoading() { _$('loading-overlay').classList.remove('active'); }
 
 function showAlert(id, msg, type = 'error') {
-  const el = _$(id);
-  el.textContent = msg;
-  el.className   = 'alert ' + type + ' show';
+  const el = _$(id); el.textContent = msg; el.className = 'alert ' + type + ' show';
 }
 function clearAlert(id) {
-  const el = _$(id);
-  el.className   = 'alert error';
-  el.textContent = '';
+  const el = _$(id); el.className = 'alert error'; el.textContent = '';
 }
 
 async function callScript(payload) {
   const res = await fetch(GOOGLE_SCRIPT_URL, {
-    method:  'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body:    JSON.stringify(payload)
+    method: 'POST', headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload)
   });
   return res.json();
 }
 
 function fmtNum(n) { return Number(n || 0).toLocaleString(); }
 
-/* ════════════════════════════════════════
-   Init（頁面載入執行）
-════════════════════════════════════════ */
+/* ── Init ── */
 (function init() {
-  // 代理下拉選單 doudou001 ~ doudou030
   const sel = document.getElementById('login-select');
   for (let i = 1; i <= 30; i++) {
     const code = 'doudou' + String(i).padStart(3, '0');
@@ -1012,37 +742,23 @@ function fmtNum(n) { return Number(n || 0).toLocaleString(); }
     opt.value = code; opt.textContent = code;
     sel.appendChild(opt);
   }
-  // 預設今天日期
   const today = new Date().toISOString().slice(0, 10);
   document.getElementById('dep-date').value      = today;
   document.getElementById('ck-date').value       = today;
   document.getElementById('admin-ck-date').value = today;
-  // 後台初始一筆空訂單
-  addOrderRow();
 })();
 
-/* ════════════════════════════════════════
-   登入頁切換
-════════════════════════════════════════ */
-function showAdminLogin() {
-  hide('login-section');
-  show('admin-login-section');
-}
-function showAgentLogin() {
-  hide('admin-login-section');
-  show('login-section');
-}
+/* ── 登入切換 ── */
+function showAdminLogin() { hide('login-section'); show('admin-login-section'); }
+function showAgentLogin()  { hide('admin-login-section'); show('login-section'); }
 
-/* ════════════════════════════════════════
-   代理登入 / 登出
-════════════════════════════════════════ */
+/* ── 代理登入 / 登出 ── */
 async function doLogin() {
   clearAlert('login-alert');
   const agentCode = _$('login-select').value;
   const phone     = _$('login-phone').value.trim();
   if (!agentCode) { showAlert('login-alert', '請選擇代理代碼'); return; }
   if (!phone)     { showAlert('login-alert', '請輸入手機後六碼'); return; }
-
   showLoading();
   try {
     const data = await callScript({ action: 'login', agentCode, phone });
@@ -1050,60 +766,40 @@ async function doLogin() {
       currentAgent   = data.agentCode;
       currentBalance = Number(data.balance);
       renderDashboard(data);
-      hide('login-section');
-      show('dashboard');
-      show('notice-banner');
-      show('main-section');
+      hide('login-section'); show('dashboard'); show('notice-banner'); show('main-section');
     } else {
       showAlert('login-alert', data.message || '登入失敗，請確認代理代碼與手機後六碼');
     }
-  } catch {
-    showAlert('login-alert', '⚠️ 無法連線至伺服器，請稍後再試');
-  } finally {
-    hideLoading();
-  }
+  } catch { showAlert('login-alert', '⚠️ 無法連線至伺服器，請稍後再試'); }
+  finally  { hideLoading(); }
 }
 
 function doLogout() {
   currentAgent = null; currentBalance = 0;
-  hide('dashboard'); hide('notice-banner');
-  hide('main-section'); hide('result-section');
-  show('login-section');
-  clearAlert('global-alert');
+  hide('dashboard'); hide('notice-banner'); hide('main-section'); hide('result-section');
+  show('login-section'); clearAlert('global-alert');
 }
 
-/* ════════════════════════════════════════
-   管理員登入 / 登出
-════════════════════════════════════════ */
+/* ── 管理員登入 / 登出 ── */
 function doAdminLogin() {
   clearAlert('admin-login-alert');
   const u = _$('admin-username').value.trim();
   const p = _$('admin-password').value;
-  if (u !== ADMIN_USER || p !== ADMIN_PASS) {
-    showAlert('admin-login-alert', '❌ 帳號或密碼錯誤'); return;
-  }
+  if (u !== ADMIN_USER || p !== ADMIN_PASS) { showAlert('admin-login-alert', '❌ 帳號或密碼錯誤'); return; }
   isAdmin = true;
-  hide('admin-login-section');
-  show('admin-dashboard');
-  show('admin-section');
-  loadPendingDeposits();
-  loadAdminAgents();
+  hide('admin-login-section'); show('admin-dashboard'); show('admin-section');
+  loadPendingDeposits(); loadAdminAgents();
 }
 
 function doAdminLogout() {
   isAdmin = false;
-  hide('admin-dashboard'); hide('admin-section');
-  show('login-section');
+  hide('admin-dashboard'); hide('admin-section'); show('login-section');
   clearAlert('admin-global-alert');
 }
 
-/* ════════════════════════════════════════
-   代理儀表板渲染
-════════════════════════════════════════ */
+/* ── 代理儀表板 ── */
 function renderDashboard(data) {
-  const label = data.agentName
-    ? data.agentCode + '（' + data.agentName + '）'
-    : data.agentCode;
+  const label = data.agentName ? data.agentCode + '（' + data.agentName + '）' : data.agentCode;
   _$('dash-name').textContent    = label;
   _$('dash-balance').textContent = fmtNum(data.balance);
   renderHistory(data.history || []);
@@ -1116,10 +812,7 @@ function updateBalance(v) {
 
 function renderHistory(list) {
   const box = _$('history-box');
-  if (!list.length) {
-    box.innerHTML = '<div class="history-empty">尚無交易紀錄</div>';
-    return;
-  }
+  if (!list.length) { box.innerHTML = '<div class="history-empty">尚無交易紀錄</div>'; return; }
   box.innerHTML = list.map(h => `
     <div class="history-row">
       <div class="history-info">
@@ -1133,21 +826,16 @@ function renderHistory(list) {
     </div>`).join('');
 }
 
-/* ════════════════════════════════════════
-   代理 Tab 切換
-════════════════════════════════════════ */
+/* ── 代理 Tab ── */
 function switchTab(tab) {
   document.querySelectorAll('#main-section .tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('#main-section .tab-btn').forEach(b => b.classList.remove('active'));
   _$('tab-' + tab).classList.add('active');
   _$('tab-btn-' + tab).classList.add('active');
-  clearAlert('global-alert');
-  hide('result-section');
+  clearAlert('global-alert'); hide('result-section');
 }
 
-/* ════════════════════════════════════════
-   代理儲值送出
-════════════════════════════════════════ */
+/* ── 代理儲值 ── */
 async function submitDeposit() {
   clearAlert('global-alert');
   const date   = _$('dep-date').value;
@@ -1165,31 +853,17 @@ async function submitDeposit() {
 
   showLoading();
   try {
-    const data = await callScript({
-      action: 'transaction', type: '儲值',
-      agentCode: currentAgent, amount, date,
-      note: '帳號末五碼：' + last5
-    });
+    const data = await callScript({ action: 'transaction', type: '儲值', agentCode: currentAgent, amount, date, note: '帳號末五碼：' + last5 });
     if (data.success) {
-      updateBalance(data.newBalance);
-      renderHistory(data.history || []);
-      _$('dep-amount').value    = '';
-      _$('dep-last5').value     = '';
-      _$('dep-confirm').checked = false;
+      updateBalance(data.newBalance); renderHistory(data.history || []);
+      _$('dep-amount').value = ''; _$('dep-last5').value = ''; _$('dep-confirm').checked = false;
       showResult(makeCopy({ type: '儲值回報', date, amount, note: '帳號末五碼：' + last5, status: '待審核' }));
-    } else {
-      showAlert('global-alert', '❌ ' + (data.message || '送出失敗'));
-    }
-  } catch {
-    showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試');
-  } finally {
-    hideLoading();
-  }
+    } else { showAlert('global-alert', '❌ ' + (data.message || '送出失敗')); }
+  } catch { showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試'); }
+  finally  { hideLoading(); }
 }
 
-/* ════════════════════════════════════════
-   代理結帳送出
-════════════════════════════════════════ */
+/* ── 代理結帳 ── */
 async function submitCheckout() {
   clearAlert('global-alert');
   const date   = _$('ck-date').value;
@@ -1203,50 +877,30 @@ async function submitCheckout() {
     showAlert('global-alert', `❌ 餘額不足！可用餘額 NT$ ${fmtNum(currentBalance)}，結帳金額 NT$ ${fmtNum(amount)} 超出額度。`);
     return;
   }
-
   showLoading();
   try {
-    const data = await callScript({
-      action: 'transaction', type: '消費',
-      agentCode: currentAgent, amount, date, note
-    });
+    const data = await callScript({ action: 'transaction', type: '消費', agentCode: currentAgent, amount, date, note });
     if (data.success) {
-      updateBalance(data.newBalance);
-      renderHistory(data.history || []);
+      updateBalance(data.newBalance); renderHistory(data.history || []);
       _$('ck-amount').value = ''; _$('ck-note').value = '';
       _$('calc-result').style.display = 'none';
       showResult(makeCopy({ type: '單筆結帳', date, amount, note, status: '已確認' }));
-    } else {
-      showAlert('global-alert', '❌ ' + (data.message || '送出失敗'));
-    }
-  } catch {
-    showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試');
-  } finally {
-    hideLoading();
-  }
+    } else { showAlert('global-alert', '❌ ' + (data.message || '送出失敗')); }
+  } catch { showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試'); }
+  finally  { hideLoading(); }
 }
 
-/* ════════════════════════════════════════
-   KRW Calculator（代理端）
-════════════════════════════════════════ */
+/* ── KRW ── */
 function addKrwRow() {
-  const row = document.createElement('div');
-  row.className = 'krw-row';
-  row.innerHTML = `
-    <input type="number" class="krw-input" placeholder="輸入韓元金額 (KRW)" min="0">
-    <button class="btn-rm" onclick="removeKrwRow(this)">✕</button>`;
+  const row = document.createElement('div'); row.className = 'krw-row';
+  row.innerHTML = `<input type="number" class="krw-input" placeholder="輸入韓元金額 (KRW)" min="0"><button class="btn-rm" onclick="removeKrwRow(this)">✕</button>`;
   _$('krw-list').appendChild(row);
 }
-
 function removeKrwRow(btn) {
   const rows = document.querySelectorAll('.krw-row');
-  if (rows.length <= 1) {
-    btn.closest('.krw-row').querySelector('input').value = '';
-    return;
-  }
+  if (rows.length <= 1) { btn.closest('.krw-row').querySelector('input').value = ''; return; }
   btn.closest('.krw-row').remove();
 }
-
 function calcKrw() {
   let total = 0;
   document.querySelectorAll('.krw-input').forEach(i => { total += Number(i.value) || 0; });
@@ -1254,66 +908,45 @@ function calcKrw() {
   if (total <= 0) { el.style.display = 'none'; return; }
   const twd = Math.ceil(total / 40);
   el.style.display = 'block';
-  el.innerHTML = `
-    🇰🇷 ${fmtNum(total)} KRW &nbsp;→&nbsp;
-    🇹🇼 <span style="color:var(--accent);font-size:15px;font-weight:800;">NT$ ${fmtNum(twd)}</span>
-    <button class="btn btn-outline btn-sm" style="margin-left:8px;" onclick="applyKrw(${twd})">帶入總額</button>`;
+  el.innerHTML = `🇰🇷 ${fmtNum(total)} KRW &nbsp;→&nbsp; 🇹🇼 <span style="color:var(--accent);font-size:15px;font-weight:800;">NT$ ${fmtNum(twd)}</span> <button class="btn btn-outline btn-sm" style="margin-left:8px;" onclick="applyKrw(${twd})">帶入總額</button>`;
 }
-
 function applyKrw(v) { _$('ck-amount').value = v; }
 
-/* ════════════════════════════════════════
-   Result 代理端
-════════════════════════════════════════ */
+/* ── Result 代理端 ── */
 function makeCopy({ type, date, amount, note, status }) {
   const now  = new Date().toLocaleString('zh-TW', { hour12: false });
   const icon = type === '儲值回報' ? '💰' : '🛒';
-  return [
-    `🥜 DouDou 代理${type}單`,
-    `────────────────────`,
-    `${icon} 類型：${type}`,
-    `👤 代理編號：${currentAgent}`,
-    `📅 日期：${date}`,
-    `💵 金額：NT$ ${fmtNum(amount)}`,
-    `📝 備註：${note}`,
-    `📋 狀態：${status}`,
-    `⏰ 送出時間：${now}`,
-    `────────────────────`,
-    `感謝您的回報，請等待阿霓確認 🙏`
-  ].join('\n');
+  return [`🥜 DouDou 代理${type}單`, `────────────────────`,
+    `${icon} 類型：${type}`, `👤 代理編號：${currentAgent}`,
+    `📅 日期：${date}`, `💵 金額：NT$ ${fmtNum(amount)}`,
+    `📝 備註：${note}`, `📋 狀態：${status}`,
+    `⏰ 送出時間：${now}`, `────────────────────`,
+    `感謝您的回報，請等待阿霓確認 🙏`].join('\n');
 }
-
 function showResult(text) {
-  _$('result-text').textContent = text;
-  show('result-section');
+  _$('result-text').textContent = text; show('result-section');
   setTimeout(() => _$('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
 }
-
 async function copyResult() {
-  const btn  = event.currentTarget;
-  const text = _$('result-text').textContent;
+  const btn = event.currentTarget; const text = _$('result-text').textContent;
   try {
     await navigator.clipboard.writeText(text);
-    const orig = btn.textContent;
-    btn.textContent = '✅ 已複製！';
+    const orig = btn.textContent; btn.textContent = '✅ 已複製！';
     setTimeout(() => { btn.textContent = orig; }, 2200);
   } catch { alert('請手動選取文字並複製'); }
 }
 
-/* ════════════════════════════════════════
-   管理員 Tab 切換
-════════════════════════════════════════ */
+/* ── 管理員 Tab ── */
 function switchAdminTab(tab) {
   document.querySelectorAll('#admin-section .tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
   _$('atab-' + tab).classList.add('active');
   _$('atab-btn-' + tab).classList.add('active');
   clearAlert('admin-global-alert');
+  hide('admin-result-section');
 }
 
-/* ════════════════════════════════════════
-   儲值審核
-════════════════════════════════════════ */
+/* ── 儲值審核 ── */
 async function loadPendingDeposits() {
   const el = _$('pending-list');
   el.innerHTML = '<div class="pending-empty">⏳ 載入中...</div>';
@@ -1325,25 +958,18 @@ async function loadPendingDeposits() {
         <div class="pending-item" id="pending-${i}">
           <div class="pending-info">
             <div class="pending-agent">👤 ${item.agentCode}${item.agentName ? '（' + item.agentName + '）' : ''}</div>
-            <div class="pending-detail">
-              📅 ${item.date} ・ 備註：${item.note}<br>
-              序號：${item.seq} ・ 送出：${item.time}
-            </div>
+            <div class="pending-detail">📅 ${item.date} ・ 備註：${item.note}<br>序號：${item.seq} ・ 送出：${item.time}</div>
           </div>
           <div style="text-align:right; flex-shrink:0;">
             <div class="pending-amount">+NT$ ${fmtNum(item.amount)}</div>
-            <button class="btn btn-success btn-sm" style="margin-top:6px;"
-              onclick="approveDeposit(${item.row}, ${i})">✅ 確認入帳</button>
+            <button class="btn btn-success btn-sm" style="margin-top:6px;" onclick="approveDeposit(${item.row}, ${i})">✅ 確認入帳</button>
           </div>
         </div>`).join('');
     } else {
       el.innerHTML = '<div class="pending-empty">✅ 目前沒有待審核的儲值</div>';
     }
-  } catch {
-    el.innerHTML = '<div class="pending-empty">❌ 載入失敗，請重試</div>';
-  } finally {
-    hideLoading();
-  }
+  } catch { el.innerHTML = '<div class="pending-empty">❌ 載入失敗，請重試</div>'; }
+  finally  { hideLoading(); }
 }
 
 async function approveDeposit(rowNum, idx) {
@@ -1353,332 +979,137 @@ async function approveDeposit(rowNum, idx) {
     const data = await callScript({ action: 'approveDeposit', rowNum });
     if (data.success) {
       const item = _$('pending-' + idx);
-      if (item) {
-        item.classList.add('approved');
-        item.querySelector('button').textContent = '✅ 已入帳';
-      }
+      if (item) { item.classList.add('approved'); item.querySelector('button').textContent = '✅ 已入帳'; }
       showAlert('admin-global-alert', '✅ 入帳成功！代理餘額已更新。', 'success');
-    } else {
-      showAlert('admin-global-alert', '❌ ' + (data.message || '審核失敗'));
-    }
-  } catch {
-    showAlert('admin-global-alert', '⚠️ 網路錯誤');
-  } finally {
-    hideLoading();
-  }
+    } else { showAlert('admin-global-alert', '❌ ' + (data.message || '審核失敗')); }
+  } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
 }
 
-/* ════════════════════════════════════════
-   載入代理列表
-════════════════════════════════════════ */
+/* ── 載入代理列表 ── */
 async function loadAdminAgents() {
   showLoading();
   try {
     const data = await callScript({ action: 'getAgentList' });
     if (data.success) {
       adminAgentData = data.agents;
-      // 填入結帳選單
       const sel = _$('admin-agent-select');
       sel.innerHTML = '<option value="">請選擇代理</option>';
       data.agents.forEach(a => {
         const opt = document.createElement('option');
-        opt.value          = a.code;
-        opt.textContent    = a.code + (a.name ? '（' + a.name + '）' : '');
+        opt.value = a.code;
+        opt.textContent = a.code + (a.name ? '（' + a.name + '）' : '');
         opt.dataset.balance = a.balance;
         opt.dataset.rate    = a.rate || 40;
         sel.appendChild(opt);
       });
-      // 填入設定表格
       renderAgentSettingsTable(data.agents);
     }
   } catch { /* silent */ } finally { hideLoading(); }
 }
 
 function onAdminAgentChange() {
-  const sel = _$('admin-agent-select');
-  const opt = sel.options[sel.selectedIndex];
+  const sel   = _$('admin-agent-select');
+  const opt   = sel.options[sel.selectedIndex];
   const balEl = _$('admin-agent-balance');
   if (opt && opt.value) {
     const bal  = Number(opt.dataset.balance) || 0;
     const rate = Number(opt.dataset.rate)    || 40;
     balEl.textContent = 'NT$ ' + fmtNum(bal) + '　（匯率 ×' + rate + '）';
     balEl.style.color = bal >= 0 ? 'var(--success)' : 'var(--accent)';
-    document.querySelectorAll('.order-rate-display').forEach(el => { el.textContent = rate; });
-    recalcAllRows();
+    // 即時更新結帳後預覽
+    updateAfterBalance();
   } else {
     balEl.textContent = '－';
     balEl.style.color = 'var(--text-muted)';
+    hide('after-balance-box');
   }
 }
 
-function getSelectedRate() {
-  const sel = _$('admin-agent-select');
-  const opt = sel.options[sel.selectedIndex];
-  return (opt && opt.dataset.rate) ? Number(opt.dataset.rate) : 40;
-}
 function getSelectedBalance() {
   const sel = _$('admin-agent-select');
   const opt = sel.options[sel.selectedIndex];
   return (opt && opt.dataset.balance) ? Number(opt.dataset.balance) : 0;
 }
 
-/* ════════════════════════════════════════
-   訂單明細列
-════════════════════════════════════════ */
-function addOrderRow() {
-  orderRowCount++;
-  const idx  = orderRowCount;
-  const rate = getSelectedRate();
-  const div  = document.createElement('div');
-  div.className = 'order-row';
-  div.id        = 'order-row-' + idx;
-  div.innerHTML = `
-    <div class="order-row-header">
-      <span class="order-row-num">品項 #${idx}</span>
-      <button class="order-row-del" onclick="removeOrderRow(${idx})">✕ 刪除</button>
-    </div>
-    <div class="order-field form-row">
-      <label>📝 備註</label>
-      <input type="text" id="row-note-${idx}" placeholder="例：運動鞋、記事本">
-    </div>
-    <div class="order-grid-dates">
-      <div class="order-field">
-        <label>訂購日期</label>
-        <input type="date" id="row-order-date-${idx}">
-      </div>
-      <div class="order-field">
-        <label>賣貨便出貨日</label>
-        <input type="date" id="row-ship-date-${idx}">
-      </div>
-    </div>
-    <div class="order-grid-dates-3">
-      <div class="order-field">
-        <label>批網配貨日</label>
-        <input type="date" id="row-batch-date-${idx}">
-      </div>
-      <div class="order-field">
-        <label>空運發貨</label>
-        <input type="date" id="row-air-date-${idx}">
-      </div>
-      <div class="order-field">
-        <label>斷貨退款日期</label>
-        <input type="date" id="row-refund-date-${idx}" onchange="onRefundDateChange(${idx})">
-      </div>
-    </div>
-    <div class="order-grid-nums">
-      <div class="order-field">
-        <label>數量</label>
-        <input type="number" id="row-qty-${idx}" placeholder="1" min="1" value="1" oninput="recalcRow(${idx})">
-      </div>
-      <div class="order-field">
-        <label>韓幣單價</label>
-        <input type="number" id="row-krw-${idx}" placeholder="0" min="0" oninput="recalcRow(${idx})">
-      </div>
-      <div class="order-field">
-        <label>台幣單價（×<span class="order-rate-display">${rate}</span>）</label>
-        <input type="number" id="row-twd-${idx}" class="auto-field" readonly placeholder="自動換算">
-      </div>
-      <div class="order-field">
-        <label>韓幣總計</label>
-        <input type="number" id="row-krw-total-${idx}" class="auto-field" readonly placeholder="自動計算">
-      </div>
-      <div class="order-field">
-        <label>台幣總價</label>
-        <input type="number" id="row-twd-total-${idx}" class="auto-field" readonly placeholder="自動計算">
-      </div>
-    </div>
-    <div class="order-row-subtotal" id="row-subtotal-${idx}">
-      <span>小計</span><strong>NT$ 0</strong>
-    </div>`;
-  _$('order-rows').appendChild(div);
+function updateAfterBalance() {
+  const amount = Number(_$('admin-ck-amount').value) || 0;
+  const bal    = getSelectedBalance();
+  if (!_$('admin-agent-select').value || !amount) { hide('after-balance-box'); return; }
+  const after = bal - amount;
+  _$('after-balance-value').textContent = 'NT$ ' + fmtNum(after);
+  _$('after-balance-value').style.color = after >= 0 ? 'var(--success)' : 'var(--accent)';
+  show('after-balance-box');
 }
 
-function removeOrderRow(idx) {
-  const el = _$('order-row-' + idx);
-  if (el) el.remove();
-  recalcAllRows();
-}
-
-function onRefundDateChange(idx) {
-  const row = _$('order-row-' + idx);
-  if (!row) return;
-  const hasRefund = !!_$('row-refund-date-' + idx).value;
-  if (hasRefund) {
-    row.classList.add('discontinued');
-    row.querySelector('.order-row-num').innerHTML = `品項 #${idx} <span class="disc-badge">斷貨退款</span>`;
-  } else {
-    row.classList.remove('discontinued');
-    row.querySelector('.order-row-num').textContent = '品項 #' + idx;
-  }
-  recalcRow(idx);
-}
-
-function recalcRow(idx) {
-  const rate  = getSelectedRate();
-  const qty   = Number(_$('row-qty-' + idx)?.value)  || 0;
-  const krw   = Number(_$('row-krw-' + idx)?.value)  || 0;
-  const twdU  = krw ? Math.ceil(krw / rate) : 0;
-  const krwT  = qty * krw;
-  const twdT  = qty * twdU;
-
-  if (_$('row-twd-' + idx))       _$('row-twd-' + idx).value       = krw ? twdU : '';
-  if (_$('row-krw-total-' + idx)) _$('row-krw-total-' + idx).value = krwT || '';
-  if (_$('row-twd-total-' + idx)) _$('row-twd-total-' + idx).value = twdT || '';
-
-  const isRefund = !!(_$('row-refund-date-' + idx)?.value);
-  const subEl    = _$('row-subtotal-' + idx);
-  if (subEl) {
-    subEl.innerHTML = isRefund
-      ? `<span>退款小計</span><strong style="color:var(--success)">－NT$ ${fmtNum(twdT)}</strong>`
-      : `<span>小計</span><strong>NT$ ${fmtNum(twdT)}</strong>`;
-  }
-}
-
-function recalcAllRows() {
-  document.querySelectorAll('.order-row').forEach(row => {
-    recalcRow(row.id.replace('order-row-', ''));
-  });
-}
-
-function calcAdminSummary() {
-  let total = 0, refund = 0;
-  document.querySelectorAll('.order-row').forEach(row => {
-    const idx   = row.id.replace('order-row-', '');
-    const twdT  = Number(_$('row-twd-total-' + idx)?.value) || 0;
-    const isRef = !!(_$('row-refund-date-' + idx)?.value);
-    if (isRef) refund += twdT;
-    else       total  += twdT;
-  });
-  const net   = total - refund;
-  const after = getSelectedBalance() - net;
-  _$('sum-total').textContent  = 'NT$ ' + fmtNum(total);
-  _$('sum-refund').textContent = '－NT$ ' + fmtNum(refund);
-  _$('sum-net').textContent    = 'NT$ ' + fmtNum(net);
-  _$('sum-after-balance').textContent = 'NT$ ' + fmtNum(after);
-  _$('sum-after-balance').style.color = after >= 0 ? 'var(--success)' : 'var(--accent)';
-  show('checkout-summary');
-}
-
-/* ════════════════════════════════════════
-   後台結帳送出
-════════════════════════════════════════ */
+/* ── 後台結帳送出（簡化版）── */
 async function submitAdminCheckout() {
   clearAlert('admin-global-alert');
   const agentCode = _$('admin-agent-select').value;
   const date      = _$('admin-ck-date').value;
   const batchNote = _$('admin-ck-note').value.trim();
+  const amount    = Number(_$('admin-ck-amount').value);
 
   if (!agentCode) { showAlert('admin-global-alert', '⚠️ 請選擇代理'); return; }
   if (!date)      { showAlert('admin-global-alert', '⚠️ 請選擇結帳日期'); return; }
+  if (!amount || amount <= 0) { showAlert('admin-global-alert', '⚠️ 請輸入結帳金額'); return; }
 
-  const orders  = [];
-  let hasItem   = false;
-  document.querySelectorAll('.order-row').forEach(row => {
-    const idx = row.id.replace('order-row-', '');
-    const qty = Number(_$('row-qty-' + idx)?.value) || 0;
-    const krw = Number(_$('row-krw-' + idx)?.value) || 0;
-    if (qty <= 0 && krw <= 0) return;
-    hasItem = true;
-    orders.push({
-      note:       _$('row-note-' + idx)?.value       || '',
-      orderDate:  _$('row-order-date-' + idx)?.value || '',
-      shipDate:   _$('row-ship-date-' + idx)?.value  || '',
-      batchDate:  _$('row-batch-date-' + idx)?.value || '',
-      airDate:    _$('row-air-date-' + idx)?.value   || '',
-      refundDate: _$('row-refund-date-' + idx)?.value|| '',
-      qty,
-      krwUnit:  krw,
-      twdUnit:  Number(_$('row-twd-' + idx)?.value)       || 0,
-      krwTotal: Number(_$('row-krw-total-' + idx)?.value) || 0,
-      twdTotal: Number(_$('row-twd-total-' + idx)?.value) || 0,
-      isRefund: !!(_$('row-refund-date-' + idx)?.value)
-    });
-  });
-
-  if (!hasItem) { showAlert('admin-global-alert', '⚠️ 請至少填寫一筆品項'); return; }
-
-  calcAdminSummary();
-  const net = orders.reduce((s, o) => o.isRefund ? s - o.twdTotal : s + o.twdTotal, 0);
   const bal = getSelectedBalance();
-  if (net > 0 && net > bal) {
-    if (!confirm(`⚠️ 代理餘額不足！\n目前餘額：NT$ ${fmtNum(bal)}\n實收金額：NT$ ${fmtNum(net)}\n確定仍要送出？`)) return;
+  if (amount > bal) {
+    if (!confirm(`⚠️ 代理餘額不足！\n目前餘額：NT$ ${fmtNum(bal)}\n結帳金額：NT$ ${fmtNum(amount)}\n確定仍要送出？`)) return;
   }
 
   showLoading();
   try {
-    const data = await callScript({ action: 'adminCheckout', agentCode, date, batchNote, orders, netAmount: net });
+    const data = await callScript({
+      action: 'adminCheckout', agentCode, date,
+      batchNote, netAmount: amount,
+      orders: [{ note: batchNote, twdTotal: amount, isRefund: false, qty: 1, krwUnit: 0, twdUnit: amount, krwTotal: 0, orderDate: date, shipDate: '', batchDate: '', airDate: '', refundDate: '' }]
+    });
     if (data.success) {
-      // 更新選單餘額快取
+      // 更新選單餘額
       const sel = _$('admin-agent-select');
       const opt = sel.options[sel.selectedIndex];
       if (opt) opt.dataset.balance = data.newBalance;
-      _$('admin-agent-balance').textContent = 'NT$ ' + fmtNum(data.newBalance) + '　（匯率 ×' + getSelectedRate() + '）';
+      _$('admin-agent-balance').textContent = 'NT$ ' + fmtNum(data.newBalance);
+      _$('admin-agent-balance').style.color = data.newBalance >= 0 ? 'var(--success)' : 'var(--accent)';
+
       // 結帳文案
-      _$('admin-result-text').textContent = buildAdminCopy(agentCode, date, batchNote, orders, net, data.newBalance);
-      _$('admin-result-section').style.display = 'block';
+      const now = new Date().toLocaleString('zh-TW', { hour12: false });
+      const txt = [
+        `🥜 DouDou 代理結帳單`,
+        `────────────────────`,
+        `👤 代理：${agentCode}`,
+        `📅 結帳日期：${date}`,
+        `📝 備註：${batchNote || '無'}`,
+        `💵 結帳金額：NT$ ${fmtNum(amount)}`,
+        `💰 結帳後餘額：NT$ ${fmtNum(data.newBalance)}`,
+        `⏰ 操作時間：${now}`
+      ].join('\n');
+      _$('admin-result-text').textContent = txt;
+      show('admin-result-section');
       _$('admin-result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
       showAlert('admin-global-alert', '✅ 結帳成功！代理餘額已扣除。', 'success');
+
       // 重置
-      _$('order-rows').innerHTML = '';
-      orderRowCount = 0;
-      addOrderRow();
-      hide('checkout-summary');
-    } else {
-      showAlert('admin-global-alert', '❌ ' + (data.message || '送出失敗'));
-    }
-  } catch {
-    showAlert('admin-global-alert', '⚠️ 網路錯誤，請稍後再試');
-  } finally {
-    hideLoading();
-  }
-}
-
-function buildAdminCopy(agentCode, date, batchNote, orders, net, newBal) {
-  const now = new Date().toLocaleString('zh-TW', { hour12: false });
-  let lines = [
-    `🥜 DouDou 代理結帳單`,
-    `────────────────────`,
-    `👤 代理：${agentCode}`,
-    `📅 結帳日期：${date}`,
-    `📝 批次備註：${batchNote || '無'}`,
-    `────────────────────`
-  ].join('\n');
-
-  orders.forEach((o, i) => {
-    lines += `\n\n【品項 ${i + 1}${o.isRefund ? '（斷貨退款）' : ''}】`;
-    if (o.note)       lines += `\n備註：${o.note}`;
-    if (o.orderDate)  lines += `\n訂購日期：${o.orderDate}`;
-    if (o.batchDate)  lines += `\n批網配貨日：${o.batchDate}`;
-    if (o.shipDate)   lines += `\n賣貨便出貨日：${o.shipDate}`;
-    if (o.airDate)    lines += `\n空運發貨：${o.airDate}`;
-    if (o.refundDate) lines += `\n斷貨退款日期：${o.refundDate}`;
-    lines += `\n數量：${o.qty}　韓幣單價：${fmtNum(o.krwUnit)}　台幣單價：${fmtNum(o.twdUnit)}`;
-    lines += `\n韓幣總計：${fmtNum(o.krwTotal)}　${o.isRefund ? '退款金額' : '台幣總價'}：${fmtNum(o.twdTotal)}`;
-  });
-
-  lines += [
-    `\n\n────────────────────`,
-    `💵 實收金額：NT$ ${fmtNum(net)}`,
-    `💰 結帳後餘額：NT$ ${fmtNum(newBal)}`,
-    `⏰ 操作時間：${now}`
-  ].join('\n');
-  return lines;
+      _$('admin-ck-amount').value = '';
+      _$('admin-ck-note').value   = '';
+      hide('after-balance-box');
+    } else { showAlert('admin-global-alert', '❌ ' + (data.message || '送出失敗')); }
+  } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤，請稍後再試'); }
+  finally  { hideLoading(); }
 }
 
 async function copyAdminResult() {
-  const btn  = event.currentTarget;
-  const text = _$('admin-result-text').textContent;
+  const btn = event.currentTarget; const text = _$('admin-result-text').textContent;
   try {
     await navigator.clipboard.writeText(text);
-    const orig = btn.textContent;
-    btn.textContent = '✅ 已複製！';
+    const orig = btn.textContent; btn.textContent = '✅ 已複製！';
     setTimeout(() => { btn.textContent = orig; }, 2200);
   } catch { alert('請手動選取文字並複製'); }
 }
 
-/* ════════════════════════════════════════
-   系統設定 — 代理資料表格
-════════════════════════════════════════ */
+/* ── 系統設定 ── */
 function renderAgentSettingsTable(agents) {
   const tbody = _$('agent-settings-body');
   if (!agents || !agents.length) {
@@ -1707,23 +1138,12 @@ async function saveAgentRow(code, i) {
       showAlert('admin-global-alert', `✅ ${code} 資料已更新`, 'success');
       const agent = adminAgentData.find(a => a.code === code);
       if (agent) { agent.name = name; agent.phone = phone; agent.rate = rate; }
-      // 同步更新結帳選單 rate
-      Array.from(_$('admin-agent-select').options).forEach(opt => {
-        if (opt.value === code) opt.dataset.rate = rate;
-      });
-    } else {
-      showAlert('admin-global-alert', '❌ ' + (data.message || '更新失敗'));
-    }
-  } catch {
-    showAlert('admin-global-alert', '⚠️ 網路錯誤');
-  } finally {
-    hideLoading();
-  }
+      Array.from(_$('admin-agent-select').options).forEach(opt => { if (opt.value === code) opt.dataset.rate = rate; });
+    } else { showAlert('admin-global-alert', '❌ ' + (data.message || '更新失敗')); }
+  } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
 }
 
-/* ════════════════════════════════════════
-   系統設定 — 公告日期
-════════════════════════════════════════ */
 async function saveAnnounceDates() {
   const wed = _$('setting-wed-date').value;
   const sun = _$('setting-sun-date').value;
@@ -1734,14 +1154,9 @@ async function saveAnnounceDates() {
     if (data.success) {
       showAlert('admin-global-alert', '✅ 公告日期已儲存', 'success');
       updateMarquee(wed, sun);
-    } else {
-      showAlert('admin-global-alert', '❌ ' + (data.message || '儲存失敗'));
-    }
-  } catch {
-    showAlert('admin-global-alert', '⚠️ 網路錯誤');
-  } finally {
-    hideLoading();
-  }
+    } else { showAlert('admin-global-alert', '❌ ' + (data.message || '儲存失敗')); }
+  } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
 }
 
 function updateMarquee(wed, sun) {
@@ -1750,7 +1165,6 @@ function updateMarquee(wed, sun) {
   const text   = `📢 儲值入帳時間調整通知 ・ 🗓️ 下次入帳日：${wedStr} & ${sunStr} ・ ⚠️ 週三入帳→請週三前完成匯款 ・ ⚠️ 週日入帳→請週日前完成匯款 ・ 當天匯款將順延至下一個入帳日 ・ 請提前儲值，避免額度不足 🥹 ・ 謝謝大家的配合與理解 ♡`;
   document.querySelectorAll('.marquee-item').forEach(el => { el.textContent = text; });
 }
-
 </script>
 </body>
 </html>
