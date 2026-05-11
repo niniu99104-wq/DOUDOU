@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🥜 DouDou 代理管理系統</title>
+<style>
+  :root {
+    --primary: #8d6e63;
+    --primary-dark: #6d4c41;
+    --primary-light: #bcaaa4;
+    --accent: #d84315;
+    --accent-light: #ff7043;
+    --bg: #fdfaf6;
+    --card-bg: #f5f0eb;
+    --card-inner: #ede8e3;
+    --border: #d7ccc8;
+    --text: #3e2723;
+    --text-muted: #795548;
+    --text-light: #a1887f;
+    --success: #558b2f;
+    --success-bg: #f1f8e9;
+    --warning: #e65100;
+    --warning-bg: #fff3e0;
+    --shadow: 0 4px 20px rgba(141,110,99,0.15);
+    --shadow-lg: 0 8px 40px rgba(141,110,99,0.22);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(188,170,164,0.18) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(216,67,21,0.07) 0%, transparent 50%);
+  }
+
+  /* ── Loading Overlay ── */
+  #loading-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(253,250,246,0.82);
+    backdrop-filter: blur(6px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+  }
+  #loading-overlay.active { display: flex; }
+  .spinner {
+    width: 48px; height: 48px;
+    border: 4px solid var(--primary-light);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text {
+    font-size: 15px; color: var(--primary-dark);
+    font-weight: 600; letter-spacing: 1px;
+  }
+
+  /* ── Layout ── */
+  .page-wrapper {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  /* ── Header ── */
+  .site-header {
+    text-align: center;
+    padding: 36px 0 28px;
+  }
+  .site-header .logo {
+    font-size: 38px; line-height: 1;
+  }
+  .site-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-top: 8px;
+    letter-spacing: 2px;
+  }
+  .site-header p {
+    font-size: 13px;
+    color: var(--text-light);
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 28px 24px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+    animation: fadeUp 0.4s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .card-title {
+    font-size: 15px; font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title::after {
+    content: ''; flex: 1;
+    height: 1px; background: var(--border);
+    margin-left: 8px;
+  }
+
+  /* ── Form Controls ── */
+  label {
+    display: block;
+    font-size: 13px; font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+  }
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  select, textarea {
+    width: 100%;
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    font-size: 14px;
+    color: var(--text);
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    appearance: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(141,110,99,0.12);
+  }
+  .form-row { margin-bottom: 16px; }
+  .form-grid-2 {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 7px;
+    border: none; border-radius: var(--radius-sm);
+    padding: 12px 22px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    font-family: inherit; letter-spacing: 0.5px;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow); }
+  .btn-accent {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-accent:hover { background: #bf360c; transform: translateY(-1px); box-shadow: var(--shadow); }
+  .btn-outline {
+    background: transparent;
+    color: var(--primary);
+    border: 1.5px solid var(--primary);
+  }
+  .btn-outline:hover { background: var(--card-inner); }
+  .btn-sm { padding: 8px 14px; font-size: 13px; }
+  .btn-full { width: 100%; }
+
+  /* ── Login Card ── */
+  #login-section .login-desc {
+    font-size: 13px; color: var(--text-light);
+    margin-bottom: 20px; line-height: 1.6;
+  }
+
+  /* ── Dashboard ── */
+  #dashboard {
+    display: none;
+    background: linear-gradient(135deg, var(--primary-dark) 0%, #4e342e 100%);
+    border-radius: var(--radius);
+    padding: 24px 24px 20px;
+    color: #fff;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-lg);
+    animation: fadeUp 0.4s ease;
+  }
+  .dash-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .dash-greeting { font-size: 13px; opacity: 0.78; }
+  .dash-agent { font-size: 18px; font-weight: 700; margin-top: 3px; }
+  .dash-balance-label { font-size: 12px; opacity: 0.7; margin-bottom: 4px; }
+  .dash-balance {
+    font-size: 30px; font-weight: 800; letter-spacing: 1px;
+    color: #ffccbc;
+  }
+  .dash-right { text-align: right; }
+
+  /* history scroll box */
+  .history-box {
+    background: rgba(255,255,255,0.1);
+    border-radius: var(--radius-sm);
+    max-height: 160px;
+    overflow-y: auto;
+    padding: 10px 12px;
+    margin-top: 14px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.3) transparent;
+  }
+  .history-box::-webkit-scrollbar { width: 4px; }
+  .history-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 2px; }
+  .history-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 12.5px;
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-type { opacity: 0.85; }
+  .history-status {
+    font-size: 11px;
+    padding: 2px 7px; border-radius: 20px;
+    background: rgba(255,255,255,0.15);
+  }
+  .history-amount { font-weight: 700; }
+  .amount-plus { color: #a5d6a7; }
+  .amount-minus { color: #ffccbc; }
+  .history-empty { opacity: 0.55; font-size: 13px; text-align: center; padding: 10px 0; }
+
+  /* ── Tabs ── */
+  #main-section { display: none; }
+  .tab-bar {
+    display: flex; gap: 0;
+    background: var(--card-inner);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    margin-bottom: 20px;
+  }
+  .tab-btn {
+    flex: 1; padding: 11px;
+    background: transparent;
+    border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer; transition: all 0.2s;
+    font-family: inherit;
+  }
+  .tab-btn.active {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(141,110,99,0.3);
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeUp 0.3s ease; }
+
+  /* ── Bank Info Box ── */
+  .bank-info {
+    background: var(--warning-bg);
+    border: 1.5px solid #ffccbc;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-size: 13px; line-height: 1.8;
+  }
+  .bank-info strong { color: var(--warning); }
+
+  /* ── Checkbox ── */
+  .checkbox-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px;
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: border-color 0.2s;
+    margin-bottom: 16px;
+  }
+  .checkbox-row:has(input:checked) { border-color: var(--primary); background: var(--card-inner); }
+  .checkbox-row input[type="checkbox"] {
+    width: 18px; height: 18px; accent-color: var(--primary);
+    cursor: pointer; flex-shrink: 0;
+  }
+  .checkbox-row span { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+
+  /* ── KRW Calculator ── */
+  .calc-box {
+    background: var(--card-inner);
+    border: 1px dashed var(--primary-light);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .calc-box-title {
+    font-size: 13px; font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 12px;
+  }
+  .krw-inputs { display: flex; flex-direction: column; gap: 8px; }
+  .krw-row { display: flex; gap: 8px; align-items: center; }
+  .krw-row input { flex: 1; }
+  .krw-row .btn-remove {
+    background: none; border: 1.5px solid var(--border);
+    border-radius: 8px; padding: 8px 10px;
+    color: var(--text-light); cursor: pointer;
+    font-size: 14px; transition: all 0.2s; flex-shrink: 0;
+  }
+  .krw-row .btn-remove:hover { border-color: var(--accent); color: var(--accent); }
+  .calc-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .calc-result {
+    margin-top: 10px; padding: 10px 14px;
+    background: #fff; border-radius: 8px;
+    font-size: 13px; font-weight: 700; color: var(--primary-dark);
+    display: none;
+  }
+
+  /* ── Result Banner ── */
+  #result-section {
+    display: none;
+    animation: fadeUp 0.4s ease;
+  }
+  .result-card {
+    background: var(--success-bg);
+    border: 1.5px solid #aed581;
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 14px;
+  }
+  .result-card h3 {
+    font-size: 15px; color: var(--success);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .result-copy-box {
+    background: #fff;
+    border: 1px solid #c5e1a5;
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    font-size: 13px; line-height: 1.9;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: var(--text);
+    font-family: 'PingFang TC', 'Microsoft JhengHei', monospace;
+    margin-bottom: 14px;
+    max-height: 260px; overflow-y: auto;
+  }
+
+  /* ── Alert / Notice ── */
+  .alert {
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 14px;
+    display: none;
+  }
+  .alert.error { background: #fbe9e7; border: 1px solid #ffccbc; color: var(--accent); }
+  .alert.success { background: var(--success-bg); border: 1px solid #aed581; color: var(--success); }
+  .alert.show { display: block; animation: fadeUp 0.3s ease; }
+
+  /* ── Divider ── */
+  .divider { height: 1px; background: var(--border); margin: 18px 0; }
+
+  /* ── Responsive ── */
+  @media (max-width: 520px) {
+    .form-grid-2 { grid-template-columns: 1fr; }
+    .dash-top { flex-direction: column; gap: 14px; }
+    .dash-right { text-align: left; }
+    .card { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-text">⏳ 資料處理中，請稍候...</div>
+</div>
+
+<div class="page-wrapper">
+  <!-- Site Header -->
+  <div class="site-header">
+    <div class="logo">🥜</div>
+    <h1>DouDou 代理管理系統</h1>
+    <p>內部專用 · 儲值 & 結帳平台</p>
+  </div>
+
+  <!-- ── LOGIN SECTION ── -->
+  <div id="login-section">
+    <div class="card">
+      <div class="card-title">🔐 代理登入</div>
+      <p class="login-desc">請選擇您的代理代碼以進入系統。本系統僅供授權代理使用，請勿外傳。</p>
+      <div class="form-row">
+        <label>代理代碼</label>
+        <select id="login-agent-select"></select>
+      </div>
+      <div id="login-alert" class="alert error"></div>
+      <button class="btn btn-primary btn-full" onclick="doLogin()">🚀 進入系統</button>
+    </div>
+  </div>
+
+  <!-- ── DASHBOARD ── -->
+  <div id="dashboard">
+    <div class="dash-top">
+      <div>
+        <div class="dash-greeting">您好，</div>
+        <div class="dash-agent" id="dash-agent-name">－</div>
+      </div>
+      <div class="dash-right">
+        <div class="dash-balance-label">可用餘額</div>
+        <div class="dash-balance">NT$ <span id="dash-balance">0</span></div>
+        <button class="btn btn-outline btn-sm" style="margin-top:10px; border-color:rgba(255,255,255,0.4); color:#fff; font-size:12px;" onclick="doLogout()">登出重選</button>
+      </div>
+    </div>
+    <div style="font-size:12px; opacity:0.7; margin-bottom:4px;">最近交易紀錄</div>
+    <div class="history-box" id="history-box">
+      <div class="history-empty">載入中...</div>
+    </div>
+  </div>
+
+  <!-- ── MAIN SECTION ── -->
+  <div id="main-section">
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-deposit-btn" onclick="switchTab('deposit')">💰 儲值回報</button>
+      <button class="tab-btn" id="tab-checkout-btn" onclick="switchTab('checkout')">🛒 單筆結帳</button>
+    </div>
+
+    <!-- Global Alert -->
+    <div id="global-alert" class="alert error"></div>
+
+    <!-- ── TAB: DEPOSIT ── -->
+    <div id="tab-deposit" class="tab-panel active">
+      <div class="card">
+        <div class="card-title">💰 儲值回報</div>
+
+        <div class="bank-info">
+          <strong>📍 匯款帳戶資訊</strong><br>
+          銀行：台新銀行（812）<br>
+          帳號：<strong>0000-0000-0000</strong>（請向阿霓確認最新帳號）<br>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>📅 匯款日期</label>
+            <input type="date" id="dep-date">
+          </div>
+          <div class="form-row">
+            <label>💵 儲值金額</label>
+            <select id="dep-amount">
+              <option value="">請選擇金額</option>
+              <option value="2000">NT$ 2,000</option>
+              <option value="3000">NT$ 3,000</option>
+              <option value="4000">NT$ 4,000</option>
+              <option value="5000">NT$ 5,000</option>
+              <option value="6000">NT$ 6,000</option>
+              <option value="7000">NT$ 7,000</option>
+              <option value="8000">NT$ 8,000</option>
+              <option value="9000">NT$ 9,000</option>
+              <option value="10000">NT$ 10,000</option>
+              <option value="12000">NT$ 12,000</option>
+              <option value="15000">NT$ 15,000</option>
+              <option value="20000">NT$ 20,000</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>🏦 匯款帳號末五碼</label>
+          <input type="text" id="dep-last5" placeholder="請輸入末五碼數字" maxlength="5">
+        </div>
+
+        <label class="checkbox-row" for="dep-confirm">
+          <input type="checkbox" id="dep-confirm">
+          <span>✅ 我確認已完成匯款，以上資訊均正確無誤</span>
+        </label>
+
+        <button class="btn btn-primary btn-full" onclick="submitDeposit()">📤 送出儲值回報</button>
+      </div>
+    </div>
+
+    <!-- ── TAB: CHECKOUT ── -->
+    <div id="tab-checkout" class="tab-panel">
+      <div class="card">
+        <div class="card-title">🛒 單筆結帳</div>
+
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>📅 結帳日期</label>
+            <input type="date" id="ck-date">
+          </div>
+          <div class="form-row">
+            <label>💵 結帳台幣總額 (NT$)</label>
+            <input type="number" id="ck-amount" placeholder="請輸入或使用計算機" min="1">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>📝 訂單項目說明</label>
+          <input type="text" id="ck-note" placeholder="例：批網商品4件">
+        </div>
+
+        <!-- KRW Calculator -->
+        <div class="calc-box">
+          <div class="calc-box-title">📊 多品項韓元計價小工具 <span style="font-weight:400;color:var(--text-light);">（匯率固定 ×40 無條件進位）</span></div>
+          <div class="krw-inputs" id="krw-inputs">
+            <div class="krw-row">
+              <input type="number" placeholder="輸入韓元 (KRW)" class="krw-input" min="0">
+              <button class="btn-remove" onclick="removeKrwRow(this)">✕</button>
+            </div>
+          </div>
+          <div class="calc-actions">
+            <button class="btn btn-outline btn-sm" onclick="addKrwRow()">➕ 新增品項</button>
+            <button class="btn btn-primary btn-sm" onclick="calcKrw()">🔢 換算台幣</button>
+          </div>
+          <div class="calc-result" id="calc-result"></div>
+        </div>
+
+        <button class="btn btn-accent btn-full" onclick="submitCheckout()">💳 送出結帳申請</button>
+      </div>
+    </div>
+
+    <!-- ── RESULT SECTION ── -->
+    <div id="result-section">
+      <div class="result-card">
+        <h3>✅ 送出成功！回報單文案</h3>
+        <div class="result-copy-box" id="result-text"></div>
+        <button class="btn btn-primary" onclick="copyResult()">📋 點擊複製文案</button>
+      </div>
+    </div>
+  </div><!-- /main-section -->
+
+</div><!-- /page-wrapper -->
+
+<script>
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKJRpDzRgtUCaUGO757TczuRQDU1wyy-_pWWFJMWn4mBoohTlqOcQYCmTFfIxACB4D-w/exec';
+
+/* ════════════════════════════════
+   State
+════════════════════════════════ */
+let currentAgent = null;
+let currentBalance = 0;
+
+/* ════════════════════════════════
+   Init
+════════════════════════════════ */
+(function init() {
+  const sel = document.getElementById('login-agent-select');
+  for (let i = 1; i <= 30; i++) {
+    const code = 'doudou' + String(i).padStart(3, '0');
+    const opt = document.createElement('option');
+    opt.value = code;
+    opt.textContent = code;
+    sel.appendChild(opt);
+  }
+  // Set today as default dates
+  const today = new Date().toISOString().slice(0, 10);
+  document.getElementById('dep-date').value = today;
+  document.getElementById('ck-date').value = today;
+})();
+
+/* ════════════════════════════════
+   Loading
+════════════════════════════════ */
+function showLoading() { document.getElementById('loading-overlay').classList.add('active'); }
+function hideLoading() { document.getElementById('loading-overlay').classList.remove('active'); }
+
+/* ════════════════════════════════
+   Alert helpers
+════════════════════════════════ */
+function showAlert(id, msg, type = 'error') {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'alert ' + type + ' show';
+}
+function clearAlert(id) {
+  const el = document.getElementById(id);
+  el.className = 'alert error';
+  el.textContent = '';
+}
+
+/* ════════════════════════════════
+   API call
+════════════════════════════════ */
+async function callScript(payload) {
+  const res = await fetch(GOOGLE_SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: { 'Content-Type': 'text/plain' }
+  });
+  return await res.json();
+}
+
+/* ════════════════════════════════
+   Login
+════════════════════════════════ */
+async function doLogin() {
+  clearAlert('login-alert');
+  const agentCode = document.getElementById('login-agent-select').value;
+  if (!agentCode) { showAlert('login-alert', '請選擇代理代碼'); return; }
+
+  showLoading();
+  try {
+    const data = await callScript({ action: 'login', agentCode });
+    if (data.success) {
+      currentAgent = data.agent;
+      currentBalance = data.balance;
+      renderDashboard(data);
+      document.getElementById('login-section').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      document.getElementById('main-section').style.display = 'block';
+    } else {
+      showAlert('login-alert', data.message || '登入失敗，請確認代理代碼');
+    }
+  } catch (e) {
+    showAlert('login-alert', '⚠️ 無法連線至伺服器，請稍後再試');
+  } finally {
+    hideLoading();
+  }
+}
+
+function doLogout() {
+  currentAgent = null; currentBalance = 0;
+  document.getElementById('login-section').style.display = '';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('main-section').style.display = 'none';
+  document.getElementById('result-section').style.display = 'none';
+  clearAlert('global-alert');
+}
+
+/* ════════════════════════════════
+   Dashboard Render
+════════════════════════════════ */
+function renderDashboard(data) {
+  document.getElementById('dash-agent-name').textContent = data.agentCode + (data.agentName ? '（' + data.agentName + '）' : '');
+  document.getElementById('dash-balance').textContent = Number(data.balance).toLocaleString();
+  renderHistory(data.history || []);
+}
+
+function updateBalance(newBalance) {
+  currentBalance = Number(newBalance);
+  document.getElementById('dash-balance').textContent = currentBalance.toLocaleString();
+}
+
+function renderHistory(list) {
+  const box = document.getElementById('history-box');
+  if (!list.length) { box.innerHTML = '<div class="history-empty">尚無交易紀錄</div>'; return; }
+  box.innerHTML = list.map(h => `
+    <div class="history-item">
+      <div>
+        <div class="history-type">${h.type} · <span style="opacity:0.7;font-size:11.5px">${h.date || ''}</span></div>
+      </div>
+      <span class="history-status">${h.status}</span>
+      <span class="history-amount ${h.type === '儲值' ? 'amount-plus' : 'amount-minus'}">
+        ${h.type === '儲值' ? '+' : '-'}${Number(h.amount).toLocaleString()}
+      </span>
+    </div>
+  `).join('');
+}
+
+/* ════════════════════════════════
+   Tab Switch
+════════════════════════════════ */
+function switchTab(tab) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('tab-' + tab + '-btn').classList.add('active');
+  clearAlert('global-alert');
+  document.getElementById('result-section').style.display = 'none';
+}
+
+/* ════════════════════════════════
+   Deposit Submit
+════════════════════════════════ */
+async function submitDeposit() {
+  clearAlert('global-alert');
+  const date = document.getElementById('dep-date').value;
+  const amount = document.getElementById('dep-amount').value;
+  const last5 = document.getElementById('dep-last5').value.trim();
+  const confirmed = document.getElementById('dep-confirm').checked;
+
+  if (!date) { showAlert('global-alert', '⚠️ 請選擇匯款日期'); return; }
+  if (!amount) { showAlert('global-alert', '⚠️ 請選擇儲值金額'); return; }
+  if (!last5 || !/^\d{5}$/.test(last5)) { showAlert('global-alert', '⚠️ 請輸入正確的帳號末五碼（5位數字）'); return; }
+  if (!confirmed) { showAlert('global-alert', '⚠️ 請勾選確認已完成匯款'); return; }
+
+  showLoading();
+  try {
+    const data = await callScript({
+      action: 'transaction',
+      type: '儲值',
+      agentCode: currentAgent,
+      amount: Number(amount),
+      date,
+      note: '帳號末五碼：' + last5
+    });
+    if (data.success) {
+      updateBalance(data.newBalance);
+      renderHistory(data.history || []);
+      // Clear form
+      document.getElementById('dep-amount').value = '';
+      document.getElementById('dep-last5').value = '';
+      document.getElementById('dep-confirm').checked = false;
+
+      const text = buildCopyText({
+        type: '儲值回報', date, amount, agentCode: currentAgent,
+        note: '帳號末五碼：' + last5, status: '待審核'
+      });
+      showResult(text);
+    } else {
+      showAlert('global-alert', '❌ ' + (data.message || '送出失敗，請再試一次'));
+    }
+  } catch (e) {
+    showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試');
+  } finally {
+    hideLoading();
+  }
+}
+
+/* ════════════════════════════════
+   Checkout Submit
+════════════════════════════════ */
+async function submitCheckout() {
+  clearAlert('global-alert');
+  const date = document.getElementById('ck-date').value;
+  const amount = Number(document.getElementById('ck-amount').value);
+  const note = document.getElementById('ck-note').value.trim();
+
+  if (!date) { showAlert('global-alert', '⚠️ 請選擇結帳日期'); return; }
+  if (!amount || amount <= 0) { showAlert('global-alert', '⚠️ 請輸入正確的結帳金額'); return; }
+  if (!note) { showAlert('global-alert', '⚠️ 請填寫訂單項目說明'); return; }
+  if (amount > currentBalance) {
+    showAlert('global-alert', `❌ 餘額不足！目前可用餘額為 NT$ ${currentBalance.toLocaleString()}，結帳金額 NT$ ${amount.toLocaleString()} 超出可用額度。`);
+    return;
+  }
+
+  showLoading();
+  try {
+    const data = await callScript({
+      action: 'transaction',
+      type: '消費',
+      agentCode: currentAgent,
+      amount,
+      date,
+      note
+    });
+    if (data.success) {
+      updateBalance(data.newBalance);
+      renderHistory(data.history || []);
+      document.getElementById('ck-amount').value = '';
+      document.getElementById('ck-note').value = '';
+      document.getElementById('calc-result').style.display = 'none';
+
+      const text = buildCopyText({
+        type: '單筆結帳', date, amount, agentCode: currentAgent, note, status: '已確認'
+      });
+      showResult(text);
+    } else {
+      showAlert('global-alert', '❌ ' + (data.message || '送出失敗，請再試一次'));
+    }
+  } catch (e) {
+    showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試');
+  } finally {
+    hideLoading();
+  }
+}
+
+/* ════════════════════════════════
+   KRW Calculator
+════════════════════════════════ */
+function addKrwRow() {
+  const row = document.createElement('div');
+  row.className = 'krw-row';
+  row.innerHTML = `
+    <input type="number" placeholder="輸入韓元 (KRW)" class="krw-input" min="0">
+    <button class="btn-remove" onclick="removeKrwRow(this)">✕</button>
+  `;
+  document.getElementById('krw-inputs').appendChild(row);
+}
+
+function removeKrwRow(btn) {
+  const rows = document.querySelectorAll('.krw-row');
+  if (rows.length <= 1) { btn.closest('.krw-row').querySelector('input').value = ''; return; }
+  btn.closest('.krw-row').remove();
+}
+
+function calcKrw() {
+  const inputs = document.querySelectorAll('.krw-input');
+  let totalKrw = 0;
+  inputs.forEach(inp => { totalKrw += Number(inp.value) || 0; });
+  if (totalKrw <= 0) { document.getElementById('calc-result').style.display = 'none'; return; }
+  const twd = Math.ceil(totalKrw / 40);
+  const resultEl = document.getElementById('calc-result');
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `
+    🇰🇷 總計：${totalKrw.toLocaleString()} KRW
+    &nbsp;→&nbsp;
+    🇹🇼 台幣：<span style="color:var(--accent);font-size:16px">NT$ ${twd.toLocaleString()}</span>
+    &nbsp;<button class="btn btn-outline btn-sm" onclick="applyKrwResult(${twd})" style="margin-left:8px">帶入總額</button>
+  `;
+}
+
+function applyKrwResult(twd) {
+  document.getElementById('ck-amount').value = twd;
+}
+
+/* ════════════════════════════════
+   Result & Copy
+════════════════════════════════ */
+function buildCopyText({ type, date, amount, agentCode, note, status }) {
+  const now = new Date().toLocaleString('zh-TW', { hour12: false });
+  const icon = type === '儲值回報' ? '💰' : '🛒';
+  return `🥜 DouDou 代理${type}單
+────────────────────
+${icon} 類型：${type}
+👤 代理編號：${agentCode}
+📅 日期：${date}
+💵 金額：NT$ ${Number(amount).toLocaleString()}
+📝 備註：${note}
+📋 狀態：${status}
+⏰ 送出時間：${now}
+────────────────────
+感謝您的回報，請等待阿霓確認 🙏`;
+}
+
+function showResult(text) {
+  document.getElementById('result-text').textContent = text;
+  const section = document.getElementById('result-section');
+  section.style.display = 'block';
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+async function copyResult() {
+  const text = document.getElementById('result-text').textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = '✅ 已複製！';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  } catch {
+    alert('請手動選取文字並複製');
+  }
+}
+</script>
+</body>
+</html>
