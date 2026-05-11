@@ -5,386 +5,551 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🥜 DouDou 代理管理系統</title>
 <style>
-  :root {
-    --primary: #8d6e63;
-    --primary-dark: #6d4c41;
-    --primary-light: #bcaaa4;
-    --accent: #d84315;
-    --accent-light: #ff7043;
-    --bg: #fdfaf6;
-    --card-bg: #f5f0eb;
-    --card-inner: #ede8e3;
-    --border: #d7ccc8;
-    --text: #3e2723;
-    --text-muted: #795548;
-    --text-light: #a1887f;
-    --success: #558b2f;
-    --success-bg: #f1f8e9;
-    --warning: #e65100;
-    --warning-bg: #fff3e0;
-    --shadow: 0 4px 20px rgba(141,110,99,0.15);
-    --shadow-lg: 0 8px 40px rgba(141,110,99,0.22);
-    --radius: 16px;
-    --radius-sm: 10px;
-  }
+/* ══════════════════════════════════════
+   Variables
+══════════════════════════════════════ */
+:root {
+  --primary:       #8d6e63;
+  --primary-dark:  #6d4c41;
+  --primary-light: #bcaaa4;
+  --accent:        #d84315;
+  --bg:            #fdfaf6;
+  --card-bg:       #f5f0eb;
+  --card-inner:    #ede8e3;
+  --border:        #d7ccc8;
+  --text:          #3e2723;
+  --text-muted:    #795548;
+  --text-light:    #a1887f;
+  --success:       #558b2f;
+  --success-bg:    #f1f8e9;
+  --warning:       #e65100;
+  --warning-bg:    #fff3e0;
+  --shadow:        0 4px 20px rgba(141,110,99,0.14);
+  --shadow-lg:     0 8px 36px rgba(141,110,99,0.22);
+  --radius:        16px;
+  --radius-sm:     10px;
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* ══════════════════════════════════════
+   Reset
+══════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    font-family: 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    background-image:
-      radial-gradient(ellipse at 20% 10%, rgba(188,170,164,0.18) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 90%, rgba(216,67,21,0.07) 0%, transparent 50%);
-  }
+body {
+  font-family: 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 18% 8%,  rgba(188,170,164,0.18) 0%, transparent 52%),
+    radial-gradient(ellipse at 82% 92%, rgba(216,67,21,0.07)   0%, transparent 52%);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
 
-  /* ── Loading Overlay ── */
-  #loading-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(253,250,246,0.82);
-    backdrop-filter: blur(6px);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 16px;
-  }
-  #loading-overlay.active { display: flex; }
-  .spinner {
-    width: 48px; height: 48px;
-    border: 4px solid var(--primary-light);
-    border-top-color: var(--primary);
-    border-radius: 50%;
-    animation: spin 0.9s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-text {
-    font-size: 15px; color: var(--primary-dark);
-    font-weight: 600; letter-spacing: 1px;
-  }
+/* ══════════════════════════════════════
+   Loading Overlay
+══════════════════════════════════════ */
+#loading-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(253,250,246,0.86);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+#loading-overlay.active { display: flex; }
 
-  /* ── Layout ── */
-  .page-wrapper {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 24px 16px 60px;
-  }
+.spinner {
+  width: 44px; height: 44px;
+  border: 4px solid var(--primary-light);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.85s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ── Header ── */
-  .site-header {
-    text-align: center;
-    padding: 36px 0 28px;
-  }
-  .site-header .logo {
-    font-size: 38px; line-height: 1;
-  }
-  .site-header h1 {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--primary-dark);
-    margin-top: 8px;
-    letter-spacing: 2px;
-  }
-  .site-header p {
-    font-size: 13px;
-    color: var(--text-light);
-    margin-top: 4px;
-    letter-spacing: 1px;
-  }
+.loading-text {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--primary-dark);
+  letter-spacing: 1px;
+}
 
-  /* ── Card ── */
-  .card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 28px 28px 24px;
-    box-shadow: var(--shadow);
-    margin-bottom: 20px;
-    animation: fadeUp 0.4s ease both;
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(18px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .card-title {
-    font-size: 15px; font-weight: 700;
-    color: var(--primary-dark);
-    margin-bottom: 18px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .card-title::after {
-    content: ''; flex: 1;
-    height: 1px; background: var(--border);
-    margin-left: 8px;
-  }
+/* ══════════════════════════════════════
+   Page Wrapper
+══════════════════════════════════════ */
+.page-wrapper {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 0 18px 72px;
+}
 
-  /* ── Form Controls ── */
-  label {
-    display: block;
-    font-size: 13px; font-weight: 600;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-    letter-spacing: 0.5px;
-  }
-  input[type="text"],
-  input[type="number"],
-  input[type="date"],
-  select, textarea {
-    width: 100%;
-    background: #fff;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 11px 14px;
-    font-size: 14px;
-    color: var(--text);
-    font-family: inherit;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    outline: none;
-    appearance: none;
-  }
-  input:focus, select:focus, textarea:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(141,110,99,0.12);
-  }
-  .form-row { margin-bottom: 16px; }
-  .form-grid-2 {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
-  }
+/* ══════════════════════════════════════
+   Site Header
+══════════════════════════════════════ */
+.site-header {
+  text-align: center;
+  padding: 36px 0 22px;
+}
+.site-header .logo    { font-size: 40px; display: block; margin-bottom: 10px; }
+.site-header h1       { font-size: 20px; font-weight: 700; color: var(--primary-dark); letter-spacing: 2px; }
+.site-header .tagline { font-size: 12px; color: var(--text-light); margin-top: 5px; letter-spacing: 1px; }
 
-  /* ── Buttons ── */
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    gap: 7px;
-    border: none; border-radius: var(--radius-sm);
-    padding: 12px 22px;
-    font-size: 14px; font-weight: 700;
-    cursor: pointer; transition: all 0.2s;
-    font-family: inherit; letter-spacing: 0.5px;
-  }
-  .btn-primary {
-    background: var(--primary);
-    color: #fff;
-  }
-  .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow); }
-  .btn-accent {
-    background: var(--accent);
-    color: #fff;
-  }
-  .btn-accent:hover { background: #bf360c; transform: translateY(-1px); box-shadow: var(--shadow); }
-  .btn-outline {
-    background: transparent;
-    color: var(--primary);
-    border: 1.5px solid var(--primary);
-  }
-  .btn-outline:hover { background: var(--card-inner); }
-  .btn-sm { padding: 8px 14px; font-size: 13px; }
-  .btn-full { width: 100%; }
+/* ══════════════════════════════════════
+   Marquee
+══════════════════════════════════════ */
+.marquee-wrap {
+  background: linear-gradient(90deg, #4e342e 0%, #8d6e63 50%, #4e342e 100%);
+  border-radius: 999px;
+  padding: 9px 22px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.marquee-inner {
+  display: inline-block;
+  animation: marquee-run 32s linear infinite;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #ffccbc;
+  letter-spacing: 0.3px;
+}
+.marquee-inner:hover { animation-play-state: paused; cursor: default; }
+@keyframes marquee-run {
+  from { transform: translateX(110vw); }
+  to   { transform: translateX(-100%); }
+}
 
-  /* ── Login Card ── */
-  #login-section .login-desc {
-    font-size: 13px; color: var(--text-light);
-    margin-bottom: 20px; line-height: 1.6;
-  }
+/* ══════════════════════════════════════
+   Card
+══════════════════════════════════════ */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 24px 22px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+  animation: fadeUp 0.35s ease both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-  /* ── Dashboard ── */
-  #dashboard {
-    display: none;
-    background: linear-gradient(135deg, var(--primary-dark) 0%, #4e342e 100%);
-    border-radius: var(--radius);
-    padding: 24px 24px 20px;
-    color: #fff;
-    margin-bottom: 20px;
-    box-shadow: var(--shadow-lg);
-    animation: fadeUp 0.4s ease;
-  }
-  .dash-top {
-    display: flex; justify-content: space-between; align-items: flex-start;
-    margin-bottom: 16px;
-  }
-  .dash-greeting { font-size: 13px; opacity: 0.78; }
-  .dash-agent { font-size: 18px; font-weight: 700; margin-top: 3px; }
-  .dash-balance-label { font-size: 12px; opacity: 0.7; margin-bottom: 4px; }
-  .dash-balance {
-    font-size: 30px; font-weight: 800; letter-spacing: 1px;
-    color: #ffccbc;
-  }
-  .dash-right { text-align: right; }
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title::after {
+  content: ''; flex: 1;
+  height: 1px; background: var(--border);
+}
 
-  /* history scroll box */
-  .history-box {
-    background: rgba(255,255,255,0.1);
-    border-radius: var(--radius-sm);
-    max-height: 160px;
-    overflow-y: auto;
-    padding: 10px 12px;
-    margin-top: 14px;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255,255,255,0.3) transparent;
-  }
-  .history-box::-webkit-scrollbar { width: 4px; }
-  .history-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 2px; }
-  .history-item {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 6px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    font-size: 12.5px;
-  }
-  .history-item:last-child { border-bottom: none; }
-  .history-type { opacity: 0.85; }
-  .history-status {
-    font-size: 11px;
-    padding: 2px 7px; border-radius: 20px;
-    background: rgba(255,255,255,0.15);
-  }
-  .history-amount { font-weight: 700; }
-  .amount-plus { color: #a5d6a7; }
-  .amount-minus { color: #ffccbc; }
-  .history-empty { opacity: 0.55; font-size: 13px; text-align: center; padding: 10px 0; }
+/* ══════════════════════════════════════
+   Form Controls
+══════════════════════════════════════ */
+label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  letter-spacing: 0.2px;
+}
 
-  /* ── Tabs ── */
-  #main-section { display: none; }
-  .tab-bar {
-    display: flex; gap: 0;
-    background: var(--card-inner);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 4px;
-    margin-bottom: 20px;
-  }
-  .tab-btn {
-    flex: 1; padding: 11px;
-    background: transparent;
-    border: none; border-radius: 8px;
-    font-size: 14px; font-weight: 600;
-    color: var(--text-muted);
-    cursor: pointer; transition: all 0.2s;
-    font-family: inherit;
-  }
-  .tab-btn.active {
-    background: var(--primary);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(141,110,99,0.3);
-  }
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select {
+  width: 100%;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 11px 13px;
+  font-size: 14px;
+  color: var(--text);
+  font-family: inherit;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+input:focus, select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(141,110,99,0.10);
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+input[type="number"] { -moz-appearance: textfield; }
 
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; animation: fadeUp 0.3s ease; }
+.form-row { margin-bottom: 14px; }
 
-  /* ── Bank Info Box ── */
-  .bank-info {
-    background: var(--warning-bg);
-    border: 1.5px solid #ffccbc;
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    margin-bottom: 16px;
-    font-size: 13px; line-height: 1.8;
-  }
-  .bank-info strong { color: var(--warning); }
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
 
-  /* ── Checkbox ── */
-  .checkbox-row {
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 14px;
-    background: #fff;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: border-color 0.2s;
-    margin-bottom: 16px;
-  }
-  .checkbox-row:has(input:checked) { border-color: var(--primary); background: var(--card-inner); }
-  .checkbox-row input[type="checkbox"] {
-    width: 18px; height: 18px; accent-color: var(--primary);
-    cursor: pointer; flex-shrink: 0;
-  }
-  .checkbox-row span { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+/* ══════════════════════════════════════
+   Buttons
+══════════════════════════════════════ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 12px 20px;
+  font-size: 13.5px;
+  font-weight: 700;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.btn:active { transform: scale(0.98) !important; }
 
-  /* ── KRW Calculator ── */
-  .calc-box {
-    background: var(--card-inner);
-    border: 1px dashed var(--primary-light);
-    border-radius: var(--radius-sm);
-    padding: 16px;
-    margin-bottom: 16px;
-  }
-  .calc-box-title {
-    font-size: 13px; font-weight: 700;
-    color: var(--primary-dark);
-    margin-bottom: 12px;
-  }
-  .krw-inputs { display: flex; flex-direction: column; gap: 8px; }
-  .krw-row { display: flex; gap: 8px; align-items: center; }
-  .krw-row input { flex: 1; }
-  .krw-row .btn-remove {
-    background: none; border: 1.5px solid var(--border);
-    border-radius: 8px; padding: 8px 10px;
-    color: var(--text-light); cursor: pointer;
-    font-size: 14px; transition: all 0.2s; flex-shrink: 0;
-  }
-  .krw-row .btn-remove:hover { border-color: var(--accent); color: var(--accent); }
-  .calc-actions { display: flex; gap: 8px; margin-top: 10px; }
-  .calc-result {
-    margin-top: 10px; padding: 10px 14px;
-    background: #fff; border-radius: 8px;
-    font-size: 13px; font-weight: 700; color: var(--primary-dark);
-    display: none;
-  }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow); }
 
-  /* ── Result Banner ── */
-  #result-section {
-    display: none;
-    animation: fadeUp 0.4s ease;
-  }
-  .result-card {
-    background: var(--success-bg);
-    border: 1.5px solid #aed581;
-    border-radius: var(--radius);
-    padding: 24px;
-    margin-bottom: 14px;
-  }
-  .result-card h3 {
-    font-size: 15px; color: var(--success);
-    margin-bottom: 14px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .result-copy-box {
-    background: #fff;
-    border: 1px solid #c5e1a5;
-    border-radius: var(--radius-sm);
-    padding: 16px;
-    font-size: 13px; line-height: 1.9;
-    white-space: pre-wrap;
-    word-break: break-all;
-    color: var(--text);
-    font-family: 'PingFang TC', 'Microsoft JhengHei', monospace;
-    margin-bottom: 14px;
-    max-height: 260px; overflow-y: auto;
-  }
+.btn-accent  { background: var(--accent); color: #fff; }
+.btn-accent:hover  { background: #bf360c; transform: translateY(-1px); box-shadow: var(--shadow); }
 
-  /* ── Alert / Notice ── */
-  .alert {
-    border-radius: var(--radius-sm);
-    padding: 12px 16px;
-    font-size: 13px; font-weight: 600;
-    margin-bottom: 14px;
-    display: none;
-  }
-  .alert.error { background: #fbe9e7; border: 1px solid #ffccbc; color: var(--accent); }
-  .alert.success { background: var(--success-bg); border: 1px solid #aed581; color: var(--success); }
-  .alert.show { display: block; animation: fadeUp 0.3s ease; }
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+}
+.btn-outline:hover { background: var(--card-inner); }
 
-  /* ── Divider ── */
-  .divider { height: 1px; background: var(--border); margin: 18px 0; }
+.btn-ghost {
+  background: transparent;
+  color: rgba(255,255,255,0.82);
+  border: 1px solid rgba(255,255,255,0.32);
+  border-radius: 20px;
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.12); }
 
-  /* ── Responsive ── */
-  @media (max-width: 520px) {
-    .form-grid-2 { grid-template-columns: 1fr; }
-    .dash-top { flex-direction: column; gap: 14px; }
-    .dash-right { text-align: left; }
-    .card { padding: 20px 16px; }
-  }
+.btn-sm   { padding: 8px 14px; font-size: 12.5px; }
+.btn-full { width: 100%; }
+
+/* ══════════════════════════════════════
+   Login
+══════════════════════════════════════ */
+.login-desc {
+  font-size: 13px;
+  color: var(--text-light);
+  line-height: 1.7;
+  margin-bottom: 18px;
+}
+
+/* ══════════════════════════════════════
+   Dashboard
+══════════════════════════════════════ */
+#dashboard {
+  display: none;
+  background: linear-gradient(135deg, #4e342e 0%, #6d4c41 100%);
+  border-radius: var(--radius);
+  padding: 20px 22px 18px;
+  color: #fff;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-lg);
+  animation: fadeUp 0.35s ease;
+}
+
+.dash-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.dash-left .greeting  { font-size: 11.5px; opacity: 0.7; margin-bottom: 3px; }
+.dash-left .agentname { font-size: 16px; font-weight: 700; }
+
+.dash-right             { text-align: right; flex-shrink: 0; }
+.dash-right .bal-label  { font-size: 11px; opacity: 0.65; margin-bottom: 3px; }
+.dash-right .bal-amount {
+  font-size: 26px; font-weight: 800;
+  color: #ffccbc; letter-spacing: 0.5px; line-height: 1.15;
+}
+
+.dash-history-label {
+  font-size: 11px; opacity: 0.6; margin-bottom: 6px;
+}
+
+.history-box {
+  background: rgba(255,255,255,0.09);
+  border-radius: 9px;
+  max-height: 144px;
+  overflow-y: auto;
+  padding: 6px 10px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.22) transparent;
+}
+.history-box::-webkit-scrollbar { width: 3px; }
+.history-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.22); border-radius: 2px; }
+
+.history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  font-size: 12px;
+}
+.history-row:last-child { border-bottom: none; }
+
+.history-info   { flex: 1; }
+.history-type   { opacity: 0.85; }
+.history-date   { font-size: 10.5px; opacity: 0.5; margin-top: 1px; }
+.history-badge  {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.12);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.history-amt    { font-weight: 700; font-size: 12.5px; white-space: nowrap; flex-shrink: 0; }
+.clr-plus       { color: #a5d6a7; }
+.clr-minus      { color: #ffccbc; }
+.history-empty  { font-size: 12px; opacity: 0.48; text-align: center; padding: 10px 0; }
+
+/* ══════════════════════════════════════
+   Notice Banner
+══════════════════════════════════════ */
+#notice-banner {
+  display: none;
+  background: linear-gradient(135deg, #fff9e6, #fff3e0);
+  border: 1.5px solid #ffcc80;
+  border-left: 5px solid var(--warning);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  animation: fadeUp 0.35s ease;
+}
+.notice-title {
+  font-size: 13px; font-weight: 800;
+  color: var(--warning);
+  margin-bottom: 9px;
+  display: flex; align-items: center; gap: 6px;
+}
+.notice-body        { font-size: 13px; color: #5d4037; line-height: 1.85; }
+.notice-body strong { color: #bf360c; }
+.notice-tag {
+  display: inline-block;
+  background: var(--warning);
+  color: #fff;
+  font-size: 11px; font-weight: 700;
+  padding: 2px 9px; border-radius: 20px;
+  margin-right: 4px; vertical-align: middle;
+}
+
+/* ══════════════════════════════════════
+   Main / Tabs
+══════════════════════════════════════ */
+#main-section { display: none; }
+
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  background: var(--card-inner);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  margin-bottom: 16px;
+}
+.tab-btn {
+  flex: 1;
+  padding: 11px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.tab-btn.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(141,110,99,0.26);
+}
+
+.tab-panel        { display: none; }
+.tab-panel.active { display: block; animation: fadeUp 0.28s ease; }
+
+/* ══════════════════════════════════════
+   Bank Info
+══════════════════════════════════════ */
+.bank-info {
+  background: var(--warning-bg);
+  border: 1.5px solid #ffccbc;
+  border-radius: var(--radius-sm);
+  padding: 13px 15px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  line-height: 1.85;
+}
+.bank-info strong { color: var(--warning); }
+
+/* ══════════════════════════════════════
+   Checkbox Row
+══════════════════════════════════════ */
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  margin-bottom: 16px;
+}
+.checkbox-row:has(input:checked) {
+  border-color: var(--primary);
+  background: var(--card-inner);
+}
+.checkbox-row input[type="checkbox"] {
+  width: 17px; height: 17px;
+  accent-color: var(--primary);
+  cursor: pointer; flex-shrink: 0;
+}
+.checkbox-row span {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-muted); line-height: 1.45;
+}
+
+/* ══════════════════════════════════════
+   KRW Calculator
+══════════════════════════════════════ */
+.calc-box {
+  background: var(--card-inner);
+  border: 1px dashed var(--primary-light);
+  border-radius: var(--radius-sm);
+  padding: 15px;
+  margin-bottom: 16px;
+}
+.calc-title {
+  font-size: 13px; font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 12px;
+}
+.calc-title span { font-weight: 400; color: var(--text-light); }
+
+.krw-list { display: flex; flex-direction: column; gap: 8px; }
+
+.krw-row  { display: flex; gap: 8px; align-items: center; }
+.krw-row input { flex: 1; }
+
+.btn-rm {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 11px;
+  color: var(--text-light);
+  font-size: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  line-height: 1;
+}
+.btn-rm:hover { border-color: var(--accent); color: var(--accent); }
+
+.calc-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.calc-result {
+  display: none;
+  margin-top: 12px;
+  padding: 11px 14px;
+  background: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary-dark);
+  line-height: 1.6;
+}
+
+/* ══════════════════════════════════════
+   Alert
+══════════════════════════════════════ */
+.alert {
+  display: none;
+  border-radius: var(--radius-sm);
+  padding: 11px 15px;
+  font-size: 13px; font-weight: 600;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.alert.error   { background: #fbe9e7; border: 1px solid #ffccbc; color: var(--accent); }
+.alert.success { background: var(--success-bg); border: 1px solid #aed581; color: var(--success); }
+.alert.show    { display: block; animation: fadeUp 0.25s ease; }
+
+/* ══════════════════════════════════════
+   Result Section
+══════════════════════════════════════ */
+#result-section { display: none; animation: fadeUp 0.35s ease; }
+
+.result-card {
+  background: var(--success-bg);
+  border: 1.5px solid #aed581;
+  border-radius: var(--radius);
+  padding: 20px 22px;
+}
+.result-card h3 {
+  font-size: 14px; font-weight: 700;
+  color: var(--success);
+  margin-bottom: 13px;
+  display: flex; align-items: center; gap: 7px;
+}
+.result-textbox {
+  background: #fff;
+  border: 1px solid #c5e1a5;
+  border-radius: var(--radius-sm);
+  padding: 15px;
+  font-size: 13px; line-height: 1.95;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: var(--text);
+  font-family: 'PingFang TC', 'Microsoft JhengHei', monospace;
+  margin-bottom: 14px;
+  max-height: 230px; overflow-y: auto;
+}
+
+/* ══════════════════════════════════════
+   Responsive
+══════════════════════════════════════ */
+@media (max-width: 480px) {
+  .page-wrapper    { padding: 0 14px 60px; }
+  .card            { padding: 20px 16px 18px; }
+  .form-grid-2     { grid-template-columns: 1fr; gap: 0; }
+  .dash-top        { flex-direction: column; gap: 8px; }
+  .dash-right      { text-align: left; }
+  .calc-actions    { flex-direction: column; }
+  .calc-actions .btn { width: 100%; }
+}
 </style>
 </head>
 <body>
@@ -396,58 +561,80 @@
 </div>
 
 <div class="page-wrapper">
-  <!-- Site Header -->
+
+  <!-- ── Header ── -->
   <div class="site-header">
-    <div class="logo">🥜</div>
+    <span class="logo">🥜</span>
     <h1>DouDou 代理管理系統</h1>
-    <p>內部專用 · 儲值 & 結帳平台</p>
+    <p class="tagline">內部專用 · 儲值 &amp; 結帳平台</p>
   </div>
 
-  <!-- ── LOGIN SECTION ── -->
+  <!-- ── 跑馬燈（全程顯示）── -->
+  <div class="marquee-wrap">
+    <span class="marquee-inner">
+      📢 儲值入帳時間調整通知 ・ 🗓️ 固定入帳日：每週三 &amp; 週日 ・ ⚠️ 週三入帳→請週三前完成匯款 ・ ⚠️ 週日入帳→請週日前完成匯款 ・ 當天匯款將順延至下一個入帳日 ・ 請提前儲值，避免額度不足 🥹 ・ 謝謝大家的配合與理解 ♡ &nbsp;&nbsp;&nbsp;&nbsp;
+    </span>
+  </div>
+
+  <!-- ══ LOGIN ══ -->
   <div id="login-section">
     <div class="card">
       <div class="card-title">🔐 代理登入</div>
-      <p class="login-desc">請選擇您的代理代碼以進入系統。本系統僅供授權代理使用，請勿外傳。</p>
+      <p class="login-desc">請選擇您的代理代碼以進入系統。<br>本系統僅供授權代理使用，請勿外傳。</p>
       <div class="form-row">
         <label>代理代碼</label>
-        <select id="login-agent-select"></select>
+        <select id="login-select"></select>
       </div>
       <div id="login-alert" class="alert error"></div>
       <button class="btn btn-primary btn-full" onclick="doLogin()">🚀 進入系統</button>
     </div>
   </div>
 
-  <!-- ── DASHBOARD ── -->
+  <!-- ══ DASHBOARD ══ -->
   <div id="dashboard">
     <div class="dash-top">
-      <div>
-        <div class="dash-greeting">您好，</div>
-        <div class="dash-agent" id="dash-agent-name">－</div>
+      <div class="dash-left">
+        <div class="greeting">您好，</div>
+        <div class="agentname" id="dash-name">－</div>
       </div>
       <div class="dash-right">
-        <div class="dash-balance-label">可用餘額</div>
-        <div class="dash-balance">NT$ <span id="dash-balance">0</span></div>
-        <button class="btn btn-outline btn-sm" style="margin-top:10px; border-color:rgba(255,255,255,0.4); color:#fff; font-size:12px;" onclick="doLogout()">登出重選</button>
+        <div class="bal-label">可用餘額</div>
+        <div class="bal-amount">NT$&nbsp;<span id="dash-balance">0</span></div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:9px;" onclick="doLogout()">登出重選</button>
       </div>
     </div>
-    <div style="font-size:12px; opacity:0.7; margin-bottom:4px;">最近交易紀錄</div>
+    <div class="dash-history-label">最近交易紀錄</div>
     <div class="history-box" id="history-box">
       <div class="history-empty">載入中...</div>
     </div>
   </div>
 
-  <!-- ── MAIN SECTION ── -->
+  <!-- ── 公告欄（登入後）── -->
+  <div id="notice-banner">
+    <div class="notice-title">📢 最新公告・板娘通知</div>
+    <div class="notice-body">
+      💰 儲值入帳時間改為固定兩天：<strong>🗓️ 每週三 ／ 每週日</strong><br><br>
+      <span class="notice-tag">週三入帳</span>請於 <strong>週三前</strong> 完成匯款<br>
+      <span class="notice-tag">週日入帳</span>請於 <strong>週日前</strong> 完成匯款<br><br>
+      ⚠️ 當天才匯款的話，會順延到下一個入帳日唷！<br>
+      麻煩大家提前備好款項，避免下單時額度不足 🥹<br>
+      謝謝大家的配合與理解 ♡
+    </div>
+  </div>
+
+  <!-- ══ MAIN ══ -->
   <div id="main-section">
-    <!-- Tabs -->
+
+    <!-- Tab Bar -->
     <div class="tab-bar">
-      <button class="tab-btn active" id="tab-deposit-btn" onclick="switchTab('deposit')">💰 儲值回報</button>
-      <button class="tab-btn" id="tab-checkout-btn" onclick="switchTab('checkout')">🛒 單筆結帳</button>
+      <button class="tab-btn active" id="tab-btn-deposit"   onclick="switchTab('deposit')">💰 儲值回報</button>
+      <button class="tab-btn"        id="tab-btn-checkout"  onclick="switchTab('checkout')">🛒 單筆結帳</button>
     </div>
 
-    <!-- Global Alert -->
+    <!-- Alert -->
     <div id="global-alert" class="alert error"></div>
 
-    <!-- ── TAB: DEPOSIT ── -->
+    <!-- ── TAB：儲值回報 ── -->
     <div id="tab-deposit" class="tab-panel active">
       <div class="card">
         <div class="card-title">💰 儲值回報</div>
@@ -455,7 +642,8 @@
         <div class="bank-info">
           <strong>📍 匯款帳戶資訊</strong><br>
           銀行：台新銀行（812）<br>
-          帳號：<strong>2888-10-2335157-5</strong><br>
+          帳號：<strong>0000-0000-0000</strong>（請向板娘確認最新帳號）<br>
+          戶名：DouDou 代理
         </div>
 
         <div class="form-grid-2">
@@ -464,28 +652,14 @@
             <input type="date" id="dep-date">
           </div>
           <div class="form-row">
-            <label>💵 儲值金額</label>
-            <select id="dep-amount">
-              <option value="">請選擇金額</option>
-              <option value="2000">NT$ 2,000</option>
-              <option value="3000">NT$ 3,000</option>
-              <option value="4000">NT$ 4,000</option>
-              <option value="5000">NT$ 5,000</option>
-              <option value="6000">NT$ 6,000</option>
-              <option value="7000">NT$ 7,000</option>
-              <option value="8000">NT$ 8,000</option>
-              <option value="9000">NT$ 9,000</option>
-              <option value="10000">NT$ 10,000</option>
-              <option value="12000">NT$ 12,000</option>
-              <option value="15000">NT$ 15,000</option>
-              <option value="20000">NT$ 20,000</option>
-            </select>
+            <label>💵 儲值金額（最低 2,000 · 以千為單位）</label>
+            <input type="number" id="dep-amount" placeholder="例：5000" min="2000" step="1000">
           </div>
         </div>
 
         <div class="form-row">
           <label>🏦 匯款帳號末五碼</label>
-          <input type="text" id="dep-last5" placeholder="請輸入末五碼數字" maxlength="5">
+          <input type="text" id="dep-last5" placeholder="請輸入末五碼數字" maxlength="5" inputmode="numeric">
         </div>
 
         <label class="checkbox-row" for="dep-confirm">
@@ -497,7 +671,7 @@
       </div>
     </div>
 
-    <!-- ── TAB: CHECKOUT ── -->
+    <!-- ── TAB：單筆結帳 ── -->
     <div id="tab-checkout" class="tab-panel">
       <div class="card">
         <div class="card-title">🛒 單筆結帳</div>
@@ -508,23 +682,26 @@
             <input type="date" id="ck-date">
           </div>
           <div class="form-row">
-            <label>💵 結帳台幣總額 (NT$)</label>
+            <label>💵 結帳台幣總額（NT$）</label>
             <input type="number" id="ck-amount" placeholder="請輸入或使用計算機" min="1">
           </div>
         </div>
 
         <div class="form-row">
           <label>📝 訂單項目說明</label>
-          <input type="text" id="ck-note" placeholder="例：批網商品4件">
+          <input type="text" id="ck-note" placeholder="例：NN123 運動鞋 x2 ／ 手提包 x1">
         </div>
 
-        <!-- KRW Calculator -->
+        <!-- KRW 計算機 -->
         <div class="calc-box">
-          <div class="calc-box-title">📊 多品項韓元計價小工具 <span style="font-weight:400;color:var(--text-light);">（匯率固定 ×40 無條件進位）</span></div>
-          <div class="krw-inputs" id="krw-inputs">
+          <div class="calc-title">
+            📊 多品項韓元計價小工具
+            <span>（匯率固定 ×40，無條件進位）</span>
+          </div>
+          <div class="krw-list" id="krw-list">
             <div class="krw-row">
-              <input type="number" placeholder="輸入韓元 (KRW)" class="krw-input" min="0">
-              <button class="btn-remove" onclick="removeKrwRow(this)">✕</button>
+              <input type="number" class="krw-input" placeholder="輸入韓元金額 (KRW)" min="0">
+              <button class="btn-rm" onclick="removeKrwRow(this)">✕</button>
             </div>
           </div>
           <div class="calc-actions">
@@ -538,99 +715,88 @@
       </div>
     </div>
 
-    <!-- ── RESULT SECTION ── -->
+    <!-- ── Result ── -->
     <div id="result-section">
       <div class="result-card">
         <h3>✅ 送出成功！回報單文案</h3>
-        <div class="result-copy-box" id="result-text"></div>
+        <div class="result-textbox" id="result-text"></div>
         <button class="btn btn-primary" onclick="copyResult()">📋 點擊複製文案</button>
       </div>
     </div>
-  </div><!-- /main-section -->
 
+  </div><!-- /main-section -->
 </div><!-- /page-wrapper -->
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKJRpDzRgtUCaUGO757TczuRQDU1wyy-_pWWFJMWn4mBoohTlqOcQYCmTFfIxACB4D-w/exec';
+const GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE';
 
-/* ════════════════════════════════
-   State
-════════════════════════════════ */
-let currentAgent = null;
+/* ── State ── */
+let currentAgent   = null;
 let currentBalance = 0;
 
-/* ════════════════════════════════
-   Init
-════════════════════════════════ */
-(function init() {
-  const sel = document.getElementById('login-agent-select');
+/* ── Init ── */
+(function () {
+  const sel = document.getElementById('login-select');
   for (let i = 1; i <= 30; i++) {
     const code = 'doudou' + String(i).padStart(3, '0');
-    const opt = document.createElement('option');
-    opt.value = code;
-    opt.textContent = code;
+    const opt  = document.createElement('option');
+    opt.value = code; opt.textContent = code;
     sel.appendChild(opt);
   }
-  // Set today as default dates
   const today = new Date().toISOString().slice(0, 10);
   document.getElementById('dep-date').value = today;
-  document.getElementById('ck-date').value = today;
+  document.getElementById('ck-date').value  = today;
 })();
 
-/* ════════════════════════════════
-   Loading
-════════════════════════════════ */
-function showLoading() { document.getElementById('loading-overlay').classList.add('active'); }
-function hideLoading() { document.getElementById('loading-overlay').classList.remove('active'); }
+/* ── Helpers ── */
+const $  = id => document.getElementById(id);
+const show = id => $(id).style.display = 'block';
+const hide = id => $(id).style.display = 'none';
 
-/* ════════════════════════════════
-   Alert helpers
-════════════════════════════════ */
+function showLoading() { $('loading-overlay').classList.add('active'); }
+function hideLoading() { $('loading-overlay').classList.remove('active'); }
+
 function showAlert(id, msg, type = 'error') {
-  const el = document.getElementById(id);
+  const el = $(id);
   el.textContent = msg;
-  el.className = 'alert ' + type + ' show';
+  el.className   = 'alert ' + type + ' show';
 }
 function clearAlert(id) {
-  const el = document.getElementById(id);
+  const el = $(id);
   el.className = 'alert error';
   el.textContent = '';
 }
 
-/* ════════════════════════════════
-   API call
-════════════════════════════════ */
 async function callScript(payload) {
   const res = await fetch(GOOGLE_SCRIPT_URL, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    headers: { 'Content-Type': 'text/plain' }
+    method:  'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body:    JSON.stringify(payload)
   });
-  return await res.json();
+  return res.json();
 }
 
-/* ════════════════════════════════
-   Login
-════════════════════════════════ */
+/* ── Login / Logout ── */
 async function doLogin() {
   clearAlert('login-alert');
-  const agentCode = document.getElementById('login-agent-select').value;
+  const agentCode = $('login-select').value;
   if (!agentCode) { showAlert('login-alert', '請選擇代理代碼'); return; }
 
   showLoading();
   try {
     const data = await callScript({ action: 'login', agentCode });
     if (data.success) {
-      currentAgent = data.agent;
-      currentBalance = data.balance;
+      currentAgent   = data.agentCode;
+      currentBalance = Number(data.balance);
       renderDashboard(data);
-      document.getElementById('login-section').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
-      document.getElementById('main-section').style.display = 'block';
+      hide('login-section');
+      show('dashboard');
+      show('notice-banner');
+      show('main-section');
     } else {
       showAlert('login-alert', data.message || '登入失敗，請確認代理代碼');
     }
-  } catch (e) {
+  } catch {
     showAlert('login-alert', '⚠️ 無法連線至伺服器，請稍後再試');
   } finally {
     hideLoading();
@@ -639,162 +805,138 @@ async function doLogin() {
 
 function doLogout() {
   currentAgent = null; currentBalance = 0;
-  document.getElementById('login-section').style.display = '';
-  document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('main-section').style.display = 'none';
-  document.getElementById('result-section').style.display = 'none';
+  hide('dashboard'); hide('notice-banner'); hide('main-section'); hide('result-section');
+  show('login-section');
   clearAlert('global-alert');
 }
 
-/* ════════════════════════════════
-   Dashboard Render
-════════════════════════════════ */
+/* ── Dashboard ── */
 function renderDashboard(data) {
-  document.getElementById('dash-agent-name').textContent = data.agentCode + (data.agentName ? '（' + data.agentName + '）' : '');
-  document.getElementById('dash-balance').textContent = Number(data.balance).toLocaleString();
+  const label = data.agentName
+    ? data.agentCode + '（' + data.agentName + '）'
+    : data.agentCode;
+  $('dash-name').textContent    = label;
+  $('dash-balance').textContent = Number(data.balance).toLocaleString();
   renderHistory(data.history || []);
 }
 
-function updateBalance(newBalance) {
-  currentBalance = Number(newBalance);
-  document.getElementById('dash-balance').textContent = currentBalance.toLocaleString();
+function updateBalance(v) {
+  currentBalance = Number(v);
+  $('dash-balance').textContent = currentBalance.toLocaleString();
 }
 
 function renderHistory(list) {
-  const box = document.getElementById('history-box');
+  const box = $('history-box');
   if (!list.length) { box.innerHTML = '<div class="history-empty">尚無交易紀錄</div>'; return; }
   box.innerHTML = list.map(h => `
-    <div class="history-item">
-      <div>
-        <div class="history-type">${h.type} · <span style="opacity:0.7;font-size:11.5px">${h.date || ''}</span></div>
+    <div class="history-row">
+      <div class="history-info">
+        <div class="history-type">${h.type}</div>
+        <div class="history-date">${h.date || ''}</div>
       </div>
-      <span class="history-status">${h.status}</span>
-      <span class="history-amount ${h.type === '儲值' ? 'amount-plus' : 'amount-minus'}">
-        ${h.type === '儲值' ? '+' : '-'}${Number(h.amount).toLocaleString()}
+      <span class="history-badge">${h.status}</span>
+      <span class="history-amt ${h.type === '儲值' ? 'clr-plus' : 'clr-minus'}">
+        ${h.type === '儲值' ? '+' : '−'}${Number(h.amount).toLocaleString()}
       </span>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-/* ════════════════════════════════
-   Tab Switch
-════════════════════════════════ */
+/* ── Tabs ── */
 function switchTab(tab) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  document.getElementById('tab-' + tab + '-btn').classList.add('active');
+  $('tab-' + tab).classList.add('active');
+  $('tab-btn-' + tab).classList.add('active');
   clearAlert('global-alert');
-  document.getElementById('result-section').style.display = 'none';
+  hide('result-section');
 }
 
-/* ════════════════════════════════
-   Deposit Submit
-════════════════════════════════ */
+/* ── Deposit ── */
 async function submitDeposit() {
   clearAlert('global-alert');
-  const date = document.getElementById('dep-date').value;
-  const amount = document.getElementById('dep-amount').value;
-  const last5 = document.getElementById('dep-last5').value.trim();
-  const confirmed = document.getElementById('dep-confirm').checked;
+  const date   = $('dep-date').value;
+  const raw    = $('dep-amount').value;
+  const amount = Number(raw);
+  const last5  = $('dep-last5').value.trim();
+  const chk    = $('dep-confirm').checked;
 
-  if (!date) { showAlert('global-alert', '⚠️ 請選擇匯款日期'); return; }
-  if (!amount) { showAlert('global-alert', '⚠️ 請選擇儲值金額'); return; }
-  if (!last5 || !/^\d{5}$/.test(last5)) { showAlert('global-alert', '⚠️ 請輸入正確的帳號末五碼（5位數字）'); return; }
-  if (!confirmed) { showAlert('global-alert', '⚠️ 請勾選確認已完成匯款'); return; }
+  if (!date)                  { showAlert('global-alert', '⚠️ 請選擇匯款日期'); return; }
+  if (!raw || amount <= 0)    { showAlert('global-alert', '⚠️ 請輸入儲值金額'); return; }
+  if (amount < 2000)          { showAlert('global-alert', '⚠️ 儲值金額最低為 NT$ 2,000'); return; }
+  if (amount % 1000 !== 0)    { showAlert('global-alert', '⚠️ 儲值金額須為 1,000 的倍數（例：2000、3000、5000）'); return; }
+  if (!/^\d{5}$/.test(last5)) { showAlert('global-alert', '⚠️ 請輸入正確的帳號末五碼（5 位數字）'); return; }
+  if (!chk)                   { showAlert('global-alert', '⚠️ 請勾選確認已完成匯款'); return; }
 
   showLoading();
   try {
     const data = await callScript({
-      action: 'transaction',
-      type: '儲值',
-      agentCode: currentAgent,
-      amount: Number(amount),
-      date,
+      action: 'transaction', type: '儲值',
+      agentCode: currentAgent, amount, date,
       note: '帳號末五碼：' + last5
     });
     if (data.success) {
       updateBalance(data.newBalance);
       renderHistory(data.history || []);
-      // Clear form
-      document.getElementById('dep-amount').value = '';
-      document.getElementById('dep-last5').value = '';
-      document.getElementById('dep-confirm').checked = false;
-
-      const text = buildCopyText({
-        type: '儲值回報', date, amount, agentCode: currentAgent,
-        note: '帳號末五碼：' + last5, status: '待審核'
-      });
-      showResult(text);
+      $('dep-amount').value = '';
+      $('dep-last5').value  = '';
+      $('dep-confirm').checked = false;
+      showResult(makeCopy({ type: '儲值回報', date, amount, note: '帳號末五碼：' + last5, status: '待審核' }));
     } else {
       showAlert('global-alert', '❌ ' + (data.message || '送出失敗，請再試一次'));
     }
-  } catch (e) {
+  } catch {
     showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試');
   } finally {
     hideLoading();
   }
 }
 
-/* ════════════════════════════════
-   Checkout Submit
-════════════════════════════════ */
+/* ── Checkout ── */
 async function submitCheckout() {
   clearAlert('global-alert');
-  const date = document.getElementById('ck-date').value;
-  const amount = Number(document.getElementById('ck-amount').value);
-  const note = document.getElementById('ck-note').value.trim();
+  const date   = $('ck-date').value;
+  const amount = Number($('ck-amount').value);
+  const note   = $('ck-note').value.trim();
 
-  if (!date) { showAlert('global-alert', '⚠️ 請選擇結帳日期'); return; }
+  if (!date)                  { showAlert('global-alert', '⚠️ 請選擇結帳日期'); return; }
   if (!amount || amount <= 0) { showAlert('global-alert', '⚠️ 請輸入正確的結帳金額'); return; }
-  if (!note) { showAlert('global-alert', '⚠️ 請填寫訂單項目說明'); return; }
+  if (!note)                  { showAlert('global-alert', '⚠️ 請填寫訂單項目說明'); return; }
   if (amount > currentBalance) {
-    showAlert('global-alert', `❌ 餘額不足！目前可用餘額為 NT$ ${currentBalance.toLocaleString()}，結帳金額 NT$ ${amount.toLocaleString()} 超出可用額度。`);
+    showAlert('global-alert', `❌ 餘額不足！可用餘額 NT$ ${currentBalance.toLocaleString()}，結帳金額 NT$ ${amount.toLocaleString()} 超出額度。`);
     return;
   }
 
   showLoading();
   try {
     const data = await callScript({
-      action: 'transaction',
-      type: '消費',
-      agentCode: currentAgent,
-      amount,
-      date,
-      note
+      action: 'transaction', type: '消費',
+      agentCode: currentAgent, amount, date, note
     });
     if (data.success) {
       updateBalance(data.newBalance);
       renderHistory(data.history || []);
-      document.getElementById('ck-amount').value = '';
-      document.getElementById('ck-note').value = '';
-      document.getElementById('calc-result').style.display = 'none';
-
-      const text = buildCopyText({
-        type: '單筆結帳', date, amount, agentCode: currentAgent, note, status: '已確認'
-      });
-      showResult(text);
+      $('ck-amount').value = '';
+      $('ck-note').value   = '';
+      $('calc-result').style.display = 'none';
+      showResult(makeCopy({ type: '單筆結帳', date, amount, note, status: '已確認' }));
     } else {
       showAlert('global-alert', '❌ ' + (data.message || '送出失敗，請再試一次'));
     }
-  } catch (e) {
+  } catch {
     showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試');
   } finally {
     hideLoading();
   }
 }
 
-/* ════════════════════════════════
-   KRW Calculator
-════════════════════════════════ */
+/* ── KRW Calculator ── */
 function addKrwRow() {
   const row = document.createElement('div');
   row.className = 'krw-row';
   row.innerHTML = `
-    <input type="number" placeholder="輸入韓元 (KRW)" class="krw-input" min="0">
-    <button class="btn-remove" onclick="removeKrwRow(this)">✕</button>
-  `;
-  document.getElementById('krw-inputs').appendChild(row);
+    <input type="number" class="krw-input" placeholder="輸入韓元金額 (KRW)" min="0">
+    <button class="btn-rm" onclick="removeKrwRow(this)">✕</button>`;
+  $('krw-list').appendChild(row);
 }
 
 function removeKrwRow(btn) {
@@ -804,59 +946,51 @@ function removeKrwRow(btn) {
 }
 
 function calcKrw() {
-  const inputs = document.querySelectorAll('.krw-input');
-  let totalKrw = 0;
-  inputs.forEach(inp => { totalKrw += Number(inp.value) || 0; });
-  if (totalKrw <= 0) { document.getElementById('calc-result').style.display = 'none'; return; }
-  const twd = Math.ceil(totalKrw / 40);
-  const resultEl = document.getElementById('calc-result');
-  resultEl.style.display = 'block';
-  resultEl.innerHTML = `
-    🇰🇷 總計：${totalKrw.toLocaleString()} KRW
-    &nbsp;→&nbsp;
-    🇹🇼 台幣：<span style="color:var(--accent);font-size:16px">NT$ ${twd.toLocaleString()}</span>
-    &nbsp;<button class="btn btn-outline btn-sm" onclick="applyKrwResult(${twd})" style="margin-left:8px">帶入總額</button>
-  `;
+  let total = 0;
+  document.querySelectorAll('.krw-input').forEach(i => { total += Number(i.value) || 0; });
+  const el = $('calc-result');
+  if (total <= 0) { el.style.display = 'none'; return; }
+  const twd = Math.ceil(total / 40);
+  el.style.display = 'block';
+  el.innerHTML = `
+    🇰🇷 ${total.toLocaleString()} KRW &nbsp;→&nbsp;
+    🇹🇼 <span style="color:var(--accent);font-size:15px;font-weight:800;">NT$ ${twd.toLocaleString()}</span>
+    <button class="btn btn-outline btn-sm" style="margin-left:8px;" onclick="applyKrw(${twd})">帶入總額</button>`;
 }
 
-function applyKrwResult(twd) {
-  document.getElementById('ck-amount').value = twd;
-}
+function applyKrw(v) { $('ck-amount').value = v; }
 
-/* ════════════════════════════════
-   Result & Copy
-════════════════════════════════ */
-function buildCopyText({ type, date, amount, agentCode, note, status }) {
-  const now = new Date().toLocaleString('zh-TW', { hour12: false });
+/* ── Result ── */
+function makeCopy({ type, date, amount, note, status }) {
+  const now  = new Date().toLocaleString('zh-TW', { hour12: false });
   const icon = type === '儲值回報' ? '💰' : '🛒';
   return `🥜 DouDou 代理${type}單
 ────────────────────
 ${icon} 類型：${type}
-👤 代理編號：${agentCode}
+👤 代理編號：${currentAgent}
 📅 日期：${date}
 💵 金額：NT$ ${Number(amount).toLocaleString()}
 📝 備註：${note}
 📋 狀態：${status}
 ⏰ 送出時間：${now}
 ────────────────────
-感謝您的回報，請等待阿霓確認 🙏`;
+感謝您的回報，請等待板娘確認 🙏`;
 }
 
 function showResult(text) {
-  document.getElementById('result-text').textContent = text;
-  const section = document.getElementById('result-section');
-  section.style.display = 'block';
-  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  $('result-text').textContent = text;
+  show('result-section');
+  setTimeout(() => $('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
 }
 
 async function copyResult() {
-  const text = document.getElementById('result-text').textContent;
+  const btn  = event.currentTarget;
+  const text = $('result-text').textContent;
   try {
     await navigator.clipboard.writeText(text);
-    const btn = event.target;
     const orig = btn.textContent;
     btn.textContent = '✅ 已複製！';
-    setTimeout(() => { btn.textContent = orig; }, 2000);
+    setTimeout(() => { btn.textContent = orig; }, 2200);
   } catch {
     alert('請手動選取文字並複製');
   }
