@@ -474,7 +474,7 @@ input[type="number"] { -moz-appearance: textfield; }
 
   <!-- 公告欄 -->
   <div id="notice-banner">
-    <div class="notice-title">📢 最新公告・阿霓通知</div>
+    <div class="notice-title">📢 最新公告，請注意</div>
     <div class="notice-body">
       💰 儲值入帳時間改為固定兩天：<strong>🗓️ 每週三 ／ 每週日</strong><br><br>
       <span class="notice-tag">週三入帳</span>請於 <strong>週三前</strong> 完成匯款<br>
@@ -899,7 +899,7 @@ async function submitCheckout() {
   if (afterBalance < 0) {
     const needPay = Math.abs(afterBalance);
     const msg = currentBalance < 0
-      ? `⚠️ 目前已有負額 NT$ ${fmtNum(Math.abs(currentBalance))}，結帳後需補齊共 NT$ ${fmtNum(Math.abs(afterBalance))}，請儘速儲值。`
+      ? `⚠️ 目前已有負額 NT$ ${fmtNum(Math.abs(currentBalance))}，結帳後需補齊共 NT$ ${fmtNum(Math.abs(afterBalance))}，請儘速完成補款。`
       : `⚠️ 結帳後餘額將不足，請記得補齊 NT$ ${fmtNum(needPay)}。`;
     if (!confirm(msg + '\n\n確定送出結帳？')) return;
   }
@@ -947,7 +947,7 @@ function makeCopy({ type, date, amount, note, status }) {
     `📅 日期：${date}`, `💵 金額：NT$ ${fmtNum(amount)}`,
     `📝 備註：${note}`, `📋 狀態：${status}`,
     `⏰ 送出時間：${now}`, `────────────────────`,
-    `感謝您的回報，請等待阿霓確認 🙏`].join('\n');
+    `感謝您的回報，請等待對帳核對 🙏`].join('\n');
 }
 function showResult(text) {
   _$('result-text').textContent = text; show('result-section');
