@@ -797,31 +797,22 @@ function doAdminLogout() {
   clearAlert('admin-global-alert');
 }
 
-/* ── 代理儀表板 ── */
-function renderDashboard(data) {
-  const label = data.agentName ? data.agentCode + '（' + data.agentName + '）' : data.agentCode;
-  _$('dash-name').textContent    = label;
-  _$('dash-balance').textContent = fmtNum(data.balance);
-  renderHistory(data.history || []);
-}
-
-function updateBalance(v) {
-  currentBalance = Number(v);
-  _$('dash-balance').textContent = fmtNum(v);
-}
-
+// ────────────────────────────────────────────────────────────
+//  【前端】代理儀表板交易紀錄顯示（完全顯示備註版）
+// ────────────────────────────────────────────────────────────
 function renderHistory(list) {
   const box = _$('history-box');
   if (!list.length) { box.innerHTML = '<div class="history-empty">尚無交易紀錄</div>'; return; }
+  
   box.innerHTML = list.map(h => `
     <div class="history-row">
       <div class="history-info">
-        <div class="history-type">${h.type}</div>
-        <div class="history-date">${h.date || ''}</div>
+        <div class="history-type" style="font-weight: 600; color: #fff;">${h.note}</div>
+        <div class="history-date" style="opacity: 0.6; font-size: 11px;">${h.date || ''}</div>
       </div>
-      <span class="history-badge">${h.status}</span>
-      <span class="history-amt ${h.type === '儲值' ? 'clr-plus' : 'clr-minus'}">
-        ${h.type === '儲值' ? '+' : '−'}${fmtNum(h.amount)}
+      <span class="history-badge" style="background: rgba(255,255,255,0.15); font-size: 10px;">${h.status}</span>
+      <span class="history-amt ${h.type === '儲值' || h.type === '退款' ? 'clr-plus' : 'clr-minus'}">
+        ${(h.type === '儲值' || h.type === '退款') ? '+' : '−'}${fmtNum(h.amount)}
       </span>
     </div>`).join('');
 }
