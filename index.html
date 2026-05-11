@@ -969,6 +969,38 @@ let adminAgentData = [];
 let orderRowCount  = 0;
 
 /* ════════════════════════════════════════
+   Utility Helpers（必須在 init 前定義）
+════════════════════════════════════════ */
+const _$ = id => document.getElementById(id);
+const show = id => _$(id).style.display = 'block';
+const hide = id => _$(id).style.display = 'none';
+
+function showLoading() { _$('loading-overlay').classList.add('active'); }
+function hideLoading() { _$('loading-overlay').classList.remove('active'); }
+
+function showAlert(id, msg, type = 'error') {
+  const el = _$(id);
+  el.textContent = msg;
+  el.className   = 'alert ' + type + ' show';
+}
+function clearAlert(id) {
+  const el = _$(id);
+  el.className   = 'alert error';
+  el.textContent = '';
+}
+
+async function callScript(payload) {
+  const res = await fetch(GOOGLE_SCRIPT_URL, {
+    method:  'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body:    JSON.stringify(payload)
+  });
+  return res.json();
+}
+
+function fmtNum(n) { return Number(n || 0).toLocaleString(); }
+
+/* ════════════════════════════════════════
    Init（頁面載入執行）
 ════════════════════════════════════════ */
 (function init() {
@@ -990,38 +1022,6 @@ let orderRowCount  = 0;
 })();
 
 /* ════════════════════════════════════════
-   Utility Helpers
-════════════════════════════════════════ */
-const $    = id => document.getElementById(id);
-const show = id => $(id).style.display = 'block';
-const hide = id => $(id).style.display = 'none';
-
-function showLoading() { $('loading-overlay').classList.add('active'); }
-function hideLoading() { $('loading-overlay').classList.remove('active'); }
-
-function showAlert(id, msg, type = 'error') {
-  const el = $(id);
-  el.textContent = msg;
-  el.className   = 'alert ' + type + ' show';
-}
-function clearAlert(id) {
-  const el = $(id);
-  el.className   = 'alert error';
-  el.textContent = '';
-}
-
-async function callScript(payload) {
-  const res = await fetch(GOOGLE_SCRIPT_URL, {
-    method:  'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body:    JSON.stringify(payload)
-  });
-  return res.json();
-}
-
-function fmtNum(n) { return Number(n || 0).toLocaleString(); }
-
-/* ════════════════════════════════════════
    登入頁切換
 ════════════════════════════════════════ */
 function showAdminLogin() {
@@ -1038,8 +1038,8 @@ function showAgentLogin() {
 ════════════════════════════════════════ */
 async function doLogin() {
   clearAlert('login-alert');
-  const agentCode = $('login-select').value;
-  const phone     = $('login-phone').value.trim();
+  const agentCode = _$('login-select').value;
+  const phone     = _$('login-phone').value.trim();
   if (!agentCode) { showAlert('login-alert', '請選擇代理代碼'); return; }
   if (!phone)     { showAlert('login-alert', '請輸入手機號碼'); return; }
 
@@ -1077,8 +1077,8 @@ function doLogout() {
 ════════════════════════════════════════ */
 function doAdminLogin() {
   clearAlert('admin-login-alert');
-  const u = $('admin-username').value.trim();
-  const p = $('admin-password').value;
+  const u = _$('admin-username').value.trim();
+  const p = _$('admin-password').value;
   if (u !== ADMIN_USER || p !== ADMIN_PASS) {
     showAlert('admin-login-alert', '❌ 帳號或密碼錯誤'); return;
   }
@@ -1104,18 +1104,18 @@ function renderDashboard(data) {
   const label = data.agentName
     ? data.agentCode + '（' + data.agentName + '）'
     : data.agentCode;
-  $('dash-name').textContent    = label;
-  $('dash-balance').textContent = fmtNum(data.balance);
+  _$('dash-name').textContent    = label;
+  _$('dash-balance').textContent = fmtNum(data.balance);
   renderHistory(data.history || []);
 }
 
 function updateBalance(v) {
   currentBalance = Number(v);
-  $('dash-balance').textContent = fmtNum(v);
+  _$('dash-balance').textContent = fmtNum(v);
 }
 
 function renderHistory(list) {
-  const box = $('history-box');
+  const box = _$('history-box');
   if (!list.length) {
     box.innerHTML = '<div class="history-empty">尚無交易紀錄</div>';
     return;
@@ -1139,8 +1139,8 @@ function renderHistory(list) {
 function switchTab(tab) {
   document.querySelectorAll('#main-section .tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('#main-section .tab-btn').forEach(b => b.classList.remove('active'));
-  $('tab-' + tab).classList.add('active');
-  $('tab-btn-' + tab).classList.add('active');
+  _$('tab-' + tab).classList.add('active');
+  _$('tab-btn-' + tab).classList.add('active');
   clearAlert('global-alert');
   hide('result-section');
 }
@@ -1150,11 +1150,11 @@ function switchTab(tab) {
 ════════════════════════════════════════ */
 async function submitDeposit() {
   clearAlert('global-alert');
-  const date   = $('dep-date').value;
-  const raw    = $('dep-amount').value;
+  const date   = _$('dep-date').value;
+  const raw    = _$('dep-amount').value;
   const amount = Number(raw);
-  const last5  = $('dep-last5').value.trim();
-  const chk    = $('dep-confirm').checked;
+  const last5  = _$('dep-last5').value.trim();
+  const chk    = _$('dep-confirm').checked;
 
   if (!date)                  { showAlert('global-alert', '⚠️ 請選擇匯款日期'); return; }
   if (!raw || amount <= 0)    { showAlert('global-alert', '⚠️ 請輸入儲值金額'); return; }
@@ -1173,9 +1173,9 @@ async function submitDeposit() {
     if (data.success) {
       updateBalance(data.newBalance);
       renderHistory(data.history || []);
-      $('dep-amount').value    = '';
-      $('dep-last5').value     = '';
-      $('dep-confirm').checked = false;
+      _$('dep-amount').value    = '';
+      _$('dep-last5').value     = '';
+      _$('dep-confirm').checked = false;
       showResult(makeCopy({ type: '儲值回報', date, amount, note: '帳號末五碼：' + last5, status: '待審核' }));
     } else {
       showAlert('global-alert', '❌ ' + (data.message || '送出失敗'));
@@ -1192,9 +1192,9 @@ async function submitDeposit() {
 ════════════════════════════════════════ */
 async function submitCheckout() {
   clearAlert('global-alert');
-  const date   = $('ck-date').value;
-  const amount = Number($('ck-amount').value);
-  const note   = $('ck-note').value.trim();
+  const date   = _$('ck-date').value;
+  const amount = Number(_$('ck-amount').value);
+  const note   = _$('ck-note').value.trim();
 
   if (!date)                   { showAlert('global-alert', '⚠️ 請選擇結帳日期'); return; }
   if (!amount || amount <= 0)  { showAlert('global-alert', '⚠️ 請輸入正確的結帳金額'); return; }
@@ -1213,8 +1213,8 @@ async function submitCheckout() {
     if (data.success) {
       updateBalance(data.newBalance);
       renderHistory(data.history || []);
-      $('ck-amount').value = ''; $('ck-note').value = '';
-      $('calc-result').style.display = 'none';
+      _$('ck-amount').value = ''; _$('ck-note').value = '';
+      _$('calc-result').style.display = 'none';
       showResult(makeCopy({ type: '單筆結帳', date, amount, note, status: '已確認' }));
     } else {
       showAlert('global-alert', '❌ ' + (data.message || '送出失敗'));
@@ -1235,7 +1235,7 @@ function addKrwRow() {
   row.innerHTML = `
     <input type="number" class="krw-input" placeholder="輸入韓元金額 (KRW)" min="0">
     <button class="btn-rm" onclick="removeKrwRow(this)">✕</button>`;
-  $('krw-list').appendChild(row);
+  _$('krw-list').appendChild(row);
 }
 
 function removeKrwRow(btn) {
@@ -1250,7 +1250,7 @@ function removeKrwRow(btn) {
 function calcKrw() {
   let total = 0;
   document.querySelectorAll('.krw-input').forEach(i => { total += Number(i.value) || 0; });
-  const el = $('calc-result');
+  const el = _$('calc-result');
   if (total <= 0) { el.style.display = 'none'; return; }
   const twd = Math.ceil(total / 40);
   el.style.display = 'block';
@@ -1260,7 +1260,7 @@ function calcKrw() {
     <button class="btn btn-outline btn-sm" style="margin-left:8px;" onclick="applyKrw(${twd})">帶入總額</button>`;
 }
 
-function applyKrw(v) { $('ck-amount').value = v; }
+function applyKrw(v) { _$('ck-amount').value = v; }
 
 /* ════════════════════════════════════════
    Result 代理端
@@ -1284,14 +1284,14 @@ function makeCopy({ type, date, amount, note, status }) {
 }
 
 function showResult(text) {
-  $('result-text').textContent = text;
+  _$('result-text').textContent = text;
   show('result-section');
-  setTimeout(() => $('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+  setTimeout(() => _$('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
 }
 
 async function copyResult() {
   const btn  = event.currentTarget;
-  const text = $('result-text').textContent;
+  const text = _$('result-text').textContent;
   try {
     await navigator.clipboard.writeText(text);
     const orig = btn.textContent;
@@ -1306,8 +1306,8 @@ async function copyResult() {
 function switchAdminTab(tab) {
   document.querySelectorAll('#admin-section .tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
-  $('atab-' + tab).classList.add('active');
-  $('atab-btn-' + tab).classList.add('active');
+  _$('atab-' + tab).classList.add('active');
+  _$('atab-btn-' + tab).classList.add('active');
   clearAlert('admin-global-alert');
 }
 
@@ -1315,7 +1315,7 @@ function switchAdminTab(tab) {
    儲值審核
 ════════════════════════════════════════ */
 async function loadPendingDeposits() {
-  const el = $('pending-list');
+  const el = _$('pending-list');
   el.innerHTML = '<div class="pending-empty">⏳ 載入中...</div>';
   showLoading();
   try {
@@ -1352,7 +1352,7 @@ async function approveDeposit(rowNum, idx) {
   try {
     const data = await callScript({ action: 'approveDeposit', rowNum });
     if (data.success) {
-      const item = $('pending-' + idx);
+      const item = _$('pending-' + idx);
       if (item) {
         item.classList.add('approved');
         item.querySelector('button').textContent = '✅ 已入帳';
@@ -1378,7 +1378,7 @@ async function loadAdminAgents() {
     if (data.success) {
       adminAgentData = data.agents;
       // 填入結帳選單
-      const sel = $('admin-agent-select');
+      const sel = _$('admin-agent-select');
       sel.innerHTML = '<option value="">請選擇代理</option>';
       data.agents.forEach(a => {
         const opt = document.createElement('option');
@@ -1395,9 +1395,9 @@ async function loadAdminAgents() {
 }
 
 function onAdminAgentChange() {
-  const sel = $('admin-agent-select');
+  const sel = _$('admin-agent-select');
   const opt = sel.options[sel.selectedIndex];
-  const balEl = $('admin-agent-balance');
+  const balEl = _$('admin-agent-balance');
   if (opt && opt.value) {
     const bal  = Number(opt.dataset.balance) || 0;
     const rate = Number(opt.dataset.rate)    || 40;
@@ -1412,12 +1412,12 @@ function onAdminAgentChange() {
 }
 
 function getSelectedRate() {
-  const sel = $('admin-agent-select');
+  const sel = _$('admin-agent-select');
   const opt = sel.options[sel.selectedIndex];
   return (opt && opt.dataset.rate) ? Number(opt.dataset.rate) : 40;
 }
 function getSelectedBalance() {
-  const sel = $('admin-agent-select');
+  const sel = _$('admin-agent-select');
   const opt = sel.options[sel.selectedIndex];
   return (opt && opt.dataset.balance) ? Number(opt.dataset.balance) : 0;
 }
@@ -1490,19 +1490,19 @@ function addOrderRow() {
     <div class="order-row-subtotal" id="row-subtotal-${idx}">
       <span>小計</span><strong>NT$ 0</strong>
     </div>`;
-  $('order-rows').appendChild(div);
+  _$('order-rows').appendChild(div);
 }
 
 function removeOrderRow(idx) {
-  const el = $('order-row-' + idx);
+  const el = _$('order-row-' + idx);
   if (el) el.remove();
   recalcAllRows();
 }
 
 function onRefundDateChange(idx) {
-  const row = $('order-row-' + idx);
+  const row = _$('order-row-' + idx);
   if (!row) return;
-  const hasRefund = !!$('row-refund-date-' + idx).value;
+  const hasRefund = !!_$('row-refund-date-' + idx).value;
   if (hasRefund) {
     row.classList.add('discontinued');
     row.querySelector('.order-row-num').innerHTML = `品項 #${idx} <span class="disc-badge">斷貨退款</span>`;
@@ -1515,18 +1515,18 @@ function onRefundDateChange(idx) {
 
 function recalcRow(idx) {
   const rate  = getSelectedRate();
-  const qty   = Number($('row-qty-' + idx)?.value)  || 0;
-  const krw   = Number($('row-krw-' + idx)?.value)  || 0;
+  const qty   = Number(_$('row-qty-' + idx)?.value)  || 0;
+  const krw   = Number(_$('row-krw-' + idx)?.value)  || 0;
   const twdU  = krw ? Math.ceil(krw / rate) : 0;
   const krwT  = qty * krw;
   const twdT  = qty * twdU;
 
-  if ($('row-twd-' + idx))       $('row-twd-' + idx).value       = krw ? twdU : '';
-  if ($('row-krw-total-' + idx)) $('row-krw-total-' + idx).value = krwT || '';
-  if ($('row-twd-total-' + idx)) $('row-twd-total-' + idx).value = twdT || '';
+  if (_$('row-twd-' + idx))       _$('row-twd-' + idx).value       = krw ? twdU : '';
+  if (_$('row-krw-total-' + idx)) _$('row-krw-total-' + idx).value = krwT || '';
+  if (_$('row-twd-total-' + idx)) _$('row-twd-total-' + idx).value = twdT || '';
 
-  const isRefund = !!($('row-refund-date-' + idx)?.value);
-  const subEl    = $('row-subtotal-' + idx);
+  const isRefund = !!(_$('row-refund-date-' + idx)?.value);
+  const subEl    = _$('row-subtotal-' + idx);
   if (subEl) {
     subEl.innerHTML = isRefund
       ? `<span>退款小計</span><strong style="color:var(--success)">－NT$ ${fmtNum(twdT)}</strong>`
@@ -1544,18 +1544,18 @@ function calcAdminSummary() {
   let total = 0, refund = 0;
   document.querySelectorAll('.order-row').forEach(row => {
     const idx   = row.id.replace('order-row-', '');
-    const twdT  = Number($('row-twd-total-' + idx)?.value) || 0;
-    const isRef = !!($('row-refund-date-' + idx)?.value);
+    const twdT  = Number(_$('row-twd-total-' + idx)?.value) || 0;
+    const isRef = !!(_$('row-refund-date-' + idx)?.value);
     if (isRef) refund += twdT;
     else       total  += twdT;
   });
   const net   = total - refund;
   const after = getSelectedBalance() - net;
-  $('sum-total').textContent  = 'NT$ ' + fmtNum(total);
-  $('sum-refund').textContent = '－NT$ ' + fmtNum(refund);
-  $('sum-net').textContent    = 'NT$ ' + fmtNum(net);
-  $('sum-after-balance').textContent = 'NT$ ' + fmtNum(after);
-  $('sum-after-balance').style.color = after >= 0 ? 'var(--success)' : 'var(--accent)';
+  _$('sum-total').textContent  = 'NT$ ' + fmtNum(total);
+  _$('sum-refund').textContent = '－NT$ ' + fmtNum(refund);
+  _$('sum-net').textContent    = 'NT$ ' + fmtNum(net);
+  _$('sum-after-balance').textContent = 'NT$ ' + fmtNum(after);
+  _$('sum-after-balance').style.color = after >= 0 ? 'var(--success)' : 'var(--accent)';
   show('checkout-summary');
 }
 
@@ -1564,9 +1564,9 @@ function calcAdminSummary() {
 ════════════════════════════════════════ */
 async function submitAdminCheckout() {
   clearAlert('admin-global-alert');
-  const agentCode = $('admin-agent-select').value;
-  const date      = $('admin-ck-date').value;
-  const batchNote = $('admin-ck-note').value.trim();
+  const agentCode = _$('admin-agent-select').value;
+  const date      = _$('admin-ck-date').value;
+  const batchNote = _$('admin-ck-note').value.trim();
 
   if (!agentCode) { showAlert('admin-global-alert', '⚠️ 請選擇代理'); return; }
   if (!date)      { showAlert('admin-global-alert', '⚠️ 請選擇結帳日期'); return; }
@@ -1575,23 +1575,23 @@ async function submitAdminCheckout() {
   let hasItem   = false;
   document.querySelectorAll('.order-row').forEach(row => {
     const idx = row.id.replace('order-row-', '');
-    const qty = Number($('row-qty-' + idx)?.value) || 0;
-    const krw = Number($('row-krw-' + idx)?.value) || 0;
+    const qty = Number(_$('row-qty-' + idx)?.value) || 0;
+    const krw = Number(_$('row-krw-' + idx)?.value) || 0;
     if (qty <= 0 && krw <= 0) return;
     hasItem = true;
     orders.push({
-      note:       $('row-note-' + idx)?.value       || '',
-      orderDate:  $('row-order-date-' + idx)?.value || '',
-      shipDate:   $('row-ship-date-' + idx)?.value  || '',
-      batchDate:  $('row-batch-date-' + idx)?.value || '',
-      airDate:    $('row-air-date-' + idx)?.value   || '',
-      refundDate: $('row-refund-date-' + idx)?.value|| '',
+      note:       _$('row-note-' + idx)?.value       || '',
+      orderDate:  _$('row-order-date-' + idx)?.value || '',
+      shipDate:   _$('row-ship-date-' + idx)?.value  || '',
+      batchDate:  _$('row-batch-date-' + idx)?.value || '',
+      airDate:    _$('row-air-date-' + idx)?.value   || '',
+      refundDate: _$('row-refund-date-' + idx)?.value|| '',
       qty,
       krwUnit:  krw,
-      twdUnit:  Number($('row-twd-' + idx)?.value)       || 0,
-      krwTotal: Number($('row-krw-total-' + idx)?.value) || 0,
-      twdTotal: Number($('row-twd-total-' + idx)?.value) || 0,
-      isRefund: !!($('row-refund-date-' + idx)?.value)
+      twdUnit:  Number(_$('row-twd-' + idx)?.value)       || 0,
+      krwTotal: Number(_$('row-krw-total-' + idx)?.value) || 0,
+      twdTotal: Number(_$('row-twd-total-' + idx)?.value) || 0,
+      isRefund: !!(_$('row-refund-date-' + idx)?.value)
     });
   });
 
@@ -1609,17 +1609,17 @@ async function submitAdminCheckout() {
     const data = await callScript({ action: 'adminCheckout', agentCode, date, batchNote, orders, netAmount: net });
     if (data.success) {
       // 更新選單餘額快取
-      const sel = $('admin-agent-select');
+      const sel = _$('admin-agent-select');
       const opt = sel.options[sel.selectedIndex];
       if (opt) opt.dataset.balance = data.newBalance;
-      $('admin-agent-balance').textContent = 'NT$ ' + fmtNum(data.newBalance) + '　（匯率 ×' + getSelectedRate() + '）';
+      _$('admin-agent-balance').textContent = 'NT$ ' + fmtNum(data.newBalance) + '　（匯率 ×' + getSelectedRate() + '）';
       // 結帳文案
-      $('admin-result-text').textContent = buildAdminCopy(agentCode, date, batchNote, orders, net, data.newBalance);
-      $('admin-result-section').style.display = 'block';
-      $('admin-result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      _$('admin-result-text').textContent = buildAdminCopy(agentCode, date, batchNote, orders, net, data.newBalance);
+      _$('admin-result-section').style.display = 'block';
+      _$('admin-result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
       showAlert('admin-global-alert', '✅ 結帳成功！代理餘額已扣除。', 'success');
       // 重置
-      $('order-rows').innerHTML = '';
+      _$('order-rows').innerHTML = '';
       orderRowCount = 0;
       addOrderRow();
       hide('checkout-summary');
@@ -1667,7 +1667,7 @@ function buildAdminCopy(agentCode, date, batchNote, orders, net, newBal) {
 
 async function copyAdminResult() {
   const btn  = event.currentTarget;
-  const text = $('admin-result-text').textContent;
+  const text = _$('admin-result-text').textContent;
   try {
     await navigator.clipboard.writeText(text);
     const orig = btn.textContent;
@@ -1680,7 +1680,7 @@ async function copyAdminResult() {
    系統設定 — 代理資料表格
 ════════════════════════════════════════ */
 function renderAgentSettingsTable(agents) {
-  const tbody = $('agent-settings-body');
+  const tbody = _$('agent-settings-body');
   if (!agents || !agents.length) {
     tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:16px;">無代理資料</td></tr>';
     return;
@@ -1697,9 +1697,9 @@ function renderAgentSettingsTable(agents) {
 }
 
 async function saveAgentRow(code, i) {
-  const name  = $('st-name-'  + i)?.value.trim() || '';
-  const phone = $('st-phone-' + i)?.value.trim() || '';
-  const rate  = Number($('st-rate-' + i)?.value) || 40;
+  const name  = _$('st-name-'  + i)?.value.trim() || '';
+  const phone = _$('st-phone-' + i)?.value.trim() || '';
+  const rate  = Number(_$('st-rate-' + i)?.value) || 40;
   showLoading();
   try {
     const data = await callScript({ action: 'updateAgent', code, name, phone, rate });
@@ -1708,7 +1708,7 @@ async function saveAgentRow(code, i) {
       const agent = adminAgentData.find(a => a.code === code);
       if (agent) { agent.name = name; agent.phone = phone; agent.rate = rate; }
       // 同步更新結帳選單 rate
-      Array.from($('admin-agent-select').options).forEach(opt => {
+      Array.from(_$('admin-agent-select').options).forEach(opt => {
         if (opt.value === code) opt.dataset.rate = rate;
       });
     } else {
@@ -1725,8 +1725,8 @@ async function saveAgentRow(code, i) {
    系統設定 — 公告日期
 ════════════════════════════════════════ */
 async function saveAnnounceDates() {
-  const wed = $('setting-wed-date').value;
-  const sun = $('setting-sun-date').value;
+  const wed = _$('setting-wed-date').value;
+  const sun = _$('setting-sun-date').value;
   if (!wed && !sun) { showAlert('admin-global-alert', '⚠️ 請至少填寫一個日期'); return; }
   showLoading();
   try {
