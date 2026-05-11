@@ -24,15 +24,15 @@
   --success-bg:    #f1f8e9;
   --warning:       #e65100;
   --warning-bg:    #fff3e0;
+  --admin:         #4a148c;
+  --admin-dark:    #311b92;
+  --admin-light:   #7b1fa2;
   --shadow:        0 4px 20px rgba(141,110,99,0.14);
   --shadow-lg:     0 8px 36px rgba(141,110,99,0.22);
   --radius:        16px;
   --radius-sm:     10px;
 }
 
-/* ══════════════════════════════════════
-   Reset
-══════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -48,12 +48,12 @@ body {
 }
 
 /* ══════════════════════════════════════
-   Loading Overlay
+   Loading
 ══════════════════════════════════════ */
 #loading-overlay {
   display: none;
   position: fixed; inset: 0;
-  background: rgba(253,250,246,0.86);
+  background: rgba(253,250,246,0.88);
   backdrop-filter: blur(6px);
   z-index: 9999;
   flex-direction: column;
@@ -62,7 +62,6 @@ body {
   gap: 14px;
 }
 #loading-overlay.active { display: flex; }
-
 .spinner {
   width: 44px; height: 44px;
   border: 4px solid var(--primary-light);
@@ -71,30 +70,17 @@ body {
   animation: spin 0.85s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-.loading-text {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--primary-dark);
-  letter-spacing: 1px;
-}
+.loading-text { font-size: 13.5px; font-weight: 600; color: var(--primary-dark); letter-spacing: 1px; }
 
 /* ══════════════════════════════════════
-   Page Wrapper
+   Layout
 ══════════════════════════════════════ */
-.page-wrapper {
-  max-width: 620px;
-  margin: 0 auto;
-  padding: 0 18px 72px;
-}
+.page-wrapper { max-width: 680px; margin: 0 auto; padding: 0 18px 80px; }
 
 /* ══════════════════════════════════════
-   Site Header
+   Header
 ══════════════════════════════════════ */
-.site-header {
-  text-align: center;
-  padding: 36px 0 22px;
-}
+.site-header { text-align: center; padding: 32px 0 20px; }
 .site-header .logo    { font-size: 40px; display: block; margin-bottom: 10px; }
 .site-header h1       { font-size: 20px; font-weight: 700; color: var(--primary-dark); letter-spacing: 2px; }
 .site-header .tagline { font-size: 12px; color: var(--text-light); margin-top: 5px; letter-spacing: 1px; }
@@ -113,10 +99,8 @@ body {
 .marquee-inner {
   display: inline-block;
   animation: marquee-run 32s linear infinite;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: #ffccbc;
-  letter-spacing: 0.3px;
+  font-size: 12.5px; font-weight: 600;
+  color: #ffccbc; letter-spacing: 0.3px;
 }
 .marquee-inner:hover { animation-play-state: paused; cursor: default; }
 @keyframes marquee-run {
@@ -140,119 +124,102 @@ body {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 .card-title {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 14px; font-weight: 700;
   color: var(--primary-dark);
   margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: flex; align-items: center; gap: 8px;
 }
-.card-title::after {
-  content: ''; flex: 1;
-  height: 1px; background: var(--border);
-}
+.card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
 /* ══════════════════════════════════════
    Form Controls
 ══════════════════════════════════════ */
 label {
   display: block;
-  font-size: 12.5px;
-  font-weight: 600;
+  font-size: 12.5px; font-weight: 600;
   color: var(--text-muted);
-  margin-bottom: 6px;
-  letter-spacing: 0.2px;
+  margin-bottom: 6px; letter-spacing: 0.2px;
 }
-
 input[type="text"],
 input[type="number"],
 input[type="date"],
-select {
+input[type="password"],
+select, textarea {
   width: 100%;
   background: #fff;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 11px 13px;
-  font-size: 14px;
-  color: var(--text);
-  font-family: inherit;
-  outline: none;
-  appearance: none;
-  -webkit-appearance: none;
+  font-size: 14px; color: var(--text);
+  font-family: inherit; outline: none;
+  appearance: none; -webkit-appearance: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
-input:focus, select:focus {
+input:focus, select:focus, textarea:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(141,110,99,0.10);
 }
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 input[type="number"] { -moz-appearance: textfield; }
-
 .form-row { margin-bottom: 14px; }
-
-.form-grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 
 /* ══════════════════════════════════════
    Buttons
 ══════════════════════════════════════ */
 .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 12px 20px;
-  font-size: 13.5px;
-  font-weight: 700;
-  font-family: inherit;
-  letter-spacing: 0.3px;
-  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 6px; border: none; border-radius: var(--radius-sm);
+  padding: 12px 20px; font-size: 13.5px; font-weight: 700;
+  font-family: inherit; letter-spacing: 0.3px; cursor: pointer;
   transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
 }
 .btn:active { transform: scale(0.98) !important; }
-
 .btn-primary { background: var(--primary); color: #fff; }
 .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow); }
-
 .btn-accent  { background: var(--accent); color: #fff; }
 .btn-accent:hover  { background: #bf360c; transform: translateY(-1px); box-shadow: var(--shadow); }
-
-.btn-outline {
-  background: transparent;
-  color: var(--primary);
-  border: 1.5px solid var(--primary);
-}
+.btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
 .btn-outline:hover { background: var(--card-inner); }
-
+.btn-success { background: var(--success); color: #fff; }
+.btn-success:hover { background: #33691e; transform: translateY(-1px); }
+.btn-admin   { background: var(--admin); color: #fff; }
+.btn-admin:hover { background: var(--admin-dark); transform: translateY(-1px); box-shadow: var(--shadow); }
 .btn-ghost {
-  background: transparent;
-  color: rgba(255,255,255,0.82);
-  border: 1px solid rgba(255,255,255,0.32);
-  border-radius: 20px;
+  background: transparent; color: rgba(255,255,255,0.82);
+  border: 1px solid rgba(255,255,255,0.32); border-radius: 20px;
 }
 .btn-ghost:hover { background: rgba(255,255,255,0.12); }
-
-.btn-sm   { padding: 8px 14px; font-size: 12.5px; }
+.btn-danger { background: #c62828; color: #fff; }
+.btn-danger:hover { background: #b71c1c; }
+.btn-sm   { padding: 7px 13px; font-size: 12.5px; }
+.btn-xs   { padding: 5px 10px; font-size: 12px; }
 .btn-full { width: 100%; }
+
+/* ══════════════════════════════════════
+   Alert
+══════════════════════════════════════ */
+.alert {
+  display: none; border-radius: var(--radius-sm);
+  padding: 11px 15px; font-size: 13px; font-weight: 600;
+  margin-bottom: 14px; line-height: 1.5;
+}
+.alert.error   { background: #fbe9e7; border: 1px solid #ffccbc; color: var(--accent); }
+.alert.success { background: var(--success-bg); border: 1px solid #aed581; color: var(--success); }
+.alert.show    { display: block; animation: fadeUp 0.25s ease; }
 
 /* ══════════════════════════════════════
    Login
 ══════════════════════════════════════ */
-.login-desc {
-  font-size: 13px;
-  color: var(--text-light);
-  line-height: 1.7;
-  margin-bottom: 18px;
+.login-desc { font-size: 13px; color: var(--text-light); line-height: 1.7; margin-bottom: 18px; }
+.login-switch {
+  text-align: center; margin-top: 14px;
+  font-size: 12.5px; color: var(--text-light);
 }
+.login-switch a { color: var(--primary); cursor: pointer; text-decoration: underline; }
 
 /* ══════════════════════════════════════
    Dashboard
@@ -260,74 +227,38 @@ input[type="number"] { -moz-appearance: textfield; }
 #dashboard {
   display: none;
   background: linear-gradient(135deg, #4e342e 0%, #6d4c41 100%);
-  border-radius: var(--radius);
-  padding: 20px 22px 18px;
-  color: #fff;
-  margin-bottom: 14px;
-  box-shadow: var(--shadow-lg);
-  animation: fadeUp 0.35s ease;
+  border-radius: var(--radius); padding: 20px 22px 18px;
+  color: #fff; margin-bottom: 14px;
+  box-shadow: var(--shadow-lg); animation: fadeUp 0.35s ease;
 }
-
-.dash-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
+.dash-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
 .dash-left .greeting  { font-size: 11.5px; opacity: 0.7; margin-bottom: 3px; }
 .dash-left .agentname { font-size: 16px; font-weight: 700; }
-
-.dash-right             { text-align: right; flex-shrink: 0; }
-.dash-right .bal-label  { font-size: 11px; opacity: 0.65; margin-bottom: 3px; }
-.dash-right .bal-amount {
-  font-size: 26px; font-weight: 800;
-  color: #ffccbc; letter-spacing: 0.5px; line-height: 1.15;
-}
-
-.dash-history-label {
-  font-size: 11px; opacity: 0.6; margin-bottom: 6px;
-}
-
+.dash-right            { text-align: right; flex-shrink: 0; }
+.dash-right .bal-label { font-size: 11px; opacity: 0.65; margin-bottom: 3px; }
+.dash-right .bal-amount { font-size: 26px; font-weight: 800; color: #ffccbc; letter-spacing: 0.5px; line-height: 1.15; }
+.dash-history-label   { font-size: 11px; opacity: 0.6; margin-bottom: 6px; }
 .history-box {
-  background: rgba(255,255,255,0.09);
-  border-radius: 9px;
-  max-height: 144px;
-  overflow-y: auto;
-  padding: 6px 10px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.22) transparent;
+  background: rgba(255,255,255,0.09); border-radius: 9px;
+  max-height: 144px; overflow-y: auto; padding: 6px 10px;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.22) transparent;
 }
 .history-box::-webkit-scrollbar { width: 3px; }
 .history-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.22); border-radius: 2px; }
-
 .history-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  font-size: 12px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 12px;
 }
 .history-row:last-child { border-bottom: none; }
-
-.history-info   { flex: 1; }
-.history-type   { opacity: 0.85; }
-.history-date   { font-size: 10.5px; opacity: 0.5; margin-top: 1px; }
-.history-badge  {
-  font-size: 10px;
-  padding: 2px 8px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.12);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.history-amt    { font-weight: 700; font-size: 12.5px; white-space: nowrap; flex-shrink: 0; }
-.clr-plus       { color: #a5d6a7; }
-.clr-minus      { color: #ffccbc; }
-.history-empty  { font-size: 12px; opacity: 0.48; text-align: center; padding: 10px 0; }
+.history-info  { flex: 1; }
+.history-type  { opacity: 0.85; }
+.history-date  { font-size: 10.5px; opacity: 0.5; margin-top: 1px; }
+.history-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; background: rgba(255,255,255,0.12); white-space: nowrap; flex-shrink: 0; }
+.history-amt   { font-weight: 700; font-size: 12.5px; white-space: nowrap; flex-shrink: 0; }
+.clr-plus  { color: #a5d6a7; }
+.clr-minus { color: #ffccbc; }
+.history-empty { font-size: 12px; opacity: 0.48; text-align: center; padding: 10px 0; }
 
 /* ══════════════════════════════════════
    Notice Banner
@@ -335,62 +266,37 @@ input[type="number"] { -moz-appearance: textfield; }
 #notice-banner {
   display: none;
   background: linear-gradient(135deg, #fff9e6, #fff3e0);
-  border: 1.5px solid #ffcc80;
-  border-left: 5px solid var(--warning);
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
-  margin-bottom: 16px;
-  animation: fadeUp 0.35s ease;
+  border: 1.5px solid #ffcc80; border-left: 5px solid var(--warning);
+  border-radius: var(--radius-sm); padding: 14px 16px;
+  margin-bottom: 16px; animation: fadeUp 0.35s ease;
 }
-.notice-title {
-  font-size: 13px; font-weight: 800;
-  color: var(--warning);
-  margin-bottom: 9px;
-  display: flex; align-items: center; gap: 6px;
-}
-.notice-body        { font-size: 13px; color: #5d4037; line-height: 1.85; }
+.notice-title { font-size: 13px; font-weight: 800; color: var(--warning); margin-bottom: 9px; display: flex; align-items: center; gap: 6px; }
+.notice-body  { font-size: 13px; color: #5d4037; line-height: 1.85; }
 .notice-body strong { color: #bf360c; }
 .notice-tag {
-  display: inline-block;
-  background: var(--warning);
-  color: #fff;
-  font-size: 11px; font-weight: 700;
-  padding: 2px 9px; border-radius: 20px;
+  display: inline-block; background: var(--warning); color: #fff;
+  font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px;
   margin-right: 4px; vertical-align: middle;
 }
 
 /* ══════════════════════════════════════
-   Main / Tabs
+   Tabs
 ══════════════════════════════════════ */
-#main-section { display: none; }
+#main-section  { display: none; }
+#admin-section { display: none; }
 
 .tab-bar {
-  display: flex;
-  gap: 4px;
-  background: var(--card-inner);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 4px;
-  margin-bottom: 16px;
+  display: flex; gap: 4px;
+  background: var(--card-inner); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 4px; margin-bottom: 16px;
 }
 .tab-btn {
-  flex: 1;
-  padding: 11px 10px;
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 0.2s;
+  flex: 1; padding: 11px 10px; background: transparent; border: none;
+  border-radius: 8px; font-size: 13.5px; font-weight: 600;
+  color: var(--text-muted); cursor: pointer; font-family: inherit; transition: all 0.2s;
 }
-.tab-btn.active {
-  background: var(--primary);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(141,110,99,0.26);
-}
+.tab-btn.active { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(141,110,99,0.26); }
+.tab-btn.active.admin-tab { background: var(--admin); box-shadow: 0 2px 8px rgba(74,20,140,0.3); }
 
 .tab-panel        { display: none; }
 .tab-panel.active { display: block; animation: fadeUp 0.28s ease; }
@@ -399,13 +305,9 @@ input[type="number"] { -moz-appearance: textfield; }
    Bank Info
 ══════════════════════════════════════ */
 .bank-info {
-  background: var(--warning-bg);
-  border: 1.5px solid #ffccbc;
-  border-radius: var(--radius-sm);
-  padding: 13px 15px;
-  margin-bottom: 18px;
-  font-size: 13px;
-  line-height: 1.85;
+  background: var(--warning-bg); border: 1.5px solid #ffccbc;
+  border-radius: var(--radius-sm); padding: 13px 15px;
+  margin-bottom: 18px; font-size: 13px; line-height: 1.85;
 }
 .bank-info strong { color: var(--warning); }
 
@@ -413,148 +315,216 @@ input[type="number"] { -moz-appearance: textfield; }
    Checkbox Row
 ══════════════════════════════════════ */
 .checkbox-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  background: #fff;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px; background: #fff;
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  cursor: pointer; transition: border-color 0.2s, background 0.2s;
   margin-bottom: 16px;
 }
-.checkbox-row:has(input:checked) {
-  border-color: var(--primary);
-  background: var(--card-inner);
-}
-.checkbox-row input[type="checkbox"] {
-  width: 17px; height: 17px;
-  accent-color: var(--primary);
-  cursor: pointer; flex-shrink: 0;
-}
-.checkbox-row span {
-  font-size: 13px; font-weight: 600;
-  color: var(--text-muted); line-height: 1.45;
-}
+.checkbox-row:has(input:checked) { border-color: var(--primary); background: var(--card-inner); }
+.checkbox-row input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0; }
+.checkbox-row span { font-size: 13px; font-weight: 600; color: var(--text-muted); line-height: 1.45; }
 
 /* ══════════════════════════════════════
-   KRW Calculator
+   KRW Calculator (代理端)
 ══════════════════════════════════════ */
 .calc-box {
-  background: var(--card-inner);
-  border: 1px dashed var(--primary-light);
-  border-radius: var(--radius-sm);
-  padding: 15px;
-  margin-bottom: 16px;
+  background: var(--card-inner); border: 1px dashed var(--primary-light);
+  border-radius: var(--radius-sm); padding: 15px; margin-bottom: 16px;
 }
-.calc-title {
-  font-size: 13px; font-weight: 700;
-  color: var(--primary-dark);
-  margin-bottom: 12px;
-}
+.calc-title { font-size: 13px; font-weight: 700; color: var(--primary-dark); margin-bottom: 12px; }
 .calc-title span { font-weight: 400; color: var(--text-light); }
-
 .krw-list { display: flex; flex-direction: column; gap: 8px; }
-
 .krw-row  { display: flex; gap: 8px; align-items: center; }
 .krw-row input { flex: 1; }
-
 .btn-rm {
-  background: none;
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  padding: 9px 11px;
-  color: var(--text-light);
-  font-size: 13px;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: all 0.2s;
-  line-height: 1;
+  background: none; border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 9px 11px; color: var(--text-light); font-size: 13px;
+  cursor: pointer; flex-shrink: 0; transition: all 0.2s; line-height: 1;
 }
 .btn-rm:hover { border-color: var(--accent); color: var(--accent); }
-
-.calc-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
-
+.calc-actions { display: flex; gap: 8px; margin-top: 12px; }
 .calc-result {
-  display: none;
-  margin-top: 12px;
-  padding: 11px 14px;
-  background: #fff;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--primary-dark);
-  line-height: 1.6;
+  display: none; margin-top: 12px; padding: 11px 14px;
+  background: #fff; border-radius: 8px;
+  font-size: 13px; font-weight: 600; color: var(--primary-dark); line-height: 1.6;
 }
-
-/* ══════════════════════════════════════
-   Alert
-══════════════════════════════════════ */
-.alert {
-  display: none;
-  border-radius: var(--radius-sm);
-  padding: 11px 15px;
-  font-size: 13px; font-weight: 600;
-  margin-bottom: 14px;
-  line-height: 1.5;
-}
-.alert.error   { background: #fbe9e7; border: 1px solid #ffccbc; color: var(--accent); }
-.alert.success { background: var(--success-bg); border: 1px solid #aed581; color: var(--success); }
-.alert.show    { display: block; animation: fadeUp 0.25s ease; }
 
 /* ══════════════════════════════════════
    Result Section
 ══════════════════════════════════════ */
 #result-section { display: none; animation: fadeUp 0.35s ease; }
-
 .result-card {
-  background: var(--success-bg);
-  border: 1.5px solid #aed581;
-  border-radius: var(--radius);
-  padding: 20px 22px;
+  background: var(--success-bg); border: 1.5px solid #aed581;
+  border-radius: var(--radius); padding: 20px 22px;
 }
-.result-card h3 {
-  font-size: 14px; font-weight: 700;
-  color: var(--success);
-  margin-bottom: 13px;
-  display: flex; align-items: center; gap: 7px;
-}
+.result-card h3 { font-size: 14px; font-weight: 700; color: var(--success); margin-bottom: 13px; display: flex; align-items: center; gap: 7px; }
 .result-textbox {
-  background: #fff;
-  border: 1px solid #c5e1a5;
-  border-radius: var(--radius-sm);
-  padding: 15px;
-  font-size: 13px; line-height: 1.95;
-  white-space: pre-wrap;
-  word-break: break-all;
-  color: var(--text);
-  font-family: 'PingFang TC', 'Microsoft JhengHei', monospace;
-  margin-bottom: 14px;
-  max-height: 230px; overflow-y: auto;
+  background: #fff; border: 1px solid #c5e1a5; border-radius: var(--radius-sm);
+  padding: 15px; font-size: 13px; line-height: 1.95;
+  white-space: pre-wrap; word-break: break-all;
+  color: var(--text); font-family: 'PingFang TC', 'Microsoft JhengHei', monospace;
+  margin-bottom: 14px; max-height: 230px; overflow-y: auto;
+}
+
+/* ══════════════════════════════════════
+   Admin Dashboard
+══════════════════════════════════════ */
+#admin-dashboard {
+  display: none;
+  background: linear-gradient(135deg, #311b92 0%, #4a148c 100%);
+  border-radius: var(--radius); padding: 20px 22px 18px;
+  color: #fff; margin-bottom: 14px;
+  box-shadow: var(--shadow-lg); animation: fadeUp 0.35s ease;
+}
+.admin-dash-top { display: flex; justify-content: space-between; align-items: center; }
+.admin-greeting { font-size: 11.5px; opacity: 0.7; margin-bottom: 3px; }
+.admin-name     { font-size: 18px; font-weight: 700; }
+.admin-badge {
+  background: rgba(255,255,255,0.15); border-radius: 20px;
+  padding: 4px 14px; font-size: 12px; font-weight: 700;
+}
+
+/* ══════════════════════════════════════
+   Admin Tabs
+══════════════════════════════════════ */
+.admin-tab-bar {
+  display: flex; gap: 4px;
+  background: #ede7f6; border: 1px solid #b39ddb;
+  border-radius: var(--radius-sm); padding: 4px; margin-bottom: 16px;
+}
+.admin-tab-btn {
+  flex: 1; padding: 10px 8px; background: transparent; border: none;
+  border-radius: 8px; font-size: 13px; font-weight: 600;
+  color: var(--admin); cursor: pointer; font-family: inherit; transition: all 0.2s;
+}
+.admin-tab-btn.active { background: var(--admin); color: #fff; box-shadow: 0 2px 8px rgba(74,20,140,0.28); }
+
+/* ══════════════════════════════════════
+   Pending Deposit List
+══════════════════════════════════════ */
+.pending-list { display: flex; flex-direction: column; gap: 10px; }
+.pending-item {
+  background: #fff; border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 13px 15px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+}
+.pending-item.approved { opacity: 0.45; pointer-events: none; }
+.pending-info   { flex: 1; min-width: 0; }
+.pending-agent  { font-size: 13.5px; font-weight: 700; color: var(--primary-dark); }
+.pending-detail { font-size: 12px; color: var(--text-muted); margin-top: 3px; line-height: 1.6; }
+.pending-amount { font-size: 16px; font-weight: 800; color: var(--success); white-space: nowrap; }
+.pending-empty  { text-align: center; color: var(--text-light); font-size: 13px; padding: 20px 0; }
+
+/* ══════════════════════════════════════
+   Admin Checkout Table
+══════════════════════════════════════ */
+.order-rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+
+.order-row {
+  background: #fff; border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px;
+  position: relative;
+}
+.order-row.discontinued {
+  border-color: #ef9a9a; background: #fff8f8;
+}
+.order-row-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.order-row-num { font-size: 12px; font-weight: 700; color: var(--text-light); }
+.order-row-del {
+  background: none; border: 1.5px solid #ef9a9a; border-radius: 8px;
+  padding: 4px 10px; color: #c62828; font-size: 12px; cursor: pointer;
+  font-family: inherit; font-weight: 600; transition: all 0.2s;
+}
+.order-row-del:hover { background: #ffebee; }
+
+.order-grid-dates { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.order-grid-dates-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.order-grid-nums  { display: grid; grid-template-columns: 2fr 2fr 2fr 3fr 3fr; gap: 8px; margin-bottom: 10px; align-items: end; }
+
+.order-field label { font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
+.order-field input, .order-field select {
+  padding: 8px 10px; font-size: 13px;
+}
+.auto-field {
+  background: var(--card-inner) !important;
+  color: var(--text-muted) !important;
+  font-weight: 600;
+}
+
+.order-row-subtotal {
+  background: var(--card-inner); border-radius: 8px;
+  padding: 8px 12px; font-size: 12.5px; color: var(--text-muted);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.order-row-subtotal strong { color: var(--primary-dark); font-size: 14px; }
+
+.disc-badge {
+  display: inline-block; background: #ef9a9a; color: #b71c1c;
+  font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+  margin-left: 6px;
+}
+
+/* ══════════════════════════════════════
+   Admin Summary
+══════════════════════════════════════ */
+.checkout-summary {
+  background: linear-gradient(135deg, #f3e5f5, #ede7f6);
+  border: 1.5px solid #b39ddb; border-radius: var(--radius-sm);
+  padding: 16px 18px; margin-bottom: 16px;
+}
+.summary-title { font-size: 13px; font-weight: 700; color: var(--admin); margin-bottom: 10px; }
+.summary-row   { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; color: var(--text-muted); }
+.summary-row.total { border-top: 1px solid #b39ddb; margin-top: 6px; padding-top: 10px; font-weight: 700; font-size: 15px; color: var(--admin); }
+.summary-refund { color: var(--success); font-weight: 700; }
+.summary-net    { color: var(--accent); }
+
+/* ══════════════════════════════════════
+   Admin Settings
+══════════════════════════════════════ */
+.settings-card {
+  background: #ede7f6; border: 1.5px solid #b39ddb;
+  border-radius: var(--radius-sm); padding: 16px; margin-bottom: 12px;
+}
+.settings-label { font-size: 13px; font-weight: 700; color: var(--admin); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+
+.agent-list-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.agent-list-table th {
+  background: var(--admin); color: #fff; padding: 8px 10px;
+  text-align: left; font-weight: 600; font-size: 12px;
+}
+.agent-list-table td { padding: 8px 10px; border-bottom: 1px solid #d1c4e9; }
+.agent-list-table tr:last-child td { border-bottom: none; }
+.agent-list-table tr:hover td { background: #f3e5f5; }
+.agent-list-table input {
+  border: 1px solid #b39ddb; border-radius: 6px;
+  padding: 5px 8px; font-size: 13px; width: 100%;
 }
 
 /* ══════════════════════════════════════
    Responsive
 ══════════════════════════════════════ */
-@media (max-width: 480px) {
+@media (max-width: 520px) {
   .page-wrapper    { padding: 0 14px 60px; }
   .card            { padding: 20px 16px 18px; }
   .form-grid-2     { grid-template-columns: 1fr; gap: 0; }
+  .form-grid-3     { grid-template-columns: 1fr 1fr; }
   .dash-top        { flex-direction: column; gap: 8px; }
   .dash-right      { text-align: left; }
   .calc-actions    { flex-direction: column; }
-  .calc-actions .btn { width: 100%; }
+  .order-grid-nums { grid-template-columns: 1fr 1fr; }
+  .order-grid-dates-3 { grid-template-columns: 1fr 1fr; }
+  .admin-tab-btn   { font-size: 11.5px; padding: 9px 5px; }
 }
 </style>
 </head>
 <body>
 
-<!-- Loading Overlay -->
+<!-- Loading -->
 <div id="loading-overlay">
   <div class="spinner"></div>
   <div class="loading-text">⏳ 資料處理中，請稍候...</div>
@@ -562,39 +532,66 @@ input[type="number"] { -moz-appearance: textfield; }
 
 <div class="page-wrapper">
 
-  <!-- ── Header ── -->
+  <!-- Header -->
   <div class="site-header">
     <span class="logo">🥜</span>
     <h1>DouDou 代理管理系統</h1>
     <p class="tagline">內部專用 · 儲值 &amp; 結帳平台</p>
   </div>
 
-  <!-- ── 跑馬燈（全程顯示）── -->
+  <!-- Marquee -->
   <div class="marquee-wrap">
     <span class="marquee-inner">
       📢 儲值入帳時間調整通知 ・ 🗓️ 固定入帳日：每週三 &amp; 週日 ・ ⚠️ 週三入帳→請週三前完成匯款 ・ ⚠️ 週日入帳→請週日前完成匯款 ・ 當天匯款將順延至下一個入帳日 ・ 請提前儲值，避免額度不足 🥹 ・ 謝謝大家的配合與理解 ♡ &nbsp;&nbsp;&nbsp;&nbsp;
     </span>
   </div>
 
-  <!-- ══ LOGIN ══ -->
+  <!-- ══════════════════ 代理登入 ══════════════════ -->
   <div id="login-section">
     <div class="card">
       <div class="card-title">🔐 代理登入</div>
-      <p class="login-desc">請選擇您的代理代碼以進入系統。<br>本系統僅供授權代理使用，請勿外傳。</p>
+      <p class="login-desc">請選擇您的代理代碼並輸入手機號碼以進入系統。<br>本系統僅供授權代理使用，請勿外傳。</p>
       <div class="form-row">
         <label>代理代碼</label>
         <select id="login-select"></select>
       </div>
+      <div class="form-row">
+        <label>手機號碼</label>
+        <input type="text" id="login-phone" placeholder="請輸入手機號碼" inputmode="tel" maxlength="20">
+      </div>
       <div id="login-alert" class="alert error"></div>
       <button class="btn btn-primary btn-full" onclick="doLogin()">🚀 進入系統</button>
+      <div class="login-switch">
+        <a onclick="showAdminLogin()">管理員入口</a>
+      </div>
     </div>
   </div>
 
-  <!-- ══ DASHBOARD ══ -->
+  <!-- ══════════════════ 管理員登入 ══════════════════ -->
+  <div id="admin-login-section" style="display:none;">
+    <div class="card" style="border-color:#b39ddb;">
+      <div class="card-title" style="color:var(--admin);">👑 管理員登入</div>
+      <div class="form-row">
+        <label>帳號</label>
+        <input type="text" id="admin-username" placeholder="管理員帳號">
+      </div>
+      <div class="form-row">
+        <label>密碼</label>
+        <input type="password" id="admin-password" placeholder="管理員密碼">
+      </div>
+      <div id="admin-login-alert" class="alert error"></div>
+      <button class="btn btn-admin btn-full" onclick="doAdminLogin()">👑 進入後台</button>
+      <div class="login-switch">
+        <a onclick="showAgentLogin()">← 返回代理登入</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ 代理儀表板 ══════════════════ -->
   <div id="dashboard">
     <div class="dash-top">
       <div class="dash-left">
-        <div class="greeting">您好，</div>
+        <div class="greeting">您好，阿霓 👋</div>
         <div class="agentname" id="dash-name">－</div>
       </div>
       <div class="dash-right">
@@ -609,9 +606,9 @@ input[type="number"] { -moz-appearance: textfield; }
     </div>
   </div>
 
-  <!-- ── 公告欄（登入後）── -->
+  <!-- 公告欄 -->
   <div id="notice-banner">
-    <div class="notice-title">📢 最新公告・板娘通知</div>
+    <div class="notice-title">📢 最新公告・阿霓通知</div>
     <div class="notice-body">
       💰 儲值入帳時間改為固定兩天：<strong>🗓️ 每週三 ／ 每週日</strong><br><br>
       <span class="notice-tag">週三入帳</span>請於 <strong>週三前</strong> 完成匯款<br>
@@ -622,29 +619,23 @@ input[type="number"] { -moz-appearance: textfield; }
     </div>
   </div>
 
-  <!-- ══ MAIN ══ -->
+  <!-- ══════════════════ 代理主系統 ══════════════════ -->
   <div id="main-section">
-
-    <!-- Tab Bar -->
     <div class="tab-bar">
-      <button class="tab-btn active" id="tab-btn-deposit"   onclick="switchTab('deposit')">💰 儲值回報</button>
-      <button class="tab-btn"        id="tab-btn-checkout"  onclick="switchTab('checkout')">🛒 單筆結帳</button>
+      <button class="tab-btn active" id="tab-btn-deposit"  onclick="switchTab('deposit')">💰 儲值回報</button>
+      <button class="tab-btn"        id="tab-btn-checkout" onclick="switchTab('checkout')">🛒 單筆結帳</button>
     </div>
-
-    <!-- Alert -->
     <div id="global-alert" class="alert error"></div>
 
-    <!-- ── TAB：儲值回報 ── -->
+    <!-- Tab 儲值 -->
     <div id="tab-deposit" class="tab-panel active">
       <div class="card">
         <div class="card-title">💰 儲值回報</div>
-
         <div class="bank-info">
           <strong>📍 匯款帳戶資訊</strong><br>
           銀行：台新銀行（812）<br>
-          帳號：<strong>2888-10-2335157-5</strong><br>
+          帳號：<strong>2888-10-2335157-5</strong>
         </div>
-
         <div class="form-grid-2">
           <div class="form-row">
             <label>📅 匯款日期</label>
@@ -655,26 +646,22 @@ input[type="number"] { -moz-appearance: textfield; }
             <input type="number" id="dep-amount" placeholder="例：5000" min="2000" step="1000">
           </div>
         </div>
-
         <div class="form-row">
           <label>🏦 匯款帳號末五碼</label>
           <input type="text" id="dep-last5" placeholder="請輸入末五碼數字" maxlength="5" inputmode="numeric">
         </div>
-
         <label class="checkbox-row" for="dep-confirm">
           <input type="checkbox" id="dep-confirm">
           <span>✅ 我確認已完成匯款，以上資訊均正確無誤</span>
         </label>
-
         <button class="btn btn-primary btn-full" onclick="submitDeposit()">📤 送出儲值回報</button>
       </div>
     </div>
 
-    <!-- ── TAB：單筆結帳 ── -->
+    <!-- Tab 結帳 -->
     <div id="tab-checkout" class="tab-panel">
       <div class="card">
         <div class="card-title">🛒 單筆結帳</div>
-
         <div class="form-grid-2">
           <div class="form-row">
             <label>📅 結帳日期</label>
@@ -685,13 +672,10 @@ input[type="number"] { -moz-appearance: textfield; }
             <input type="number" id="ck-amount" placeholder="請輸入或使用計算機" min="1">
           </div>
         </div>
-
         <div class="form-row">
           <label>📝 訂單項目說明</label>
           <input type="text" id="ck-note" placeholder="例：批網4件 ／ 記事本湊單米菲兔">
         </div>
-
-        <!-- KRW 計算機 -->
         <div class="calc-box">
           <div class="calc-title">
             📊 多品項韓元計價小工具
@@ -709,12 +693,11 @@ input[type="number"] { -moz-appearance: textfield; }
           </div>
           <div class="calc-result" id="calc-result"></div>
         </div>
-
         <button class="btn btn-accent btn-full" onclick="submitCheckout()">💳 送出結帳申請</button>
       </div>
     </div>
 
-    <!-- ── Result ── -->
+    <!-- Result -->
     <div id="result-section">
       <div class="result-card">
         <h3>✅ 送出成功！回報單文案</h3>
@@ -722,16 +705,183 @@ input[type="number"] { -moz-appearance: textfield; }
         <button class="btn btn-primary" onclick="copyResult()">📋 點擊複製文案</button>
       </div>
     </div>
+  </div>
 
-  </div><!-- /main-section -->
+  <!-- ══════════════════ 管理員儀表板 ══════════════════ -->
+  <div id="admin-dashboard">
+    <div class="admin-dash-top">
+      <div>
+        <div class="admin-greeting">歡迎回來，</div>
+        <div class="admin-name">👑 阿霓</div>
+      </div>
+      <div>
+        <span class="admin-badge">管理員後台</span><br>
+        <button class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="doAdminLogout()">登出</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 管理員主系統 -->
+  <div id="admin-section">
+    <div class="admin-tab-bar">
+      <button class="admin-tab-btn active" id="atab-btn-deposit"  onclick="switchAdminTab('deposit')">📥 儲值審核</button>
+      <button class="admin-tab-btn"        id="atab-btn-checkout" onclick="switchAdminTab('checkout')">🛒 幫代理結帳</button>
+      <button class="admin-tab-btn"        id="atab-btn-settings" onclick="switchAdminTab('settings')">⚙️ 系統設定</button>
+    </div>
+    <div id="admin-global-alert" class="alert error"></div>
+
+    <!-- ── 儲值審核 ── -->
+    <div id="atab-deposit" class="tab-panel active">
+      <div class="card">
+        <div class="card-title" style="color:var(--admin);">📥 待審核儲值清單</div>
+        <div id="pending-list" class="pending-list">
+          <div class="pending-empty">⏳ 載入中...</div>
+        </div>
+        <div style="margin-top:14px;">
+          <button class="btn btn-outline btn-sm" onclick="loadPendingDeposits()">🔄 重新整理</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 幫代理結帳 ── -->
+    <div id="atab-checkout" class="tab-panel">
+      <div class="card">
+        <div class="card-title" style="color:var(--admin);">🛒 幫代理結帳</div>
+
+        <!-- 選代理 + 顯示餘額 -->
+        <div class="form-grid-2" style="margin-bottom:14px;">
+          <div class="form-row" style="margin:0;">
+            <label>選擇代理</label>
+            <select id="admin-agent-select" onchange="onAdminAgentChange()">
+              <option value="">請選擇代理</option>
+            </select>
+          </div>
+          <div class="form-row" style="margin:0;">
+            <label>代理目前餘額</label>
+            <div id="admin-agent-balance" style="padding:11px 13px; background:#fff; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-weight:700; color:var(--success); font-size:15px;">－</div>
+          </div>
+        </div>
+
+        <!-- 結帳日期 & 批次備註 -->
+        <div class="form-grid-2" style="margin-bottom:14px;">
+          <div class="form-row" style="margin:0;">
+            <label>📅 結帳日期</label>
+            <input type="date" id="admin-ck-date">
+          </div>
+          <div class="form-row" style="margin:0;">
+            <label>📝 批次備註（如：以上結帳0307）</label>
+            <input type="text" id="admin-ck-note" placeholder="例：以上結帳0307">
+          </div>
+        </div>
+
+        <!-- 訂單明細 -->
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+          <div style="font-size:13px; font-weight:700; color:var(--admin);">📋 訂單明細</div>
+          <button class="btn btn-admin btn-sm" onclick="addOrderRow()">➕ 新增品項</button>
+        </div>
+
+        <div class="order-rows" id="order-rows">
+          <!-- 動態產生 -->
+        </div>
+
+        <!-- 合計摘要 -->
+        <div class="checkout-summary" id="checkout-summary" style="display:none;">
+          <div class="summary-title">💰 結帳摘要</div>
+          <div class="summary-row">
+            <span>商品總金額</span>
+            <span id="sum-total">NT$ 0</span>
+          </div>
+          <div class="summary-row summary-refund">
+            <span>斷貨退款</span>
+            <span id="sum-refund">－NT$ 0</span>
+          </div>
+          <div class="summary-row total">
+            <span>實收金額</span>
+            <span id="sum-net" class="summary-net">NT$ 0</span>
+          </div>
+          <div class="summary-row" style="margin-top:8px; font-size:12px; color:var(--text-light);">
+            <span>結帳後預估餘額</span>
+            <span id="sum-after-balance">－</span>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-outline btn-sm" onclick="calcAdminSummary()">🧮 計算合計</button>
+          <button class="btn btn-admin btn-full" onclick="submitAdminCheckout()" style="flex:1; min-width:200px;">✅ 確認送出結帳</button>
+        </div>
+      </div>
+
+      <!-- Admin Result -->
+      <div id="admin-result-section" style="display:none; animation: fadeUp 0.35s ease;">
+        <div class="result-card">
+          <h3>✅ 結帳完成！</h3>
+          <div class="result-textbox" id="admin-result-text"></div>
+          <button class="btn btn-primary" onclick="copyAdminResult()">📋 點擊複製文案</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 系統設定 ── -->
+    <div id="atab-settings" class="tab-panel">
+      <div class="card">
+        <div class="card-title" style="color:var(--admin);">⚙️ 系統設定</div>
+
+        <!-- 公告日期 -->
+        <div class="settings-card">
+          <div class="settings-label">📅 公告日期設定（前後台顯示）</div>
+          <div class="form-grid-2">
+            <div class="form-row" style="margin:0;">
+              <label>週三入帳日</label>
+              <input type="date" id="setting-wed-date">
+            </div>
+            <div class="form-row" style="margin:0;">
+              <label>週日入帳日</label>
+              <input type="date" id="setting-sun-date">
+            </div>
+          </div>
+          <div style="margin-top:12px;">
+            <button class="btn btn-admin btn-sm" onclick="saveAnnounceDates()">💾 儲存公告日期</button>
+          </div>
+        </div>
+
+        <!-- 代理管理 -->
+        <div class="settings-card">
+          <div class="settings-label">👥 代理資料管理（匯率 &amp; 手機號碼）</div>
+          <div style="overflow-x:auto;">
+            <table class="agent-list-table" id="agent-settings-table">
+              <thead>
+                <tr>
+                  <th>代理代碼</th>
+                  <th>名稱</th>
+                  <th>手機號碼</th>
+                  <th>匯率</th>
+                  <th>餘額</th>
+                  <th>儲存</th>
+                </tr>
+              </thead>
+              <tbody id="agent-settings-body">
+                <tr><td colspan="6" style="text-align:center; color:var(--text-light); padding:16px;">載入中...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /admin-section -->
+
 </div><!-- /page-wrapper -->
 
 <script>
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKJRpDzRgtUCaUGO757TczuRQDU1wyy-_pWWFJMWn4mBoohTlqOcQYCmTFfIxACB4D-w/exec';
+const ADMIN_USER = 'doudouNi';
+const ADMIN_PASS = 'nini99104';
 
 /* ── State ── */
 let currentAgent   = null;
 let currentBalance = 0;
+let isAdmin        = false;
+let adminAgentData = []; // 所有代理資料（後台用）
 
 /* ── Init ── */
 (function () {
@@ -743,47 +893,57 @@ let currentBalance = 0;
     sel.appendChild(opt);
   }
   const today = new Date().toISOString().slice(0, 10);
-  document.getElementById('dep-date').value = today;
-  document.getElementById('ck-date').value  = today;
+  document.getElementById('dep-date').value     = today;
+  document.getElementById('ck-date').value      = today;
+  document.getElementById('admin-ck-date').value = today;
+  // 初始加一筆空訂單
+  addOrderRow();
 })();
 
 /* ── Helpers ── */
-const $  = id => document.getElementById(id);
+const $ = id => document.getElementById(id);
 const show = id => $(id).style.display = 'block';
 const hide = id => $(id).style.display = 'none';
-
 function showLoading() { $('loading-overlay').classList.add('active'); }
 function hideLoading() { $('loading-overlay').classList.remove('active'); }
-
 function showAlert(id, msg, type = 'error') {
-  const el = $(id);
-  el.textContent = msg;
-  el.className   = 'alert ' + type + ' show';
+  const el = $(id); el.textContent = msg; el.className = 'alert ' + type + ' show';
 }
-function clearAlert(id) {
-  const el = $(id);
-  el.className = 'alert error';
-  el.textContent = '';
-}
-
+function clearAlert(id) { const el = $(id); el.className = 'alert error'; el.textContent = ''; }
 async function callScript(payload) {
   const res = await fetch(GOOGLE_SCRIPT_URL, {
-    method:  'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body:    JSON.stringify(payload)
+    method: 'POST', headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload)
   });
   return res.json();
 }
+function fmtNum(n) { return Number(n || 0).toLocaleString(); }
 
-/* ── Login / Logout ── */
+/* ══════════════════════════════════════
+   登入切換
+══════════════════════════════════════ */
+function showAdminLogin() {
+  hide('login-section');
+  show('admin-login-section');
+}
+function showAgentLogin() {
+  hide('admin-login-section');
+  show('login-section');
+}
+
+/* ══════════════════════════════════════
+   代理登入
+══════════════════════════════════════ */
 async function doLogin() {
   clearAlert('login-alert');
   const agentCode = $('login-select').value;
+  const phone     = $('login-phone').value.trim();
   if (!agentCode) { showAlert('login-alert', '請選擇代理代碼'); return; }
+  if (!phone)     { showAlert('login-alert', '請輸入手機號碼'); return; }
 
   showLoading();
   try {
-    const data = await callScript({ action: 'login', agentCode });
+    const data = await callScript({ action: 'login', agentCode, phone });
     if (data.success) {
       currentAgent   = data.agentCode;
       currentBalance = Number(data.balance);
@@ -793,13 +953,10 @@ async function doLogin() {
       show('notice-banner');
       show('main-section');
     } else {
-      showAlert('login-alert', data.message || '登入失敗，請確認代理代碼');
+      showAlert('login-alert', data.message || '登入失敗，請確認代理代碼與手機號碼');
     }
-  } catch {
-    showAlert('login-alert', '⚠️ 無法連線至伺服器，請稍後再試');
-  } finally {
-    hideLoading();
-  }
+  } catch { showAlert('login-alert', '⚠️ 無法連線至伺服器，請稍後再試'); }
+  finally  { hideLoading(); }
 }
 
 function doLogout() {
@@ -809,21 +966,44 @@ function doLogout() {
   clearAlert('global-alert');
 }
 
-/* ── Dashboard ── */
+/* ══════════════════════════════════════
+   管理員登入
+══════════════════════════════════════ */
+function doAdminLogin() {
+  clearAlert('admin-login-alert');
+  const u = $('admin-username').value.trim();
+  const p = $('admin-password').value;
+  if (u !== ADMIN_USER || p !== ADMIN_PASS) {
+    showAlert('admin-login-alert', '❌ 帳號或密碼錯誤'); return;
+  }
+  isAdmin = true;
+  hide('admin-login-section');
+  show('admin-dashboard');
+  show('admin-section');
+  loadPendingDeposits();
+  loadAdminAgents();
+}
+
+function doAdminLogout() {
+  isAdmin = false;
+  hide('admin-dashboard'); hide('admin-section');
+  show('login-section');
+  clearAlert('admin-global-alert');
+}
+
+/* ══════════════════════════════════════
+   代理儀表板
+══════════════════════════════════════ */
 function renderDashboard(data) {
-  const label = data.agentName
-    ? data.agentCode + '（' + data.agentName + '）'
-    : data.agentCode;
+  const label = data.agentName ? data.agentCode + '（' + data.agentName + '）' : data.agentCode;
   $('dash-name').textContent    = label;
-  $('dash-balance').textContent = Number(data.balance).toLocaleString();
+  $('dash-balance').textContent = fmtNum(data.balance);
   renderHistory(data.history || []);
 }
-
 function updateBalance(v) {
   currentBalance = Number(v);
-  $('dash-balance').textContent = currentBalance.toLocaleString();
+  $('dash-balance').textContent = fmtNum(v);
 }
-
 function renderHistory(list) {
   const box = $('history-box');
   if (!list.length) { box.innerHTML = '<div class="history-empty">尚無交易紀錄</div>'; return; }
@@ -835,22 +1015,26 @@ function renderHistory(list) {
       </div>
       <span class="history-badge">${h.status}</span>
       <span class="history-amt ${h.type === '儲值' ? 'clr-plus' : 'clr-minus'}">
-        ${h.type === '儲值' ? '+' : '−'}${Number(h.amount).toLocaleString()}
+        ${h.type === '儲值' ? '+' : '−'}${fmtNum(h.amount)}
       </span>
     </div>`).join('');
 }
 
-/* ── Tabs ── */
+/* ══════════════════════════════════════
+   代理 Tab 切換
+══════════════════════════════════════ */
 function switchTab(tab) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#main-section .tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('#main-section .tab-btn').forEach(b => b.classList.remove('active'));
   $('tab-' + tab).classList.add('active');
   $('tab-btn-' + tab).classList.add('active');
   clearAlert('global-alert');
   hide('result-section');
 }
 
-/* ── Deposit ── */
+/* ══════════════════════════════════════
+   代理儲值送出
+══════════════════════════════════════ */
 async function submitDeposit() {
   clearAlert('global-alert');
   const date   = $('dep-date').value;
@@ -862,88 +1046,66 @@ async function submitDeposit() {
   if (!date)                  { showAlert('global-alert', '⚠️ 請選擇匯款日期'); return; }
   if (!raw || amount <= 0)    { showAlert('global-alert', '⚠️ 請輸入儲值金額'); return; }
   if (amount < 2000)          { showAlert('global-alert', '⚠️ 儲值金額最低為 NT$ 2,000'); return; }
-  if (amount % 1000 !== 0)    { showAlert('global-alert', '⚠️ 儲值金額須為 1,000 的倍數（例：2000、3000、5000）'); return; }
+  if (amount % 1000 !== 0)    { showAlert('global-alert', '⚠️ 儲值金額須為 1,000 的倍數'); return; }
   if (!/^\d{5}$/.test(last5)) { showAlert('global-alert', '⚠️ 請輸入正確的帳號末五碼（5 位數字）'); return; }
   if (!chk)                   { showAlert('global-alert', '⚠️ 請勾選確認已完成匯款'); return; }
 
   showLoading();
   try {
-    const data = await callScript({
-      action: 'transaction', type: '儲值',
-      agentCode: currentAgent, amount, date,
-      note: '帳號末五碼：' + last5
-    });
+    const data = await callScript({ action: 'transaction', type: '儲值', agentCode: currentAgent, amount, date, note: '帳號末五碼：' + last5 });
     if (data.success) {
       updateBalance(data.newBalance);
       renderHistory(data.history || []);
-      $('dep-amount').value = '';
-      $('dep-last5').value  = '';
-      $('dep-confirm').checked = false;
+      $('dep-amount').value = ''; $('dep-last5').value = ''; $('dep-confirm').checked = false;
       showResult(makeCopy({ type: '儲值回報', date, amount, note: '帳號末五碼：' + last5, status: '待審核' }));
-    } else {
-      showAlert('global-alert', '❌ ' + (data.message || '送出失敗，請再試一次'));
-    }
-  } catch {
-    showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試');
-  } finally {
-    hideLoading();
-  }
+    } else { showAlert('global-alert', '❌ ' + (data.message || '送出失敗')); }
+  } catch { showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試'); }
+  finally  { hideLoading(); }
 }
 
-/* ── Checkout ── */
+/* ══════════════════════════════════════
+   代理結帳送出
+══════════════════════════════════════ */
 async function submitCheckout() {
   clearAlert('global-alert');
   const date   = $('ck-date').value;
   const amount = Number($('ck-amount').value);
   const note   = $('ck-note').value.trim();
 
-  if (!date)                  { showAlert('global-alert', '⚠️ 請選擇結帳日期'); return; }
-  if (!amount || amount <= 0) { showAlert('global-alert', '⚠️ 請輸入正確的結帳金額'); return; }
-  if (!note)                  { showAlert('global-alert', '⚠️ 請填寫訂單項目說明'); return; }
+  if (!date)                   { showAlert('global-alert', '⚠️ 請選擇結帳日期'); return; }
+  if (!amount || amount <= 0)  { showAlert('global-alert', '⚠️ 請輸入正確的結帳金額'); return; }
+  if (!note)                   { showAlert('global-alert', '⚠️ 請填寫訂單項目說明'); return; }
   if (amount > currentBalance) {
-    showAlert('global-alert', `❌ 餘額不足！可用餘額 NT$ ${currentBalance.toLocaleString()}，結帳金額 NT$ ${amount.toLocaleString()} 超出額度。`);
+    showAlert('global-alert', `❌ 餘額不足！可用餘額 NT$ ${fmtNum(currentBalance)}，結帳金額 NT$ ${fmtNum(amount)} 超出額度。`);
     return;
   }
-
   showLoading();
   try {
-    const data = await callScript({
-      action: 'transaction', type: '消費',
-      agentCode: currentAgent, amount, date, note
-    });
+    const data = await callScript({ action: 'transaction', type: '消費', agentCode: currentAgent, amount, date, note });
     if (data.success) {
       updateBalance(data.newBalance);
       renderHistory(data.history || []);
-      $('ck-amount').value = '';
-      $('ck-note').value   = '';
+      $('ck-amount').value = ''; $('ck-note').value = '';
       $('calc-result').style.display = 'none';
       showResult(makeCopy({ type: '單筆結帳', date, amount, note, status: '已確認' }));
-    } else {
-      showAlert('global-alert', '❌ ' + (data.message || '送出失敗，請再試一次'));
-    }
-  } catch {
-    showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試');
-  } finally {
-    hideLoading();
-  }
+    } else { showAlert('global-alert', '❌ ' + (data.message || '送出失敗')); }
+  } catch { showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試'); }
+  finally  { hideLoading(); }
 }
 
-/* ── KRW Calculator ── */
+/* ══════════════════════════════════════
+   KRW Calculator（代理端）
+══════════════════════════════════════ */
 function addKrwRow() {
-  const row = document.createElement('div');
-  row.className = 'krw-row';
-  row.innerHTML = `
-    <input type="number" class="krw-input" placeholder="輸入韓元金額 (KRW)" min="0">
-    <button class="btn-rm" onclick="removeKrwRow(this)">✕</button>`;
+  const row = document.createElement('div'); row.className = 'krw-row';
+  row.innerHTML = `<input type="number" class="krw-input" placeholder="輸入韓元金額 (KRW)" min="0"><button class="btn-rm" onclick="removeKrwRow(this)">✕</button>`;
   $('krw-list').appendChild(row);
 }
-
 function removeKrwRow(btn) {
   const rows = document.querySelectorAll('.krw-row');
   if (rows.length <= 1) { btn.closest('.krw-row').querySelector('input').value = ''; return; }
   btn.closest('.krw-row').remove();
 }
-
 function calcKrw() {
   let total = 0;
   document.querySelectorAll('.krw-input').forEach(i => { total += Number(i.value) || 0; });
@@ -951,48 +1113,454 @@ function calcKrw() {
   if (total <= 0) { el.style.display = 'none'; return; }
   const twd = Math.ceil(total / 40);
   el.style.display = 'block';
-  el.innerHTML = `
-    🇰🇷 ${total.toLocaleString()} KRW &nbsp;→&nbsp;
-    🇹🇼 <span style="color:var(--accent);font-size:15px;font-weight:800;">NT$ ${twd.toLocaleString()}</span>
-    <button class="btn btn-outline btn-sm" style="margin-left:8px;" onclick="applyKrw(${twd})">帶入總額</button>`;
+  el.innerHTML = `🇰🇷 ${fmtNum(total)} KRW &nbsp;→&nbsp; 🇹🇼 <span style="color:var(--accent);font-size:15px;font-weight:800;">NT$ ${fmtNum(twd)}</span> <button class="btn btn-outline btn-sm" style="margin-left:8px;" onclick="applyKrw(${twd})">帶入總額</button>`;
 }
-
 function applyKrw(v) { $('ck-amount').value = v; }
 
-/* ── Result ── */
+/* ══════════════════════════════════════
+   Result (代理端)
+══════════════════════════════════════ */
 function makeCopy({ type, date, amount, note, status }) {
   const now  = new Date().toLocaleString('zh-TW', { hour12: false });
   const icon = type === '儲值回報' ? '💰' : '🛒';
-  return `🥜 DouDou 代理${type}單
-────────────────────
-${icon} 類型：${type}
-👤 代理編號：${currentAgent}
-📅 日期：${date}
-💵 金額：NT$ ${Number(amount).toLocaleString()}
-📝 備註：${note}
-📋 狀態：${status}
-⏰ 送出時間：${now}
-────────────────────
-感謝您的回報，請等待板娘確認 🙏`;
+  return `🥜 DouDou 代理${type}單\n────────────────────\n${icon} 類型：${type}\n👤 代理編號：${currentAgent}\n📅 日期：${date}\n💵 金額：NT$ ${fmtNum(amount)}\n📝 備註：${note}\n📋 狀態：${status}\n⏰ 送出時間：${now}\n────────────────────\n感謝您的回報，請等待阿霓確認 🙏`;
 }
-
 function showResult(text) {
-  $('result-text').textContent = text;
-  show('result-section');
+  $('result-text').textContent = text; show('result-section');
   setTimeout(() => $('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
 }
-
 async function copyResult() {
-  const btn  = event.currentTarget;
-  const text = $('result-text').textContent;
+  const btn = event.currentTarget; const text = $('result-text').textContent;
   try {
     await navigator.clipboard.writeText(text);
-    const orig = btn.textContent;
-    btn.textContent = '✅ 已複製！';
+    const orig = btn.textContent; btn.textContent = '✅ 已複製！';
     setTimeout(() => { btn.textContent = orig; }, 2200);
-  } catch {
-    alert('請手動選取文字並複製');
+  } catch { alert('請手動選取文字並複製'); }
+}
+
+/* ══════════════════════════════════════
+   管理員 Tab 切換
+══════════════════════════════════════ */
+function switchAdminTab(tab) {
+  document.querySelectorAll('#admin-section .tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+  $('atab-' + tab).classList.add('active');
+  $('atab-btn-' + tab).classList.add('active');
+  clearAlert('admin-global-alert');
+}
+
+/* ══════════════════════════════════════
+   儲值審核
+══════════════════════════════════════ */
+async function loadPendingDeposits() {
+  const el = $('pending-list');
+  el.innerHTML = '<div class="pending-empty">⏳ 載入中...</div>';
+  showLoading();
+  try {
+    const data = await callScript({ action: 'getPendingDeposits' });
+    if (data.success && data.list.length > 0) {
+      el.innerHTML = data.list.map((item, i) => `
+        <div class="pending-item" id="pending-${i}">
+          <div class="pending-info">
+            <div class="pending-agent">👤 ${item.agentCode}${item.agentName ? '（' + item.agentName + '）' : ''}</div>
+            <div class="pending-detail">
+              📅 ${item.date} ・ 備註：${item.note}<br>
+              序號：${item.seq} ・ 送出：${item.time}
+            </div>
+          </div>
+          <div style="text-align:right; flex-shrink:0;">
+            <div class="pending-amount">+NT$ ${fmtNum(item.amount)}</div>
+            <button class="btn btn-success btn-sm" style="margin-top:6px;" onclick="approveDeposit(${item.row}, ${i})">✅ 確認入帳</button>
+          </div>
+        </div>`).join('');
+    } else {
+      el.innerHTML = '<div class="pending-empty">✅ 目前沒有待審核的儲值</div>';
+    }
+  } catch { el.innerHTML = '<div class="pending-empty">❌ 載入失敗，請重試</div>'; }
+  finally  { hideLoading(); }
+}
+
+async function approveDeposit(rowNum, idx) {
+  if (!confirm('確認將此筆儲值標記為「已確認」並入帳？')) return;
+  showLoading();
+  try {
+    const data = await callScript({ action: 'approveDeposit', rowNum });
+    if (data.success) {
+      const item = $('pending-' + idx);
+      if (item) { item.classList.add('approved'); item.querySelector('button').textContent = '✅ 已入帳'; }
+      showAlert('admin-global-alert', '✅ 入帳成功！代理餘額已更新。', 'success');
+    } else { showAlert('admin-global-alert', '❌ ' + (data.message || '審核失敗')); }
+  } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
+}
+
+/* ══════════════════════════════════════
+   載入代理列表（後台用）
+══════════════════════════════════════ */
+async function loadAdminAgents() {
+  showLoading();
+  try {
+    const data = await callScript({ action: 'getAgentList' });
+    if (data.success) {
+      adminAgentData = data.agents;
+      // 填入結帳選單
+      const sel = $('admin-agent-select');
+      sel.innerHTML = '<option value="">請選擇代理</option>';
+      data.agents.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a.code; opt.textContent = a.code + (a.name ? '（' + a.name + '）' : '');
+        opt.dataset.balance = a.balance; opt.dataset.rate = a.rate || 40;
+        sel.appendChild(opt);
+      });
+      // 填入設定表格
+      renderAgentSettingsTable(data.agents);
+    }
+  } catch { /* silent */ }
+  finally  { hideLoading(); }
+}
+
+function onAdminAgentChange() {
+  const sel = $('admin-agent-select');
+  const opt = sel.options[sel.selectedIndex];
+  if (opt && opt.value) {
+    const bal  = Number(opt.dataset.balance) || 0;
+    const rate = Number(opt.dataset.rate) || 40;
+    $('admin-agent-balance').textContent = 'NT$ ' + fmtNum(bal) + '　（匯率 ×' + rate + '）';
+    $('admin-agent-balance').style.color = bal >= 0 ? 'var(--success)' : 'var(--accent)';
+    // 更新訂單列的匯率顯示
+    document.querySelectorAll('.order-rate-display').forEach(el => { el.textContent = rate; });
+    recalcAllRows();
+  } else {
+    $('admin-agent-balance').textContent = '－';
+    $('admin-agent-balance').style.color = 'var(--text-muted)';
   }
+}
+
+function getSelectedRate() {
+  const sel = $('admin-agent-select');
+  const opt = sel.options[sel.selectedIndex];
+  return opt && opt.dataset.rate ? Number(opt.dataset.rate) : 40;
+}
+function getSelectedBalance() {
+  const sel = $('admin-agent-select');
+  const opt = sel.options[sel.selectedIndex];
+  return opt && opt.dataset.balance ? Number(opt.dataset.balance) : 0;
+}
+
+/* ══════════════════════════════════════
+   訂單明細列（後台結帳）
+══════════════════════════════════════ */
+let orderRowCount = 0;
+
+function addOrderRow() {
+  orderRowCount++;
+  const idx  = orderRowCount;
+  const rate = getSelectedRate();
+  const div  = document.createElement('div');
+  div.className = 'order-row';
+  div.id        = 'order-row-' + idx;
+  div.innerHTML = `
+    <div class="order-row-header">
+      <span class="order-row-num">品項 #${idx}</span>
+      <button class="order-row-del" onclick="removeOrderRow(${idx})">✕ 刪除</button>
+    </div>
+    <!-- 備註 -->
+    <div class="order-field form-row">
+      <label>📝 備註</label>
+      <input type="text" id="row-note-${idx}" placeholder="例：運動鞋、記事本">
+    </div>
+    <!-- 日期欄 -->
+    <div class="order-grid-dates">
+      <div class="order-field">
+        <label>訂購日期</label>
+        <input type="date" id="row-order-date-${idx}">
+      </div>
+      <div class="order-field">
+        <label>賣貨便出貨日</label>
+        <input type="date" id="row-ship-date-${idx}">
+      </div>
+    </div>
+    <div class="order-grid-dates-3">
+      <div class="order-field">
+        <label>批網配貨日</label>
+        <input type="date" id="row-batch-date-${idx}">
+      </div>
+      <div class="order-field">
+        <label>空運發貨</label>
+        <input type="date" id="row-air-date-${idx}">
+      </div>
+      <div class="order-field">
+        <label>斷貨退款日期</label>
+        <input type="date" id="row-refund-date-${idx}" onchange="onRefundDateChange(${idx})">
+      </div>
+    </div>
+    <!-- 數量 & 金額 -->
+    <div class="order-grid-nums">
+      <div class="order-field">
+        <label>數量</label>
+        <input type="number" id="row-qty-${idx}" placeholder="1" min="1" value="1" oninput="recalcRow(${idx})">
+      </div>
+      <div class="order-field">
+        <label>韓幣單價</label>
+        <input type="number" id="row-krw-${idx}" placeholder="0" min="0" oninput="recalcRow(${idx})">
+      </div>
+      <div class="order-field">
+        <label>台幣單價（×<span class="order-rate-display">${rate}</span>）</label>
+        <input type="number" id="row-twd-${idx}" class="auto-field" readonly placeholder="自動換算">
+      </div>
+      <div class="order-field">
+        <label>韓幣總計</label>
+        <input type="number" id="row-krw-total-${idx}" class="auto-field" readonly placeholder="自動計算">
+      </div>
+      <div class="order-field">
+        <label>台幣總價</label>
+        <input type="number" id="row-twd-total-${idx}" class="auto-field" readonly placeholder="自動計算">
+      </div>
+    </div>
+    <div class="order-row-subtotal" id="row-subtotal-${idx}">
+      <span>小計</span>
+      <strong>NT$ 0</strong>
+    </div>`;
+  $('order-rows').appendChild(div);
+}
+
+function removeOrderRow(idx) {
+  const el = $('order-row-' + idx);
+  if (el) el.remove();
+  recalcAllRows();
+}
+
+function onRefundDateChange(idx) {
+  const row = $('order-row-' + idx);
+  if (!row) return;
+  const hasRefund = !!$('row-refund-date-' + idx).value;
+  if (hasRefund) {
+    row.classList.add('discontinued');
+    row.querySelector('.order-row-num').innerHTML = `品項 #${idx} <span class="disc-badge">斷貨退款</span>`;
+  } else {
+    row.classList.remove('discontinued');
+    row.querySelector('.order-row-num').textContent = '品項 #' + idx;
+  }
+  recalcRow(idx);
+}
+
+function recalcRow(idx) {
+  const rate  = getSelectedRate();
+  const qty   = Number($('row-qty-' + idx)?.value) || 0;
+  const krw   = Number($('row-krw-' + idx)?.value) || 0;
+  const twdU  = Math.ceil(krw / rate);          // 台幣單價 無條件進位
+  const krwT  = qty * krw;
+  const twdT  = qty * twdU;
+
+  if ($('row-twd-' + idx))       $('row-twd-' + idx).value       = krw ? twdU : '';
+  if ($('row-krw-total-' + idx)) $('row-krw-total-' + idx).value  = krwT || '';
+  if ($('row-twd-total-' + idx)) $('row-twd-total-' + idx).value  = twdT || '';
+
+  const isRefund = !!($('row-refund-date-' + idx)?.value);
+  const subEl = $('row-subtotal-' + idx);
+  if (subEl) {
+    if (isRefund) {
+      subEl.innerHTML = `<span>退款小計</span><strong style="color:var(--success)">－NT$ ${fmtNum(twdT)}</strong>`;
+    } else {
+      subEl.innerHTML = `<span>小計</span><strong>NT$ ${fmtNum(twdT)}</strong>`;
+    }
+  }
+}
+
+function recalcAllRows() {
+  document.querySelectorAll('.order-row').forEach(row => {
+    const idx = row.id.replace('order-row-', '');
+    recalcRow(idx);
+  });
+}
+
+function calcAdminSummary() {
+  let total = 0, refund = 0;
+  document.querySelectorAll('.order-row').forEach(row => {
+    const idx    = row.id.replace('order-row-', '');
+    const twdT   = Number($('row-twd-total-' + idx)?.value) || 0;
+    const isRef  = !!($('row-refund-date-' + idx)?.value);
+    if (isRef) refund += twdT;
+    else total += twdT;
+  });
+  const net   = total - refund;
+  const after = getSelectedBalance() - net;
+  $('sum-total').textContent  = 'NT$ ' + fmtNum(total);
+  $('sum-refund').textContent = '－NT$ ' + fmtNum(refund);
+  $('sum-net').textContent    = 'NT$ ' + fmtNum(net);
+  $('sum-after-balance').textContent = 'NT$ ' + fmtNum(after);
+  $('sum-after-balance').style.color = after >= 0 ? 'var(--success)' : 'var(--accent)';
+  show('checkout-summary');
+}
+
+/* ══════════════════════════════════════
+   後台結帳送出
+══════════════════════════════════════ */
+async function submitAdminCheckout() {
+  clearAlert('admin-global-alert');
+  const agentCode = $('admin-agent-select').value;
+  const date      = $('admin-ck-date').value;
+  const batchNote = $('admin-ck-note').value.trim();
+
+  if (!agentCode) { showAlert('admin-global-alert', '⚠️ 請選擇代理'); return; }
+  if (!date)      { showAlert('admin-global-alert', '⚠️ 請選擇結帳日期'); return; }
+
+  // 收集訂單列
+  const orders = [];
+  let hasItem = false;
+  document.querySelectorAll('.order-row').forEach(row => {
+    const idx     = row.id.replace('order-row-', '');
+    const qty     = Number($('row-qty-' + idx)?.value) || 0;
+    const krw     = Number($('row-krw-' + idx)?.value) || 0;
+    if (qty <= 0 && krw <= 0) return; // 空列跳過
+    hasItem = true;
+    orders.push({
+      note:       $('row-note-' + idx)?.value || '',
+      orderDate:  $('row-order-date-' + idx)?.value || '',
+      shipDate:   $('row-ship-date-' + idx)?.value || '',
+      batchDate:  $('row-batch-date-' + idx)?.value || '',
+      airDate:    $('row-air-date-' + idx)?.value || '',
+      refundDate: $('row-refund-date-' + idx)?.value || '',
+      qty,
+      krwUnit:    krw,
+      twdUnit:    Number($('row-twd-' + idx)?.value) || 0,
+      krwTotal:   Number($('row-krw-total-' + idx)?.value) || 0,
+      twdTotal:   Number($('row-twd-total-' + idx)?.value) || 0,
+      isRefund:   !!($('row-refund-date-' + idx)?.value)
+    });
+  });
+
+  if (!hasItem) { showAlert('admin-global-alert', '⚠️ 請至少填寫一筆品項'); return; }
+
+  calcAdminSummary();
+  const net = orders.reduce((s, o) => o.isRefund ? s - o.twdTotal : s + o.twdTotal, 0);
+  const bal = getSelectedBalance();
+
+  if (net > 0 && net > bal) {
+    if (!confirm(`⚠️ 代理餘額不足！\n目前餘額：NT$ ${fmtNum(bal)}\n實收金額：NT$ ${fmtNum(net)}\n確定仍要送出？`)) return;
+  }
+
+  showLoading();
+  try {
+    const data = await callScript({
+      action: 'adminCheckout', agentCode, date, batchNote, orders, netAmount: net
+    });
+    if (data.success) {
+      // 更新選單餘額
+      const sel = $('admin-agent-select');
+      const opt = sel.options[sel.selectedIndex];
+      if (opt) opt.dataset.balance = data.newBalance;
+      $('admin-agent-balance').textContent = 'NT$ ' + fmtNum(data.newBalance) + '　（匯率 ×' + getSelectedRate() + '）';
+
+      // 產生結帳文案
+      const txt = buildAdminCopy(agentCode, date, batchNote, orders, net, data.newBalance);
+      $('admin-result-text').textContent = txt;
+      show('admin-result-section');
+      $('admin-result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      showAlert('admin-global-alert', '✅ 結帳成功！代理餘額已扣除。', 'success');
+      // 重置表單
+      $('order-rows').innerHTML = '';
+      orderRowCount = 0;
+      addOrderRow();
+      hide('checkout-summary');
+    } else { showAlert('admin-global-alert', '❌ ' + (data.message || '送出失敗')); }
+  } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤，請稍後再試'); }
+  finally  { hideLoading(); }
+}
+
+function buildAdminCopy(agentCode, date, batchNote, orders, net, newBal) {
+  const now = new Date().toLocaleString('zh-TW', { hour12: false });
+  let lines = `🥜 DouDou 代理結帳單\n────────────────────\n👤 代理：${agentCode}\n📅 結帳日期：${date}\n📝 批次備註：${batchNote || '無'}\n────────────────────\n`;
+  orders.forEach((o, i) => {
+    lines += `\n【品項 ${i + 1}${o.isRefund ? '（斷貨退款）' : ''}】\n`;
+    if (o.note)      lines += `備註：${o.note}\n`;
+    if (o.orderDate) lines += `訂購日期：${o.orderDate}\n`;
+    if (o.batchDate) lines += `批網配貨日：${o.batchDate}\n`;
+    if (o.shipDate)  lines += `賣貨便出貨日：${o.shipDate}\n`;
+    if (o.airDate)   lines += `空運發貨：${o.airDate}\n`;
+    if (o.refundDate)lines += `斷貨退款日期：${o.refundDate}\n`;
+    lines += `數量：${o.qty}　韓幣單價：${fmtNum(o.krwUnit)}　台幣單價：${fmtNum(o.twdUnit)}\n`;
+    lines += `韓幣總計：${fmtNum(o.krwTotal)}　${o.isRefund ? '退款金額' : '台幣總價'}：${fmtNum(o.twdTotal)}\n`;
+  });
+  lines += `\n────────────────────\n💵 實收金額：NT$ ${fmtNum(net)}\n💰 結帳後餘額：NT$ ${fmtNum(newBal)}\n⏰ 操作時間：${now}`;
+  return lines;
+}
+
+async function copyAdminResult() {
+  const btn = event.currentTarget; const text = $('admin-result-text').textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    const orig = btn.textContent; btn.textContent = '✅ 已複製！';
+    setTimeout(() => { btn.textContent = orig; }, 2200);
+  } catch { alert('請手動選取文字並複製'); }
+}
+
+/* ══════════════════════════════════════
+   系統設定 - 代理資料表格
+══════════════════════════════════════ */
+function renderAgentSettingsTable(agents) {
+  const tbody = $('agent-settings-body');
+  if (!agents || !agents.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:16px;">無代理資料</td></tr>';
+    return;
+  }
+  tbody.innerHTML = agents.map((a, i) => `
+    <tr>
+      <td><strong>${a.code}</strong></td>
+      <td><input type="text" id="st-name-${i}" value="${a.name || ''}" placeholder="名稱"></td>
+      <td><input type="text" id="st-phone-${i}" value="${a.phone || ''}" placeholder="手機號碼" inputmode="tel"></td>
+      <td><input type="number" id="st-rate-${i}" value="${a.rate || 40}" min="1" max="100" style="width:70px;"></td>
+      <td style="font-weight:700; color:var(--primary-dark);">NT$ ${fmtNum(a.balance)}</td>
+      <td><button class="btn btn-admin btn-xs" onclick="saveAgentRow('${a.code}', ${i})">儲存</button></td>
+    </tr>`).join('');
+}
+
+async function saveAgentRow(code, i) {
+  const name  = $('st-name-' + i)?.value.trim()  || '';
+  const phone = $('st-phone-' + i)?.value.trim() || '';
+  const rate  = Number($('st-rate-' + i)?.value) || 40;
+  showLoading();
+  try {
+    const data = await callScript({ action: 'updateAgent', code, name, phone, rate });
+    if (data.success) {
+      showAlert('admin-global-alert', `✅ ${code} 資料已更新`, 'success');
+      // 更新本地快取
+      const agent = adminAgentData.find(a => a.code === code);
+      if (agent) { agent.name = name; agent.phone = phone; agent.rate = rate; }
+      // 更新結帳選單的 rate
+      const sel = $('admin-agent-select');
+      Array.from(sel.options).forEach(opt => { if (opt.value === code) opt.dataset.rate = rate; });
+    } else { showAlert('admin-global-alert', '❌ ' + (data.message || '更新失敗')); }
+  } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
+}
+
+/* ══════════════════════════════════════
+   系統設定 - 公告日期
+══════════════════════════════════════ */
+async function saveAnnounceDates() {
+  const wed = $('setting-wed-date').value;
+  const sun = $('setting-sun-date').value;
+  if (!wed && !sun) { showAlert('admin-global-alert', '⚠️ 請至少填寫一個日期'); return; }
+  showLoading();
+  try {
+    const data = await callScript({ action: 'saveSettings', wedDate: wed, sunDate: sun });
+    if (data.success) {
+      showAlert('admin-global-alert', '✅ 公告日期已儲存', 'success');
+      // 更新跑馬燈
+      updateMarquee(wed, sun);
+    } else { showAlert('admin-global-alert', '❌ ' + (data.message || '儲存失敗')); }
+  } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
+}
+
+function updateMarquee(wed, sun) {
+  const wedStr = wed ? `週三（${wed}）` : '週三';
+  const sunStr = sun ? `週日（${sun}）` : '週日';
+  document.querySelector('.marquee-inner').innerHTML = `
+    📢 儲值入帳時間調整通知 ・ 🗓️ 下次入帳日：${wedStr} &amp; ${sunStr} ・ ⚠️ 週三入帳→請週三前完成匯款 ・ ⚠️ 週日入帳→請週日前完成匯款 ・ 當天匯款將順延至下一個入帳日 ・ 請提前儲值，避免額度不足 🥹 ・ 謝謝大家的配合與理解 ♡ &nbsp;&nbsp;&nbsp;&nbsp;
+  `;
 }
 </script>
 </body>
