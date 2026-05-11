@@ -390,6 +390,16 @@ input[type="number"] { -moz-appearance: textfield; }
           銀行：台新銀行（812）<br>
           帳號：<strong>2888-10-2335157-5</strong>
         </div>
+
+        <!-- 付款方式選擇 -->
+        <div class="form-row">
+          <label>💳 付款方式</label>
+          <div class="type-toggle">
+            <div class="type-btn active" id="pay-btn-balance" onclick="switchPayMethod('balance')">💰 扣除儲值餘額</div>
+            <div class="type-btn"        id="pay-btn-transfer" onclick="switchPayMethod('transfer')">🏦 直接匯款送出</div>
+          </div>
+        </div>
+
         <div class="form-grid-2">
           <div class="form-row">
             <label>📅 結帳日期</label>
@@ -422,15 +432,15 @@ input[type="number"] { -moz-appearance: textfield; }
           </div>
           <div class="calc-result" id="calc-result"></div>
         </div>
-        <button class="btn btn-accent btn-full" onclick="submitCheckout()">💳 完成匯款，送出審核</button>
+        <button class="btn btn-accent btn-full" onclick="submitCheckout()">💳 送出結帳申請</button>
       </div>
     </div>
 
     <div id="result-section">
       <div class="result-card">
-        <h3>✅ 送出成功！回報單文章</h3>
+        <h3>✅ 送出成功！回報單文案</h3>
         <div class="result-textbox" id="result-text"></div>
-        <button class="btn btn-primary" onclick="copyResult()">📋 點擊複製文章</button>
+        <button class="btn btn-primary" onclick="copyResult()">📋 點擊複製文案</button>
       </div>
     </div>
   </div>
@@ -453,7 +463,7 @@ input[type="number"] { -moz-appearance: textfield; }
   <div id="admin-section">
     <div class="admin-tab-bar">
       <button class="admin-tab-btn active" id="atab-btn-deposit"  onclick="switchAdminTab('deposit')">📥 儲值審核</button>
-      <button class="admin-tab-btn"        id="atab-btn-checkout" onclick="switchAdminTab('checkout')">💳 結帳專用</button>
+      <button class="admin-tab-btn"        id="atab-btn-checkout" onclick="switchAdminTab('checkout')">💳 幫代理結帳</button>
       <button class="admin-tab-btn"        id="atab-btn-settings" onclick="switchAdminTab('settings')">⚙️ 系統設定</button>
     </div>
     <div id="admin-global-alert" class="alert error"></div>
@@ -474,13 +484,16 @@ input[type="number"] { -moz-appearance: textfield; }
         <div id="checkout-list" class="pending-list">
           <div class="pending-empty">⏳ 載入中...</div>
         </div>
+        <div style="margin-top:14px;">
+          <button class="btn btn-outline btn-sm" onclick="loadPendingDeposits()">🔄 重新整理</button>
+        </div>
       </div>
     </div>
 
-    <!-- 結帳專用 -->
+    <!-- 幫代理結帳 -->
     <div id="atab-checkout" class="tab-panel">
       <div class="card">
-        <div class="card-title admin-color">💳 結帳專用</div>
+        <div class="card-title admin-color">💳 幫代理結帳</div>
 
         <!-- 選代理 + 餘額 -->
         <div class="form-grid-2" style="margin-bottom:16px;">
@@ -574,7 +587,7 @@ input[type="number"] { -moz-appearance: textfield; }
         <div class="result-card">
           <h3>✅ 結帳完成！</h3>
           <div class="result-textbox" id="admin-result-text"></div>
-          <button class="btn btn-primary" onclick="copyAdminResult()">📋 點擊複製文章</button>
+          <button class="btn btn-primary" onclick="copyAdminResult()">📋 點擊複製文案</button>
         </div>
       </div>
     </div>
@@ -611,7 +624,7 @@ input[type="number"] { -moz-appearance: textfield; }
 </div><!-- /page-wrapper -->
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxiKhZsJJdReRCmhdnduoYpnL-aMXinxTtIvD1nR_fYKClYOL3WuUXKYD5QQbqAj7NQkg/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxa4BzrAgj0cYHyqC-5YSln2Dy6m25tD0h3wBd_bIihADx1nu-mGeprK3NHE_Du8SW7uw/exec';
 const ADMIN_USER = 'doudouNi';
 const ADMIN_PASS = 'nini99104';
 
@@ -619,7 +632,8 @@ let currentAgent    = null;
 let currentBalance  = 0;
 let isAdmin         = false;
 let adminAgentData  = [];
-let currentCheckoutType = 'batch'; // 'batch' or 'online'
+let currentCheckoutType = 'batch';
+let currentPayMethod    = 'balance'; // 'balance' or 'transfer'
 
 /* ── Helpers ── */
 const _$   = id => document.getElementById(id);
@@ -737,6 +751,13 @@ function switchTab(tab) {
   clearAlert('global-alert'); hide('result-section');
 }
 
+/* ── 付款方式切換 ── */
+function switchPayMethod(method) {
+  currentPayMethod = method;
+  _$('pay-btn-balance').classList.toggle('active',   method === 'balance');
+  _$('pay-btn-transfer').classList.toggle('active',  method === 'transfer');
+}
+
 /* ── 代理儲值 ── */
 async function submitDeposit() {
   clearAlert('global-alert');
@@ -778,23 +799,32 @@ async function submitCheckout() {
   if (!note)                  { showAlert('global-alert', '⚠️ 請填寫訂單項目說明'); return; }
   if (!/^\d{5}$/.test(last5)) { showAlert('global-alert', '⚠️ 請輸入正確的帳號末五碼（5 位數字）'); return; }
 
-  const afterBalance = currentBalance - amount;
-  if (afterBalance < 0) {
-    const msg = currentBalance < 0
-      ? `⚠️ 目前已有負額 NT$ ${fmtNum(Math.abs(currentBalance))}，結帳後需補齊共 NT$ ${fmtNum(Math.abs(afterBalance))}，請儘速補款。`
-      : `⚠️ 結帳後餘額將不足，請記得補齊 NT$ ${fmtNum(Math.abs(afterBalance))}。`;
-    if (!confirm(msg + '\n\n確定送出結帳？')) return;
+  const isTransfer = currentPayMethod === 'transfer';
+
+  // 扣餘額模式才檢查餘額
+  if (!isTransfer) {
+    const afterBalance = currentBalance - amount;
+    if (afterBalance < 0) {
+      const msg = currentBalance < 0
+        ? `⚠️ 目前已有負額 NT$ ${fmtNum(Math.abs(currentBalance))}，結帳後需補齊共 NT$ ${fmtNum(Math.abs(afterBalance))}，請儘速儲值。`
+        : `⚠️ 結帳後餘額將不足，請記得補齊 NT$ ${fmtNum(Math.abs(afterBalance))}。`;
+      if (!confirm(msg + '\n\n確定送出結帳？')) return;
+    }
   }
 
   showLoading();
   try {
     const fullNote = note + '｜末五碼：' + last5;
-    const data = await callScript({ action: 'transaction', type: '消費', agentCode: currentAgent, amount, date, note: fullNote });
+    // 直接匯款：類型傳「結帳待審」，不扣餘額；扣餘額：傳「消費」
+    const txType = isTransfer ? '結帳待審' : '消費';
+    const data = await callScript({ action: 'transaction', type: txType, agentCode: currentAgent, amount, date, note: fullNote });
     if (data.success) {
-      updateBalance(data.newBalance); renderHistory(data.history || []);
+      if (!isTransfer) updateBalance(data.newBalance);
+      renderHistory(data.history || []);
       _$('ck-amount').value = ''; _$('ck-note').value = ''; _$('ck-last5').value = '';
       _$('calc-result').style.display = 'none';
-      showResult(makeCopy({ type: '單筆結帳', date, amount, note: fullNote, status: '已確認' }));
+      const status = isTransfer ? '待審核（直接匯款）' : '已確認（扣除餘額）';
+      showResult(makeCopy({ type: '單筆結帳', date, amount, note: fullNote, status }));
     } else { showAlert('global-alert', '❌ ' + (data.message || '送出失敗')); }
   } catch { showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試'); }
   finally  { hideLoading(); }
@@ -831,7 +861,7 @@ function makeCopy({ type, date, amount, note, status }) {
     `📅 日期：${date}`, `💵 金額：NT$ ${fmtNum(amount)}`,
     `📝 備註：${note}`, `📋 狀態：${status}`,
     `⏰ 送出時間：${now}`, `────────────────────`,
-    `感謝您的回報，請等待對帳確認 🙏`].join('\n');
+    `感謝您的回報，請等待阿霓確認 🙏`].join('\n');
 }
 function showResult(text) {
   _$('result-text').textContent = text; show('result-section');
@@ -892,19 +922,23 @@ async function loadPendingDeposits() {
     // 結帳對帳
     const ckEl = _$('checkout-list');
     if (ckData.success && ckData.list.length > 0) {
-      ckEl.innerHTML = ckData.list.map(item => `
-        <div class="pending-item">
+      ckEl.innerHTML = ckData.list.map((item, i) => `
+        <div class="pending-item" id="ck-item-${i}">
           <div class="pending-info">
             <div class="pending-agent">👤 ${item.agentCode}${item.agentName ? '（' + item.agentName + '）' : ''}</div>
             <div class="pending-detail">
               📅 ${item.date}<br>
               📝 ${item.note || '無說明'}<br>
-              🏦 末五碼：${item.last5 || '－'}
+              🏦 末五碼：${item.last5 || '－'}<br>
+              📋 ${item.status}
             </div>
           </div>
           <div style="text-align:right; flex-shrink:0;">
             <div class="pending-amount minus">−NT$ ${fmtNum(item.amount)}</div>
-            <span style="font-size:11px; color:var(--text-light); margin-top:4px; display:block;">${item.status}</span>
+            ${item.status === '待審核'
+              ? `<button class="btn btn-success btn-sm" style="margin-top:6px;" onclick="approveCheckout(${item.row}, ${i})">✅ 確認入帳</button>`
+              : `<span style="font-size:11px; color:var(--success); margin-top:4px; display:block;">✅ 已確認</span>`
+            }
           </div>
         </div>`).join('');
     } else {
@@ -926,6 +960,24 @@ async function approveDeposit(rowNum, idx) {
       if (item) { item.classList.add('approved'); item.querySelector('button').textContent = '✅ 已入帳'; }
       showAlert('admin-global-alert', '✅ 入帳成功！代理餘額已更新。', 'success');
     } else { showAlert('admin-global-alert', '❌ ' + (data.message || '審核失敗')); }
+  } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
+}
+
+async function approveCheckout(rowNum, idx) {
+  if (!confirm('確認此筆直接匯款已收到，標記為已確認？')) return;
+  showLoading();
+  try {
+    const data = await callScript({ action: 'approveCheckout', rowNum });
+    if (data.success) {
+      const item = _$('ck-item-' + idx);
+      if (item) {
+        item.classList.add('approved');
+        const btn = item.querySelector('button');
+        if (btn) btn.outerHTML = '<span style="font-size:11px; color:var(--success); margin-top:4px; display:block;">✅ 已確認</span>';
+      }
+      showAlert('admin-global-alert', '✅ 已確認入帳！', 'success');
+    } else { showAlert('admin-global-alert', '❌ ' + (data.message || '確認失敗')); }
   } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
   finally  { hideLoading(); }
 }
