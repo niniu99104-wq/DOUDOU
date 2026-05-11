@@ -528,6 +528,11 @@ input[type="number"] { -moz-appearance: textfield; }
     <div id="tab-checkout" class="tab-panel">
       <div class="card">
         <div class="card-title">🛒 單筆結帳</div>
+        <div class="bank-info">
+          <strong>📍 匯款帳戶資訊</strong><br>
+          銀行：台新銀行（812）<br>
+          帳號：<strong>2888-10-2335157-5</strong>
+        </div>
         <div class="form-grid-2">
           <div class="form-row">
             <label>📅 結帳日期</label>
@@ -702,7 +707,7 @@ input[type="number"] { -moz-appearance: textfield; }
 </div><!-- /page-wrapper -->
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXIcB-Fvd_f4B9UtZJr0cOB7ru3llBaIv1FM1XpT45YsVgMlYXZa3KNUC8LWBErRfmlw/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzRL_vYy6UCI9J2Iv79YSnUClbcN8Klf5zt8lhSWRa4EFh-E2fAcpoH5nOr8X_YhOaxTg/exec';
 const ADMIN_USER = 'doudouNi';
 const ADMIN_PASS = 'nini99104';
 
@@ -888,9 +893,15 @@ async function submitCheckout() {
   if (!date)                   { showAlert('global-alert', '⚠️ 請選擇結帳日期'); return; }
   if (!amount || amount <= 0)  { showAlert('global-alert', '⚠️ 請輸入正確的結帳金額'); return; }
   if (!note)                   { showAlert('global-alert', '⚠️ 請填寫訂單項目說明'); return; }
-  if (amount > currentBalance) {
-    showAlert('global-alert', `❌ 餘額不足！可用餘額 NT$ ${fmtNum(currentBalance)}，結帳金額 NT$ ${fmtNum(amount)} 超出額度。`);
-    return;
+
+  // 若結帳後會是負數，提醒但不阻擋
+  const afterBalance = currentBalance - amount;
+  if (afterBalance < 0) {
+    const needPay = Math.abs(afterBalance);
+    const msg = currentBalance < 0
+      ? `⚠️ 目前已有負額 NT$ ${fmtNum(Math.abs(currentBalance))}，結帳後需補齊共 NT$ ${fmtNum(Math.abs(afterBalance))}，請儘速儲值。`
+      : `⚠️ 結帳後餘額將不足，請記得補齊 NT$ ${fmtNum(needPay)}。`;
+    if (!confirm(msg + '\n\n確定送出結帳？')) return;
   }
   showLoading();
   try {
