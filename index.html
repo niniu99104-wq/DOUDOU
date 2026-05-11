@@ -422,15 +422,15 @@ input[type="number"] { -moz-appearance: textfield; }
           </div>
           <div class="calc-result" id="calc-result"></div>
         </div>
-        <button class="btn btn-accent btn-full" onclick="submitCheckout()">💳 送出結帳申請</button>
+        <button class="btn btn-accent btn-full" onclick="submitCheckout()">💳 完成匯款，送出審核</button>
       </div>
     </div>
 
     <div id="result-section">
       <div class="result-card">
-        <h3>✅ 送出成功！回報單文案</h3>
+        <h3>✅ 送出成功！回報單文章</h3>
         <div class="result-textbox" id="result-text"></div>
-        <button class="btn btn-primary" onclick="copyResult()">📋 點擊複製文案</button>
+        <button class="btn btn-primary" onclick="copyResult()">📋 點擊複製文章</button>
       </div>
     </div>
   </div>
@@ -453,7 +453,7 @@ input[type="number"] { -moz-appearance: textfield; }
   <div id="admin-section">
     <div class="admin-tab-bar">
       <button class="admin-tab-btn active" id="atab-btn-deposit"  onclick="switchAdminTab('deposit')">📥 儲值審核</button>
-      <button class="admin-tab-btn"        id="atab-btn-checkout" onclick="switchAdminTab('checkout')">💳 幫代理結帳</button>
+      <button class="admin-tab-btn"        id="atab-btn-checkout" onclick="switchAdminTab('checkout')">💳 結帳專用</button>
       <button class="admin-tab-btn"        id="atab-btn-settings" onclick="switchAdminTab('settings')">⚙️ 系統設定</button>
     </div>
     <div id="admin-global-alert" class="alert error"></div>
@@ -477,10 +477,10 @@ input[type="number"] { -moz-appearance: textfield; }
       </div>
     </div>
 
-    <!-- 幫代理結帳 -->
+    <!-- 結帳專用 -->
     <div id="atab-checkout" class="tab-panel">
       <div class="card">
-        <div class="card-title admin-color">💳 幫代理結帳</div>
+        <div class="card-title admin-color">💳 結帳專用</div>
 
         <!-- 選代理 + 餘額 -->
         <div class="form-grid-2" style="margin-bottom:16px;">
@@ -574,7 +574,7 @@ input[type="number"] { -moz-appearance: textfield; }
         <div class="result-card">
           <h3>✅ 結帳完成！</h3>
           <div class="result-textbox" id="admin-result-text"></div>
-          <button class="btn btn-primary" onclick="copyAdminResult()">📋 點擊複製文案</button>
+          <button class="btn btn-primary" onclick="copyAdminResult()">📋 點擊複製文章</button>
         </div>
       </div>
     </div>
@@ -781,7 +781,7 @@ async function submitCheckout() {
   const afterBalance = currentBalance - amount;
   if (afterBalance < 0) {
     const msg = currentBalance < 0
-      ? `⚠️ 目前已有負額 NT$ ${fmtNum(Math.abs(currentBalance))}，結帳後需補齊共 NT$ ${fmtNum(Math.abs(afterBalance))}，請儘速儲值。`
+      ? `⚠️ 目前已有負額 NT$ ${fmtNum(Math.abs(currentBalance))}，結帳後需補齊共 NT$ ${fmtNum(Math.abs(afterBalance))}，請儘速補款。`
       : `⚠️ 結帳後餘額將不足，請記得補齊 NT$ ${fmtNum(Math.abs(afterBalance))}。`;
     if (!confirm(msg + '\n\n確定送出結帳？')) return;
   }
@@ -831,7 +831,7 @@ function makeCopy({ type, date, amount, note, status }) {
     `📅 日期：${date}`, `💵 金額：NT$ ${fmtNum(amount)}`,
     `📝 備註：${note}`, `📋 狀態：${status}`,
     `⏰ 送出時間：${now}`, `────────────────────`,
-    `感謝您的回報，請等待阿霓確認 🙏`].join('\n');
+    `感謝您的回報，請等待對帳確認 🙏`].join('\n');
 }
 function showResult(text) {
   _$('result-text').textContent = text; show('result-section');
