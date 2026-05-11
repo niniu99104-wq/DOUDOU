@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🥜 DouDou 代理管理系統</title>
+<title>🥜 DouDou.代理管理系統</title>
 <style>
 /* ════════════════════════════════════════
    DouDou 代理管理系統 — style.css
@@ -816,7 +816,7 @@ function renderHistory(list) {
   box.innerHTML = list.map(h => `
     <div class="history-row">
       <div class="history-info">
-        <div class="history-type">${h.type}</div>
+        <div class="history-type">${h.note || h.type}</div>
         <div class="history-date">${h.date || ''}</div>
       </div>
       <span class="history-badge">${h.status}</span>
