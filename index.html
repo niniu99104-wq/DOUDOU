@@ -5,10 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🥜 DouDou 代理管理系統</title>
 <style>
-/* ════════════════════════════════════════
-   DouDou 代理管理系統 — style.css
-════════════════════════════════════════ */
-
 :root {
   --primary:       #8d6e63;
   --primary-dark:  #6d4c41;
@@ -32,122 +28,67 @@
   --radius:        16px;
   --radius-sm:     10px;
 }
-
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 body {
   font-family: 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
   background: var(--bg);
   background-image:
     radial-gradient(ellipse at 18% 8%,  rgba(188,170,164,0.18) 0%, transparent 52%),
     radial-gradient(ellipse at 82% 92%, rgba(216,67,21,0.07)   0%, transparent 52%);
-  color: var(--text);
-  min-height: 100vh;
-  font-size: 14px;
-  line-height: 1.5;
+  color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.5;
 }
 
-/* ── Loading ── */
+/* Loading */
 #loading-overlay {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(253,250,246,0.88);
-  backdrop-filter: blur(6px);
-  z-index: 9999;
-  flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 14px;
+  display: none; position: fixed; inset: 0;
+  background: rgba(253,250,246,0.88); backdrop-filter: blur(6px);
+  z-index: 9999; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
 }
 #loading-overlay.active { display: flex; }
-.spinner {
-  width: 44px; height: 44px;
-  border: 4px solid var(--primary-light);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  animation: spin 0.85s linear infinite;
-}
+.spinner { width: 44px; height: 44px; border: 4px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.85s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-text { font-size: 13.5px; font-weight: 600; color: var(--primary-dark); letter-spacing: 1px; }
 
-/* ── Layout ── */
+/* Layout */
 .page-wrapper { max-width: 680px; margin: 0 auto; padding: 0 18px 80px; }
 
-/* ── Header ── */
+/* Header */
 .site-header { text-align: center; padding: 32px 0 20px; }
 .site-header .logo    { font-size: 40px; display: block; margin-bottom: 10px; }
 .site-header h1       { font-size: 20px; font-weight: 700; color: var(--primary-dark); letter-spacing: 2px; }
 .site-header .tagline { font-size: 12px; color: var(--text-light); margin-top: 5px; letter-spacing: 1px; }
 
-/* ── Marquee ── */
-.marquee-wrap {
-  background: linear-gradient(90deg, #4e342e 0%, #8d6e63 50%, #4e342e 100%);
-  border-radius: 999px; padding: 9px 0; margin-bottom: 20px;
-  overflow: hidden; white-space: nowrap;
-}
-.marquee-track {
-  display: flex; width: max-content;
-  animation: marquee-go 28s linear infinite;
-}
+/* Marquee */
+.marquee-wrap { background: linear-gradient(90deg, #4e342e 0%, #8d6e63 50%, #4e342e 100%); border-radius: 999px; padding: 9px 0; margin-bottom: 20px; overflow: hidden; white-space: nowrap; }
+.marquee-track { display: flex; width: max-content; animation: marquee-go 28s linear infinite; }
 .marquee-track:hover { animation-play-state: paused; }
-.marquee-item {
-  font-size: 12.5px; font-weight: 600;
-  color: #ffccbc; letter-spacing: 0.3px;
-  padding: 0 40px; white-space: nowrap; user-select: none;
-}
-@keyframes marquee-go {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
+.marquee-item { font-size: 12.5px; font-weight: 600; color: #ffccbc; letter-spacing: 0.3px; padding: 0 40px; white-space: nowrap; user-select: none; }
+@keyframes marquee-go { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-/* ── Card ── */
-.card {
-  background: var(--card-bg); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 24px 24px 22px;
-  box-shadow: var(--shadow); margin-bottom: 16px;
-  animation: fadeUp 0.35s ease both;
-}
+/* Card */
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 24px 22px; box-shadow: var(--shadow); margin-bottom: 16px; animation: fadeUp 0.35s ease both; }
 .card-admin { border-color: #b39ddb; }
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.card-title {
-  font-size: 14px; font-weight: 700; color: var(--primary-dark);
-  margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
-}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+.card-title { font-size: 14px; font-weight: 700; color: var(--primary-dark); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
 .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 .admin-color { color: var(--admin) !important; }
 
-/* ── Form ── */
-label {
-  display: block; font-size: 12.5px; font-weight: 600;
-  color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.2px;
+/* Form */
+label { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.2px; }
+input[type="text"], input[type="number"], input[type="date"], input[type="password"], select, textarea {
+  width: 100%; background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  padding: 11px 13px; font-size: 14px; color: var(--text); font-family: inherit;
+  outline: none; appearance: none; -webkit-appearance: none; transition: border-color 0.2s, box-shadow 0.2s;
 }
-input[type="text"], input[type="number"], input[type="date"],
-input[type="password"], select, textarea {
-  width: 100%; background: #fff; border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm); padding: 11px 13px;
-  font-size: 14px; color: var(--text); font-family: inherit;
-  outline: none; appearance: none; -webkit-appearance: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-input:focus, select:focus, textarea:focus {
-  border-color: var(--primary); box-shadow: 0 0 0 3px rgba(141,110,99,0.10);
-}
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(141,110,99,0.10); }
+input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 input[type="number"] { -moz-appearance: textfield; }
 .form-row    { margin-bottom: 14px; }
 .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 
-/* ── Buttons ── */
-.btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  gap: 6px; border: none; border-radius: var(--radius-sm);
-  padding: 12px 20px; font-size: 13.5px; font-weight: 700;
-  font-family: inherit; letter-spacing: 0.3px; cursor: pointer;
-  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-}
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: none; border-radius: var(--radius-sm); padding: 12px 20px; font-size: 13.5px; font-weight: 700; font-family: inherit; letter-spacing: 0.3px; cursor: pointer; transition: background 0.2s, transform 0.15s, box-shadow 0.2s; }
 .btn:active { transform: scale(0.98) !important; }
 .btn-primary { background: var(--primary); color: #fff; }
 .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow); }
@@ -159,38 +100,25 @@ input[type="number"] { -moz-appearance: textfield; }
 .btn-success:hover { background: #33691e; transform: translateY(-1px); }
 .btn-admin   { background: var(--admin); color: #fff; }
 .btn-admin:hover { background: var(--admin-dark); transform: translateY(-1px); box-shadow: var(--shadow); }
-.btn-ghost {
-  background: transparent; color: rgba(255,255,255,0.82);
-  border: 1px solid rgba(255,255,255,0.32); border-radius: 20px;
-}
+.btn-ghost { background: transparent; color: rgba(255,255,255,0.82); border: 1px solid rgba(255,255,255,0.32); border-radius: 20px; }
 .btn-ghost:hover { background: rgba(255,255,255,0.12); }
-.btn-sm   { padding: 7px 13px; font-size: 12.5px; }
-.btn-xs   { padding: 5px 10px; font-size: 12px; }
+.btn-sm  { padding: 7px 13px; font-size: 12.5px; }
+.btn-xs  { padding: 5px 10px; font-size: 12px; }
 .btn-full { width: 100%; }
 
-/* ── Alert ── */
-.alert {
-  display: none; border-radius: var(--radius-sm);
-  padding: 11px 15px; font-size: 13px; font-weight: 600;
-  margin-bottom: 14px; line-height: 1.5;
-}
+/* Alert */
+.alert { display: none; border-radius: var(--radius-sm); padding: 11px 15px; font-size: 13px; font-weight: 600; margin-bottom: 14px; line-height: 1.5; }
 .alert.error   { background: #fbe9e7; border: 1px solid #ffccbc; color: var(--accent); }
 .alert.success { background: var(--success-bg); border: 1px solid #aed581; color: var(--success); }
 .alert.show    { display: block; animation: fadeUp 0.25s ease; }
 
-/* ── Login ── */
+/* Login */
 .login-desc { font-size: 13px; color: var(--text-light); line-height: 1.7; margin-bottom: 18px; }
 .login-switch { text-align: center; margin-top: 14px; font-size: 12.5px; color: var(--text-light); }
 .login-switch a { color: var(--primary); cursor: pointer; text-decoration: underline; }
 
-/* ── Dashboard ── */
-#dashboard {
-  display: none;
-  background: linear-gradient(135deg, #4e342e 0%, #6d4c41 100%);
-  border-radius: var(--radius); padding: 20px 22px 18px;
-  color: #fff; margin-bottom: 14px;
-  box-shadow: var(--shadow-lg); animation: fadeUp 0.35s ease;
-}
+/* Dashboard */
+#dashboard { display: none; background: linear-gradient(135deg, #4e342e 0%, #6d4c41 100%); border-radius: var(--radius); padding: 20px 22px 18px; color: #fff; margin-bottom: 14px; box-shadow: var(--shadow-lg); animation: fadeUp 0.35s ease; }
 .dash-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
 .dash-left .greeting  { font-size: 11.5px; opacity: 0.7; margin-bottom: 3px; }
 .dash-left .agentname { font-size: 16px; font-weight: 700; }
@@ -198,17 +126,10 @@ input[type="number"] { -moz-appearance: textfield; }
 .dash-right .bal-label { font-size: 11px; opacity: 0.65; margin-bottom: 3px; }
 .dash-right .bal-amount { font-size: 26px; font-weight: 800; color: #ffccbc; letter-spacing: 0.5px; line-height: 1.15; }
 .dash-history-label { font-size: 11px; opacity: 0.6; margin-bottom: 6px; }
-.history-box {
-  background: rgba(255,255,255,0.09); border-radius: 9px;
-  max-height: 144px; overflow-y: auto; padding: 6px 10px;
-  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.22) transparent;
-}
+.history-box { background: rgba(255,255,255,0.09); border-radius: 9px; max-height: 144px; overflow-y: auto; padding: 6px 10px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.22) transparent; }
 .history-box::-webkit-scrollbar { width: 3px; }
 .history-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.22); border-radius: 2px; }
-.history-row {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 12px;
-}
+.history-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 12px; }
 .history-row:last-child { border-bottom: none; }
 .history-info { flex: 1; }
 .history-type { opacity: 0.85; }
@@ -219,152 +140,89 @@ input[type="number"] { -moz-appearance: textfield; }
 .clr-minus { color: #ffccbc; }
 .history-empty { font-size: 12px; opacity: 0.48; text-align: center; padding: 10px 0; }
 
-/* ── Notice Banner ── */
-#notice-banner {
-  display: none;
-  background: linear-gradient(135deg, #fff9e6, #fff3e0);
-  border: 1.5px solid #ffcc80; border-left: 5px solid var(--warning);
-  border-radius: var(--radius-sm); padding: 14px 16px;
-  margin-bottom: 16px; animation: fadeUp 0.35s ease;
-}
+/* Notice */
+#notice-banner { display: none; background: linear-gradient(135deg, #fff9e6, #fff3e0); border: 1.5px solid #ffcc80; border-left: 5px solid var(--warning); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 16px; animation: fadeUp 0.35s ease; }
 .notice-title { font-size: 13px; font-weight: 800; color: var(--warning); margin-bottom: 9px; display: flex; align-items: center; gap: 6px; }
 .notice-body  { font-size: 13px; color: #5d4037; line-height: 1.85; }
 .notice-body strong { color: #bf360c; }
-.notice-tag {
-  display: inline-block; background: var(--warning); color: #fff;
-  font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px;
-  margin-right: 4px; vertical-align: middle;
-}
+.notice-tag { display: inline-block; background: var(--warning); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px; margin-right: 4px; vertical-align: middle; }
 
-/* ── Tabs ── */
+/* Tabs */
 #main-section  { display: none; }
 #admin-section { display: none; }
-.tab-bar {
-  display: flex; gap: 4px; background: var(--card-inner);
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  padding: 4px; margin-bottom: 16px;
-}
-.tab-btn {
-  flex: 1; padding: 11px 10px; background: transparent; border: none;
-  border-radius: 8px; font-size: 13.5px; font-weight: 600;
-  color: var(--text-muted); cursor: pointer; font-family: inherit; transition: all 0.2s;
-}
+.tab-bar { display: flex; gap: 4px; background: var(--card-inner); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 16px; }
+.tab-btn { flex: 1; padding: 11px 10px; background: transparent; border: none; border-radius: 8px; font-size: 13.5px; font-weight: 600; color: var(--text-muted); cursor: pointer; font-family: inherit; transition: all 0.2s; }
 .tab-btn.active { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(141,110,99,0.26); }
 .tab-panel        { display: none; }
 .tab-panel.active { display: block; animation: fadeUp 0.28s ease; }
 
-/* ── Bank Info ── */
-.bank-info {
-  background: var(--warning-bg); border: 1.5px solid #ffccbc;
-  border-radius: var(--radius-sm); padding: 13px 15px;
-  margin-bottom: 18px; font-size: 13px; line-height: 1.85;
-}
+/* Bank Info */
+.bank-info { background: var(--warning-bg); border: 1.5px solid #ffccbc; border-radius: var(--radius-sm); padding: 13px 15px; margin-bottom: 18px; font-size: 13px; line-height: 1.85; }
 .bank-info strong { color: var(--warning); }
 
-/* ── Checkbox ── */
-.checkbox-row {
-  display: flex; align-items: center; gap: 10px; padding: 12px 14px;
-  background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-  cursor: pointer; transition: border-color 0.2s, background 0.2s; margin-bottom: 16px;
-}
+/* Checkbox */
+.checkbox-row { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: border-color 0.2s, background 0.2s; margin-bottom: 16px; }
 .checkbox-row:has(input:checked) { border-color: var(--primary); background: var(--card-inner); }
 .checkbox-row input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0; }
 .checkbox-row span { font-size: 13px; font-weight: 600; color: var(--text-muted); line-height: 1.45; }
 
-/* ── KRW Calc ── */
-.calc-box {
-  background: var(--card-inner); border: 1px dashed var(--primary-light);
-  border-radius: var(--radius-sm); padding: 15px; margin-bottom: 16px;
-}
+/* KRW */
+.calc-box { background: var(--card-inner); border: 1px dashed var(--primary-light); border-radius: var(--radius-sm); padding: 15px; margin-bottom: 16px; }
 .calc-title { font-size: 13px; font-weight: 700; color: var(--primary-dark); margin-bottom: 12px; }
 .calc-title span { font-weight: 400; color: var(--text-light); }
-.krw-list  { display: flex; flex-direction: column; gap: 8px; }
-.krw-row   { display: flex; gap: 8px; align-items: center; }
+.krw-list { display: flex; flex-direction: column; gap: 8px; }
+.krw-row  { display: flex; gap: 8px; align-items: center; }
 .krw-row input { flex: 1; }
-.btn-rm {
-  background: none; border: 1.5px solid var(--border); border-radius: 8px;
-  padding: 9px 11px; color: var(--text-light); font-size: 13px;
-  cursor: pointer; flex-shrink: 0; transition: all 0.2s; line-height: 1;
-}
+.btn-rm { background: none; border: 1.5px solid var(--border); border-radius: 8px; padding: 9px 11px; color: var(--text-light); font-size: 13px; cursor: pointer; flex-shrink: 0; transition: all 0.2s; line-height: 1; }
 .btn-rm:hover { border-color: var(--accent); color: var(--accent); }
-.calc-actions  { display: flex; gap: 8px; margin-top: 12px; }
-.calc-result {
-  display: none; margin-top: 12px; padding: 11px 14px;
-  background: #fff; border-radius: 8px;
-  font-size: 13px; font-weight: 600; color: var(--primary-dark); line-height: 1.6;
-}
+.calc-actions { display: flex; gap: 8px; margin-top: 12px; }
+.calc-result { display: none; margin-top: 12px; padding: 11px 14px; background: #fff; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--primary-dark); line-height: 1.6; }
 
-/* ── Result ── */
-#result-section      { display: none; animation: fadeUp 0.35s ease; }
+/* Result */
+#result-section       { display: none; animation: fadeUp 0.35s ease; }
 #admin-result-section { display: none; animation: fadeUp 0.35s ease; }
-.result-card {
-  background: var(--success-bg); border: 1.5px solid #aed581;
-  border-radius: var(--radius); padding: 20px 22px;
-}
+.result-card { background: var(--success-bg); border: 1.5px solid #aed581; border-radius: var(--radius); padding: 20px 22px; }
 .result-card h3 { font-size: 14px; font-weight: 700; color: var(--success); margin-bottom: 13px; display: flex; align-items: center; gap: 7px; }
-.result-textbox {
-  background: #fff; border: 1px solid #c5e1a5; border-radius: var(--radius-sm);
-  padding: 15px; font-size: 13px; line-height: 1.95; white-space: pre-wrap;
-  word-break: break-all; color: var(--text);
-  font-family: 'PingFang TC', 'Microsoft JhengHei', monospace;
-  margin-bottom: 14px; max-height: 230px; overflow-y: auto;
-}
+.result-textbox { background: #fff; border: 1px solid #c5e1a5; border-radius: var(--radius-sm); padding: 15px; font-size: 13px; line-height: 1.95; white-space: pre-wrap; word-break: break-all; color: var(--text); font-family: 'PingFang TC', 'Microsoft JhengHei', monospace; margin-bottom: 14px; max-height: 230px; overflow-y: auto; }
 
-/* ── Admin Dashboard ── */
-#admin-dashboard {
-  display: none;
-  background: linear-gradient(135deg, #311b92 0%, #4a148c 100%);
-  border-radius: var(--radius); padding: 20px 22px 18px;
-  color: #fff; margin-bottom: 14px;
-  box-shadow: var(--shadow-lg); animation: fadeUp 0.35s ease;
-}
-.admin-dash-top  { display: flex; justify-content: space-between; align-items: center; }
-.admin-greeting  { font-size: 11.5px; opacity: 0.7; margin-bottom: 3px; }
-.admin-name      { font-size: 18px; font-weight: 700; }
+/* Admin Dashboard */
+#admin-dashboard { display: none; background: linear-gradient(135deg, #311b92 0%, #4a148c 100%); border-radius: var(--radius); padding: 20px 22px 18px; color: #fff; margin-bottom: 14px; box-shadow: var(--shadow-lg); animation: fadeUp 0.35s ease; }
+.admin-dash-top { display: flex; justify-content: space-between; align-items: center; }
+.admin-greeting { font-size: 11.5px; opacity: 0.7; margin-bottom: 3px; }
+.admin-name     { font-size: 18px; font-weight: 700; }
 .admin-badge { background: rgba(255,255,255,0.15); border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 700; }
 
-/* ── Admin Tabs ── */
-.admin-tab-bar {
-  display: flex; gap: 4px; background: #ede7f6; border: 1px solid #b39ddb;
-  border-radius: var(--radius-sm); padding: 4px; margin-bottom: 16px;
-}
-.admin-tab-btn {
-  flex: 1; padding: 10px 8px; background: transparent; border: none;
-  border-radius: 8px; font-size: 13px; font-weight: 600;
-  color: var(--admin); cursor: pointer; font-family: inherit; transition: all 0.2s;
-}
+/* Admin Tabs */
+.admin-tab-bar { display: flex; gap: 4px; background: #ede7f6; border: 1px solid #b39ddb; border-radius: var(--radius-sm); padding: 4px; margin-bottom: 16px; }
+.admin-tab-btn { flex: 1; padding: 10px 6px; background: transparent; border: none; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: var(--admin); cursor: pointer; font-family: inherit; transition: all 0.2s; }
 .admin-tab-btn.active { background: var(--admin); color: #fff; box-shadow: 0 2px 8px rgba(74,20,140,0.28); }
 
-/* ── Pending ── */
+/* Pending */
 .pending-list  { display: flex; flex-direction: column; gap: 10px; }
-.pending-item {
-  background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-  padding: 13px 15px; display: flex; align-items: center;
-  justify-content: space-between; gap: 12px; flex-wrap: wrap;
-}
+.pending-item { background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 13px 15px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .pending-item.approved { opacity: 0.45; pointer-events: none; }
 .pending-info   { flex: 1; min-width: 0; }
 .pending-agent  { font-size: 13.5px; font-weight: 700; color: var(--primary-dark); }
-.pending-detail { font-size: 12px; color: var(--text-muted); margin-top: 3px; line-height: 1.6; }
+.pending-detail { font-size: 12px; color: var(--text-muted); margin-top: 3px; line-height: 1.7; }
 .pending-amount { font-size: 16px; font-weight: 800; color: var(--success); white-space: nowrap; }
+.pending-amount.minus { color: var(--accent); }
 .pending-empty  { text-align: center; color: var(--text-light); font-size: 13px; padding: 20px 0; }
 
-/* ── Admin Checkout (Simple) ── */
-.balance-display {
-  padding: 11px 13px; background: #fff;
-  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-  font-weight: 700; color: var(--success); font-size: 15px;
-}
-.after-balance-box {
-  background: linear-gradient(135deg, #f3e5f5, #ede7f6);
-  border: 1.5px solid #b39ddb; border-radius: var(--radius-sm);
-  padding: 14px 16px; margin-bottom: 16px;
-  display: flex; justify-content: space-between; align-items: center;
-}
+/* Admin Checkout */
+.balance-display { padding: 11px 13px; background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-weight: 700; color: var(--success); font-size: 15px; }
+.after-balance-box { background: linear-gradient(135deg, #f3e5f5, #ede7f6); border: 1.5px solid #b39ddb; border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
 .after-balance-label { font-size: 13px; color: var(--admin); font-weight: 600; }
 .after-balance-value { font-size: 18px; font-weight: 800; color: var(--accent); }
 
-/* ── Settings ── */
+/* Checkout Type Toggle */
+.type-toggle { display: flex; gap: 8px; margin-bottom: 16px; }
+.type-btn { flex: 1; padding: 11px; background: var(--card-inner); border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; font-family: inherit; transition: all 0.2s; text-align: center; }
+.type-btn.active { background: var(--admin); color: #fff; border-color: var(--admin); }
+
+/* Section divider */
+.section-label { font-size: 12px; font-weight: 700; color: var(--text-light); letter-spacing: 1px; text-transform: uppercase; margin: 18px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+
+/* Settings */
 .settings-card { background: #ede7f6; border: 1.5px solid #b39ddb; border-radius: var(--radius-sm); padding: 16px; margin-bottom: 12px; }
 .settings-label { font-size: 13px; font-weight: 700; color: var(--admin); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
 .agent-list-table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -374,15 +232,17 @@ input[type="number"] { -moz-appearance: textfield; }
 .agent-list-table tr:hover td { background: #f3e5f5; }
 .agent-list-table input { border: 1px solid #b39ddb; border-radius: 6px; padding: 5px 8px; font-size: 13px; width: 100%; }
 
-/* ── Responsive ── */
+/* Responsive */
 @media (max-width: 520px) {
   .page-wrapper  { padding: 0 14px 60px; }
   .card          { padding: 20px 16px 18px; }
   .form-grid-2   { grid-template-columns: 1fr; gap: 0; }
+  .form-grid-3   { grid-template-columns: 1fr 1fr; }
   .dash-top      { flex-direction: column; gap: 8px; }
   .dash-right    { text-align: left; }
   .calc-actions  { flex-direction: column; }
-  .admin-tab-btn { font-size: 11.5px; padding: 9px 5px; }
+  .admin-tab-btn { font-size: 11px; padding: 9px 4px; }
+  .type-toggle   { flex-direction: column; }
 }
 </style>
 </head>
@@ -414,10 +274,7 @@ input[type="number"] { -moz-appearance: textfield; }
   <div id="login-section">
     <div class="card">
       <div class="card-title">🔐 代理登入</div>
-      <p class="login-desc">
-        請選擇您的代理代碼並輸入手機後六碼以進入系統。<br>
-        本系統僅供授權代理使用，請勿外傳。
-      </p>
+      <p class="login-desc">請選擇您的代理代碼並輸入手機後六碼以進入系統。<br>本系統僅供授權代理使用，請勿外傳。</p>
       <div class="form-row">
         <label>代理代碼</label>
         <select id="login-select"></select>
@@ -474,7 +331,7 @@ input[type="number"] { -moz-appearance: textfield; }
 
   <!-- 公告欄 -->
   <div id="notice-banner">
-    <div class="notice-title">📢 最新公告，請注意</div>
+    <div class="notice-title">📢 最新公告・請注意⚠️</div>
     <div class="notice-body">
       💰 儲值入帳時間改為固定兩天：<strong>🗓️ 每週三 ／ 每週日</strong><br><br>
       <span class="notice-tag">週三入帳</span>請於 <strong>週三前</strong> 完成匯款<br>
@@ -547,6 +404,10 @@ input[type="number"] { -moz-appearance: textfield; }
           <label>📝 訂單項目說明</label>
           <input type="text" id="ck-note" placeholder="例：批網4件 ／ 記事本湊單米菲兔">
         </div>
+        <div class="form-row">
+          <label>🏦 匯款帳號末五碼</label>
+          <input type="text" id="ck-last5" placeholder="請輸入末五碼數字" maxlength="5" inputmode="numeric">
+        </div>
         <div class="calc-box">
           <div class="calc-title">📊 多品項韓元計價小工具 <span>（匯率固定 ×40，無條件進位）</span></div>
           <div class="krw-list" id="krw-list">
@@ -597,7 +458,7 @@ input[type="number"] { -moz-appearance: textfield; }
     </div>
     <div id="admin-global-alert" class="alert error"></div>
 
-    <!-- 儲值審核 -->
+    <!-- 儲值審核 + 結帳對帳 -->
     <div id="atab-deposit" class="tab-panel active">
       <div class="card">
         <div class="card-title admin-color">📥 待審核儲值清單</div>
@@ -608,9 +469,15 @@ input[type="number"] { -moz-appearance: textfield; }
           <button class="btn btn-outline btn-sm" onclick="loadPendingDeposits()">🔄 重新整理</button>
         </div>
       </div>
+      <div class="card">
+        <div class="card-title admin-color">🛒 代理單筆結帳紀錄</div>
+        <div id="checkout-list" class="pending-list">
+          <div class="pending-empty">⏳ 載入中...</div>
+        </div>
+      </div>
     </div>
 
-    <!-- ══ 幫代理結帳（簡化版）══ -->
+    <!-- 幫代理結帳 -->
     <div id="atab-checkout" class="tab-panel">
       <div class="card">
         <div class="card-title admin-color">💳 幫代理結帳</div>
@@ -629,25 +496,72 @@ input[type="number"] { -moz-appearance: textfield; }
           </div>
         </div>
 
-        <!-- 日期 + 備註 -->
-        <div class="form-grid-2" style="margin-bottom:16px;">
-          <div class="form-row" style="margin:0;">
-            <label>📅 結帳日期</label>
-            <input type="date" id="admin-ck-date">
-          </div>
-          <div class="form-row" style="margin:0;">
-            <label>📝 備註（如：以上結帳0307）</label>
-            <input type="text" id="admin-ck-note" placeholder="例：以上結帳0307">
-          </div>
-        </div>
-
-        <!-- 結帳金額 -->
+        <!-- 結帳類型 -->
         <div class="form-row">
-          <label>💵 結帳台幣總額（NT$）</label>
-          <input type="number" id="admin-ck-amount" placeholder="請輸入本次結帳總金額" min="1">
+          <label>結帳類型</label>
+          <div class="type-toggle">
+            <div class="type-btn active" id="type-btn-batch"  onclick="switchCheckoutType('batch')">🛍️ 批發網</div>
+            <div class="type-btn"        id="type-btn-online" onclick="switchCheckoutType('online')">🌐 官網&amp;記事本</div>
+          </div>
         </div>
 
-        <!-- 預覽餘額 -->
+        <!-- 批發網欄位 -->
+        <div id="form-batch">
+          <div class="form-grid-2" style="margin-bottom:14px;">
+            <div class="form-row" style="margin:0;">
+              <label>📅 下單日期</label>
+              <input type="date" id="batch-date">
+            </div>
+            <div class="form-row" style="margin:0;">
+              <label>📦 總件數</label>
+              <input type="number" id="batch-qty" placeholder="0" min="0">
+            </div>
+          </div>
+          <div class="form-grid-2" style="margin-bottom:14px;">
+            <div class="form-row" style="margin:0;">
+              <label>🇰🇷 韓幣總計</label>
+              <input type="number" id="batch-krw" placeholder="0" min="0" oninput="autoCalcBatchTwd()">
+            </div>
+            <div class="form-row" style="margin:0;">
+              <label>💵 台幣總計（NT$）</label>
+              <input type="number" id="batch-twd" placeholder="自動換算或手動輸入" min="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <label>📝 備註</label>
+            <input type="text" id="batch-note" placeholder="例：以上結帳0307">
+          </div>
+        </div>
+
+        <!-- 官網&記事本欄位 -->
+        <div id="form-online" style="display:none;">
+          <div class="form-grid-2" style="margin-bottom:14px;">
+            <div class="form-row" style="margin:0;">
+              <label>📅 結單日期</label>
+              <input type="date" id="online-date">
+            </div>
+            <div class="form-row" style="margin:0;">
+              <label>📦 總件數</label>
+              <input type="number" id="online-qty" placeholder="0" min="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <label>🏷️ 開團品項</label>
+            <select id="online-product">
+              <option value="">請選擇品項</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>💵 台幣總計（NT$）</label>
+            <input type="number" id="online-twd" placeholder="請輸入金額" min="0">
+          </div>
+          <div class="form-row">
+            <label>📝 備註</label>
+            <input type="text" id="online-note" placeholder="備註">
+          </div>
+        </div>
+
+        <!-- 預估餘額 -->
         <div class="after-balance-box" id="after-balance-box" style="display:none;">
           <span class="after-balance-label">結帳後預估餘額</span>
           <span class="after-balance-value" id="after-balance-value">NT$ 0</span>
@@ -670,30 +584,20 @@ input[type="number"] { -moz-appearance: textfield; }
       <div class="card">
         <div class="card-title admin-color">⚙️ 系統設定</div>
         <div class="settings-card">
-          <div class="settings-label">📅 公告日期設定（前後台顯示）</div>
+          <div class="settings-label">📅 公告日期設定</div>
           <div class="form-grid-2">
-            <div class="form-row" style="margin:0;">
-              <label>週三入帳日</label>
-              <input type="date" id="setting-wed-date">
-            </div>
-            <div class="form-row" style="margin:0;">
-              <label>週日入帳日</label>
-              <input type="date" id="setting-sun-date">
-            </div>
+            <div class="form-row" style="margin:0;"><label>週三入帳日</label><input type="date" id="setting-wed-date"></div>
+            <div class="form-row" style="margin:0;"><label>週日入帳日</label><input type="date" id="setting-sun-date"></div>
           </div>
           <div style="margin-top:12px;">
             <button class="btn btn-admin btn-sm" onclick="saveAnnounceDates()">💾 儲存公告日期</button>
           </div>
         </div>
         <div class="settings-card">
-          <div class="settings-label">👥 代理資料管理（匯率 &amp; 手機號碼）</div>
+          <div class="settings-label">👥 代理資料管理</div>
           <div style="overflow-x:auto;">
             <table class="agent-list-table">
-              <thead>
-                <tr>
-                  <th>代理代碼</th><th>名稱</th><th>手機號碼</th><th>匯率</th><th>餘額</th><th>儲存</th>
-                </tr>
-              </thead>
+              <thead><tr><th>代理代碼</th><th>名稱</th><th>手機號碼</th><th>匯率</th><th>餘額</th><th>儲存</th></tr></thead>
               <tbody id="agent-settings-body">
                 <tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:16px;">載入中...</td></tr>
               </tbody>
@@ -707,38 +611,28 @@ input[type="number"] { -moz-appearance: textfield; }
 </div><!-- /page-wrapper -->
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzRL_vYy6UCI9J2Iv79YSnUClbcN8Klf5zt8lhSWRa4EFh-E2fAcpoH5nOr8X_YhOaxTg/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxiKhZsJJdReRCmhdnduoYpnL-aMXinxTtIvD1nR_fYKClYOL3WuUXKYD5QQbqAj7NQkg/exec';
 const ADMIN_USER = 'doudouNi';
 const ADMIN_PASS = 'nini99104';
 
-let currentAgent   = null;
-let currentBalance = 0;
-let isAdmin        = false;
-let adminAgentData = [];
+let currentAgent    = null;
+let currentBalance  = 0;
+let isAdmin         = false;
+let adminAgentData  = [];
+let currentCheckoutType = 'batch'; // 'batch' or 'online'
 
 /* ── Helpers ── */
 const _$   = id => document.getElementById(id);
 const show = id => _$(id).style.display = 'block';
 const hide = id => _$(id).style.display = 'none';
-
 function showLoading() { _$('loading-overlay').classList.add('active'); }
 function hideLoading() { _$('loading-overlay').classList.remove('active'); }
-
-function showAlert(id, msg, type = 'error') {
-  const el = _$(id); el.textContent = msg; el.className = 'alert ' + type + ' show';
-}
-function clearAlert(id) {
-  const el = _$(id); el.className = 'alert error'; el.textContent = '';
-}
-
+function showAlert(id, msg, type = 'error') { const el = _$(id); el.textContent = msg; el.className = 'alert ' + type + ' show'; }
+function clearAlert(id) { const el = _$(id); el.className = 'alert error'; el.textContent = ''; }
 async function callScript(payload) {
-  const res = await fetch(GOOGLE_SCRIPT_URL, {
-    method: 'POST', headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(payload)
-  });
+  const res = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) });
   return res.json();
 }
-
 function fmtNum(n) { return Number(n || 0).toLocaleString(); }
 
 /* ── Init ── */
@@ -751,9 +645,9 @@ function fmtNum(n) { return Number(n || 0).toLocaleString(); }
     sel.appendChild(opt);
   }
   const today = new Date().toISOString().slice(0, 10);
-  document.getElementById('dep-date').value      = today;
-  document.getElementById('ck-date').value       = today;
-  document.getElementById('admin-ck-date').value = today;
+  ['dep-date','ck-date','batch-date','online-date'].forEach(id => {
+    if (_$(id)) _$(id).value = today;
+  });
 })();
 
 /* ── 登入切換 ── */
@@ -775,9 +669,7 @@ async function doLogin() {
       currentBalance = Number(data.balance);
       renderDashboard(data);
       hide('login-section'); show('dashboard'); show('notice-banner'); show('main-section');
-    } else {
-      showAlert('login-alert', data.message || '登入失敗，請確認代理代碼與手機後六碼');
-    }
+    } else { showAlert('login-alert', data.message || '登入失敗'); }
   } catch { showAlert('login-alert', '⚠️ 無法連線至伺服器，請稍後再試'); }
   finally  { hideLoading(); }
 }
@@ -798,7 +690,6 @@ function doAdminLogin() {
   hide('admin-login-section'); show('admin-dashboard'); show('admin-section');
   loadPendingDeposits(); loadAdminAgents();
 }
-
 function doAdminLogout() {
   isAdmin = false;
   hide('admin-dashboard'); hide('admin-section'); show('login-section');
@@ -813,23 +704,14 @@ function renderDashboard(data) {
   checkBalanceWarning(Number(data.balance));
   renderHistory(data.history || []);
 }
-
 function updateBalance(v) {
   currentBalance = Number(v);
   _$('dash-balance').textContent = fmtNum(v);
   checkBalanceWarning(currentBalance);
 }
-
 function checkBalanceWarning(bal) {
-  const el = _$('balance-warning');
-  if (!el) return;
-  if (bal < 0) {
-    el.style.display = 'block';
-  } else {
-    el.style.display = 'none';
-  }
+  _$('balance-warning').style.display = bal < 0 ? 'block' : 'none';
 }
-
 function renderHistory(list) {
   const box = _$('history-box');
   if (!list.length) { box.innerHTML = '<div class="history-empty">尚無交易紀錄</div>'; return; }
@@ -840,8 +722,8 @@ function renderHistory(list) {
         <div class="history-date">${h.date || ''}</div>
       </div>
       <span class="history-badge">${h.status}</span>
-      <span class="history-amt ${h.type === '儲值' ? 'clr-plus' : 'clr-minus'}">
-        ${h.type === '儲值' ? '+' : '−'}${fmtNum(h.amount)}
+      <span class="history-amt ${h.type === '儲值' || h.type === '退款' ? 'clr-plus' : 'clr-minus'}">
+        ${h.type === '儲值' || h.type === '退款' ? '+' : '−'}${fmtNum(h.amount)}
       </span>
     </div>`).join('');
 }
@@ -889,28 +771,30 @@ async function submitCheckout() {
   const date   = _$('ck-date').value;
   const amount = Number(_$('ck-amount').value);
   const note   = _$('ck-note').value.trim();
+  const last5  = _$('ck-last5').value.trim();
 
-  if (!date)                   { showAlert('global-alert', '⚠️ 請選擇結帳日期'); return; }
-  if (!amount || amount <= 0)  { showAlert('global-alert', '⚠️ 請輸入正確的結帳金額'); return; }
-  if (!note)                   { showAlert('global-alert', '⚠️ 請填寫訂單項目說明'); return; }
+  if (!date)                  { showAlert('global-alert', '⚠️ 請選擇結帳日期'); return; }
+  if (!amount || amount <= 0) { showAlert('global-alert', '⚠️ 請輸入正確的結帳金額'); return; }
+  if (!note)                  { showAlert('global-alert', '⚠️ 請填寫訂單項目說明'); return; }
+  if (!/^\d{5}$/.test(last5)) { showAlert('global-alert', '⚠️ 請輸入正確的帳號末五碼（5 位數字）'); return; }
 
-  // 若結帳後會是負數，提醒但不阻擋
   const afterBalance = currentBalance - amount;
   if (afterBalance < 0) {
-    const needPay = Math.abs(afterBalance);
     const msg = currentBalance < 0
-      ? `⚠️ 目前已有負額 NT$ ${fmtNum(Math.abs(currentBalance))}，結帳後需補齊共 NT$ ${fmtNum(Math.abs(afterBalance))}，請儘速完成補款。`
-      : `⚠️ 結帳後餘額將不足，請記得補齊 NT$ ${fmtNum(needPay)}。`;
+      ? `⚠️ 目前已有負額 NT$ ${fmtNum(Math.abs(currentBalance))}，結帳後需補齊共 NT$ ${fmtNum(Math.abs(afterBalance))}，請儘速儲值。`
+      : `⚠️ 結帳後餘額將不足，請記得補齊 NT$ ${fmtNum(Math.abs(afterBalance))}。`;
     if (!confirm(msg + '\n\n確定送出結帳？')) return;
   }
+
   showLoading();
   try {
-    const data = await callScript({ action: 'transaction', type: '消費', agentCode: currentAgent, amount, date, note });
+    const fullNote = note + '｜末五碼：' + last5;
+    const data = await callScript({ action: 'transaction', type: '消費', agentCode: currentAgent, amount, date, note: fullNote });
     if (data.success) {
       updateBalance(data.newBalance); renderHistory(data.history || []);
-      _$('ck-amount').value = ''; _$('ck-note').value = '';
+      _$('ck-amount').value = ''; _$('ck-note').value = ''; _$('ck-last5').value = '';
       _$('calc-result').style.display = 'none';
-      showResult(makeCopy({ type: '單筆結帳', date, amount, note, status: '已確認' }));
+      showResult(makeCopy({ type: '單筆結帳', date, amount, note: fullNote, status: '已確認' }));
     } else { showAlert('global-alert', '❌ ' + (data.message || '送出失敗')); }
   } catch { showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試'); }
   finally  { hideLoading(); }
@@ -947,7 +831,7 @@ function makeCopy({ type, date, amount, note, status }) {
     `📅 日期：${date}`, `💵 金額：NT$ ${fmtNum(amount)}`,
     `📝 備註：${note}`, `📋 狀態：${status}`,
     `⏰ 送出時間：${now}`, `────────────────────`,
-    `感謝您的回報，請等待對帳核對 🙏`].join('\n');
+    `感謝您的回報，請等待阿霓確認 🙏`].join('\n');
 }
 function showResult(text) {
   _$('result-text').textContent = text; show('result-section');
@@ -972,19 +856,29 @@ function switchAdminTab(tab) {
   hide('admin-result-section');
 }
 
-/* ── 儲值審核 ── */
+/* ── 儲值審核 + 結帳對帳 ── */
 async function loadPendingDeposits() {
-  const el = _$('pending-list');
-  el.innerHTML = '<div class="pending-empty">⏳ 載入中...</div>';
+  _$('pending-list').innerHTML  = '<div class="pending-empty">⏳ 載入中...</div>';
+  _$('checkout-list').innerHTML = '<div class="pending-empty">⏳ 載入中...</div>';
   showLoading();
   try {
-    const data = await callScript({ action: 'getPendingDeposits' });
-    if (data.success && data.list.length > 0) {
-      el.innerHTML = data.list.map((item, i) => `
+    const [depData, ckData] = await Promise.all([
+      callScript({ action: 'getPendingDeposits' }),
+      callScript({ action: 'getCheckoutList' })
+    ]);
+
+    // 儲值審核
+    const el = _$('pending-list');
+    if (depData.success && depData.list.length > 0) {
+      el.innerHTML = depData.list.map((item, i) => `
         <div class="pending-item" id="pending-${i}">
           <div class="pending-info">
             <div class="pending-agent">👤 ${item.agentCode}${item.agentName ? '（' + item.agentName + '）' : ''}</div>
-            <div class="pending-detail">📅 ${item.date} ・ 備註：${item.note}<br>序號：${item.seq} ・ 送出：${item.time}</div>
+            <div class="pending-detail">
+              📅 匯款日期：${item.date}<br>
+              🏦 帳號末五碼：${item.last5 || '－'}<br>
+              🕐 送出：${item.time}
+            </div>
           </div>
           <div style="text-align:right; flex-shrink:0;">
             <div class="pending-amount">+NT$ ${fmtNum(item.amount)}</div>
@@ -994,8 +888,32 @@ async function loadPendingDeposits() {
     } else {
       el.innerHTML = '<div class="pending-empty">✅ 目前沒有待審核的儲值</div>';
     }
-  } catch { el.innerHTML = '<div class="pending-empty">❌ 載入失敗，請重試</div>'; }
-  finally  { hideLoading(); }
+
+    // 結帳對帳
+    const ckEl = _$('checkout-list');
+    if (ckData.success && ckData.list.length > 0) {
+      ckEl.innerHTML = ckData.list.map(item => `
+        <div class="pending-item">
+          <div class="pending-info">
+            <div class="pending-agent">👤 ${item.agentCode}${item.agentName ? '（' + item.agentName + '）' : ''}</div>
+            <div class="pending-detail">
+              📅 ${item.date}<br>
+              📝 ${item.note || '無說明'}<br>
+              🏦 末五碼：${item.last5 || '－'}
+            </div>
+          </div>
+          <div style="text-align:right; flex-shrink:0;">
+            <div class="pending-amount minus">−NT$ ${fmtNum(item.amount)}</div>
+            <span style="font-size:11px; color:var(--text-light); margin-top:4px; display:block;">${item.status}</span>
+          </div>
+        </div>`).join('');
+    } else {
+      ckEl.innerHTML = '<div class="pending-empty">尚無結帳紀錄</div>';
+    }
+  } catch {
+    _$('pending-list').innerHTML  = '<div class="pending-empty">❌ 載入失敗，請重試</div>';
+    _$('checkout-list').innerHTML = '<div class="pending-empty">❌ 載入失敗，請重試</div>';
+  } finally { hideLoading(); }
 }
 
 async function approveDeposit(rowNum, idx) {
@@ -1016,12 +934,16 @@ async function approveDeposit(rowNum, idx) {
 async function loadAdminAgents() {
   showLoading();
   try {
-    const data = await callScript({ action: 'getAgentList' });
-    if (data.success) {
-      adminAgentData = data.agents;
+    const [agentData, productData] = await Promise.all([
+      callScript({ action: 'getAgentList' }),
+      callScript({ action: 'getProductList' })
+    ]);
+
+    if (agentData.success) {
+      adminAgentData = agentData.agents;
       const sel = _$('admin-agent-select');
       sel.innerHTML = '<option value="">請選擇代理</option>';
-      data.agents.forEach(a => {
+      agentData.agents.forEach(a => {
         const opt = document.createElement('option');
         opt.value = a.code;
         opt.textContent = a.code + (a.name ? '（' + a.name + '）' : '');
@@ -1029,9 +951,31 @@ async function loadAdminAgents() {
         opt.dataset.rate    = a.rate || 40;
         sel.appendChild(opt);
       });
-      renderAgentSettingsTable(data.agents);
+      renderAgentSettingsTable(agentData.agents);
+    }
+
+    // 填入開團品項選單
+    if (productData.success && productData.products.length > 0) {
+      const pSel = _$('online-product');
+      pSel.innerHTML = '<option value="">請選擇品項</option>';
+      productData.products.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.name;
+        opt.textContent = p.name + (p.closeDate ? '（截止：' + p.closeDate + '）' : '');
+        pSel.appendChild(opt);
+      });
     }
   } catch { /* silent */ } finally { hideLoading(); }
+}
+
+/* ── 結帳類型切換 ── */
+function switchCheckoutType(type) {
+  currentCheckoutType = type;
+  _$('type-btn-batch').classList.toggle('active',  type === 'batch');
+  _$('type-btn-online').classList.toggle('active', type === 'online');
+  _$('form-batch').style.display  = type === 'batch'  ? 'block' : 'none';
+  _$('form-online').style.display = type === 'online' ? 'block' : 'none';
+  updateAfterBalance();
 }
 
 function onAdminAgentChange() {
@@ -1043,23 +987,29 @@ function onAdminAgentChange() {
     const rate = Number(opt.dataset.rate)    || 40;
     balEl.textContent = 'NT$ ' + fmtNum(bal) + '　（匯率 ×' + rate + '）';
     balEl.style.color = bal >= 0 ? 'var(--success)' : 'var(--accent)';
-    // 即時更新結帳後預覽
     updateAfterBalance();
   } else {
-    balEl.textContent = '－';
-    balEl.style.color = 'var(--text-muted)';
+    balEl.textContent = '－'; balEl.style.color = 'var(--text-muted)';
     hide('after-balance-box');
   }
 }
 
 function getSelectedBalance() {
-  const sel = _$('admin-agent-select');
-  const opt = sel.options[sel.selectedIndex];
+  const sel = _$('admin-agent-select'); const opt = sel.options[sel.selectedIndex];
   return (opt && opt.dataset.balance) ? Number(opt.dataset.balance) : 0;
+}
+function getSelectedRate() {
+  const sel = _$('admin-agent-select'); const opt = sel.options[sel.selectedIndex];
+  return (opt && opt.dataset.rate) ? Number(opt.dataset.rate) : 40;
+}
+
+function getCurrentAmount() {
+  if (currentCheckoutType === 'batch') return Number(_$('batch-twd').value) || 0;
+  return Number(_$('online-twd').value) || 0;
 }
 
 function updateAfterBalance() {
-  const amount = Number(_$('admin-ck-amount').value) || 0;
+  const amount = getCurrentAmount();
   const bal    = getSelectedBalance();
   if (!_$('admin-agent-select').value || !amount) { hide('after-balance-box'); return; }
   const after = bal - amount;
@@ -1068,58 +1018,81 @@ function updateAfterBalance() {
   show('after-balance-box');
 }
 
-/* ── 後台結帳送出（簡化版）── */
+// 批發網：韓幣自動換算台幣
+function autoCalcBatchTwd() {
+  const krw  = Number(_$('batch-krw').value) || 0;
+  const rate = getSelectedRate();
+  if (krw > 0) _$('batch-twd').value = Math.ceil(krw / rate);
+  updateAfterBalance();
+}
+
+/* ── 後台結帳送出 ── */
 async function submitAdminCheckout() {
   clearAlert('admin-global-alert');
   const agentCode = _$('admin-agent-select').value;
-  const date      = _$('admin-ck-date').value;
-  const batchNote = _$('admin-ck-note').value.trim();
-  const amount    = Number(_$('admin-ck-amount').value);
-
   if (!agentCode) { showAlert('admin-global-alert', '⚠️ 請選擇代理'); return; }
-  if (!date)      { showAlert('admin-global-alert', '⚠️ 請選擇結帳日期'); return; }
-  if (!amount || amount <= 0) { showAlert('admin-global-alert', '⚠️ 請輸入結帳金額'); return; }
+
+  let payload = { action: 'adminCheckout', agentCode, checkoutType: currentCheckoutType === 'batch' ? '批發網' : '官網&記事本' };
+
+  if (currentCheckoutType === 'batch') {
+    const date    = _$('batch-date').value;
+    const qty     = Number(_$('batch-qty').value) || 0;
+    const krw     = Number(_$('batch-krw').value) || 0;
+    const twd     = Number(_$('batch-twd').value) || 0;
+    const note    = _$('batch-note').value.trim();
+    if (!date)    { showAlert('admin-global-alert', '⚠️ 請選擇下單日期'); return; }
+    if (!twd)     { showAlert('admin-global-alert', '⚠️ 請輸入台幣總計'); return; }
+    Object.assign(payload, { date, qty, krwTotal: krw, amount: twd, note });
+  } else {
+    const date    = _$('online-date').value;
+    const product = _$('online-product').value;
+    const qty     = Number(_$('online-qty').value) || 0;
+    const twd     = Number(_$('online-twd').value) || 0;
+    const note    = _$('online-note').value.trim();
+    if (!date)    { showAlert('admin-global-alert', '⚠️ 請選擇結單日期'); return; }
+    if (!product) { showAlert('admin-global-alert', '⚠️ 請選擇開團品項'); return; }
+    if (!twd)     { showAlert('admin-global-alert', '⚠️ 請輸入台幣總計'); return; }
+    Object.assign(payload, { date, product, qty, amount: twd, note });
+  }
 
   const bal = getSelectedBalance();
-  if (amount > bal) {
-    if (!confirm(`⚠️ 代理餘額不足！\n目前餘額：NT$ ${fmtNum(bal)}\n結帳金額：NT$ ${fmtNum(amount)}\n確定仍要送出？`)) return;
+  if (payload.amount > bal) {
+    if (!confirm(`⚠️ 代理餘額不足！\n目前餘額：NT$ ${fmtNum(bal)}\n結帳金額：NT$ ${fmtNum(payload.amount)}\n確定仍要送出？`)) return;
   }
 
   showLoading();
   try {
-    const data = await callScript({
-      action: 'adminCheckout', agentCode, date,
-      batchNote, netAmount: amount,
-      orders: [{ note: batchNote, twdTotal: amount, isRefund: false, qty: 1, krwUnit: 0, twdUnit: amount, krwTotal: 0, orderDate: date, shipDate: '', batchDate: '', airDate: '', refundDate: '' }]
-    });
+    const data = await callScript(payload);
     if (data.success) {
-      // 更新選單餘額
-      const sel = _$('admin-agent-select');
-      const opt = sel.options[sel.selectedIndex];
+      const sel = _$('admin-agent-select'); const opt = sel.options[sel.selectedIndex];
       if (opt) opt.dataset.balance = data.newBalance;
-      _$('admin-agent-balance').textContent = 'NT$ ' + fmtNum(data.newBalance);
+      _$('admin-agent-balance').textContent = 'NT$ ' + fmtNum(data.newBalance) + '　（匯率 ×' + getSelectedRate() + '）';
       _$('admin-agent-balance').style.color = data.newBalance >= 0 ? 'var(--success)' : 'var(--accent)';
 
-      // 結帳文案
       const now = new Date().toLocaleString('zh-TW', { hour12: false });
+      const typeLabel = currentCheckoutType === 'batch' ? '批發網扣帳' : '官網&記事本扣帳';
       const txt = [
-        `🥜 DouDou 代理結帳單`,
+        `🥜 DouDou ${typeLabel}`,
         `────────────────────`,
         `👤 代理：${agentCode}`,
-        `📅 結帳日期：${date}`,
-        `📝 備註：${batchNote || '無'}`,
-        `💵 結帳金額：NT$ ${fmtNum(amount)}`,
+        `📅 日期：${payload.date}`,
+        currentCheckoutType === 'online' ? `🏷️ 品項：${payload.product}` : '',
+        payload.qty ? `📦 件數：${payload.qty}` : '',
+        currentCheckoutType === 'batch' && payload.krwTotal ? `🇰🇷 韓幣：${fmtNum(payload.krwTotal)}` : '',
+        `💵 台幣：NT$ ${fmtNum(payload.amount)}`,
+        payload.note ? `📝 備註：${payload.note}` : '',
         `💰 結帳後餘額：NT$ ${fmtNum(data.newBalance)}`,
         `⏰ 操作時間：${now}`
-      ].join('\n');
+      ].filter(Boolean).join('\n');
+
       _$('admin-result-text').textContent = txt;
       show('admin-result-section');
       _$('admin-result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
       showAlert('admin-global-alert', '✅ 結帳成功！代理餘額已扣除。', 'success');
 
       // 重置
-      _$('admin-ck-amount').value = '';
-      _$('admin-ck-note').value   = '';
+      ['batch-qty','batch-krw','batch-twd','batch-note','online-qty','online-twd','online-note'].forEach(id => { if(_$(id)) _$(id).value = ''; });
+      if (_$('online-product')) _$('online-product').value = '';
       hide('after-balance-box');
     } else { showAlert('admin-global-alert', '❌ ' + (data.message || '送出失敗')); }
   } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤，請稍後再試'); }
@@ -1138,10 +1111,7 @@ async function copyAdminResult() {
 /* ── 系統設定 ── */
 function renderAgentSettingsTable(agents) {
   const tbody = _$('agent-settings-body');
-  if (!agents || !agents.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:16px;">無代理資料</td></tr>';
-    return;
-  }
+  if (!agents || !agents.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:16px;">無代理資料</td></tr>'; return; }
   tbody.innerHTML = agents.map((a, i) => `
     <tr>
       <td><strong>${a.code}</strong></td>
