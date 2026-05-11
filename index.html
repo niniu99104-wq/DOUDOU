@@ -635,7 +635,7 @@ input[type="number"] { -moz-appearance: textfield; }
     <div class="card">
       <div class="card-title">🔐 代理登入</div>
       <p class="login-desc">
-        請選擇您的代理代碼並輸入手機號碼以進入系統。<br>
+        請選擇您的代理代碼並輸入手機後六碼以進入系統。<br>
         本系統僅供授權代理使用，請勿外傳。
       </p>
       <div class="form-row">
@@ -643,8 +643,8 @@ input[type="number"] { -moz-appearance: textfield; }
         <select id="login-select"></select>
       </div>
       <div class="form-row">
-        <label>手機號碼</label>
-        <input type="text" id="login-phone" placeholder="請輸入手機號碼" inputmode="tel" maxlength="20">
+        <label>手機後六碼</label>
+        <input type="text" id="login-phone" placeholder="請輸入手機後六碼" inputmode="tel" maxlength="20">
       </div>
       <div id="login-alert" class="alert error"></div>
       <button class="btn btn-primary btn-full" onclick="doLogin()">🚀 進入系統</button>
@@ -678,7 +678,7 @@ input[type="number"] { -moz-appearance: textfield; }
   <div id="dashboard">
     <div class="dash-top">
       <div class="dash-left">
-        <div class="greeting">您好，👋</div>
+        <div class="greeting">代理老闆，您好👋</div>
         <div class="agentname" id="dash-name">－</div>
       </div>
       <div class="dash-right">
@@ -1041,7 +1041,7 @@ async function doLogin() {
   const agentCode = _$('login-select').value;
   const phone     = _$('login-phone').value.trim();
   if (!agentCode) { showAlert('login-alert', '請選擇代理代碼'); return; }
-  if (!phone)     { showAlert('login-alert', '請輸入手機號碼'); return; }
+  if (!phone)     { showAlert('login-alert', '請輸入手機後六碼'); return; }
 
   showLoading();
   try {
@@ -1055,7 +1055,7 @@ async function doLogin() {
       show('notice-banner');
       show('main-section');
     } else {
-      showAlert('login-alert', data.message || '登入失敗，請確認代理代碼與手機號碼');
+      showAlert('login-alert', data.message || '登入失敗，請確認代理代碼與手機後六碼');
     }
   } catch {
     showAlert('login-alert', '⚠️ 無法連線至伺服器，請稍後再試');
