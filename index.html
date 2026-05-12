@@ -408,9 +408,8 @@ input[type="number"] { -moz-appearance: textfield; }
 
     <div id="result-section">
       <div class="result-card">
-        <h3>✅ 送出成功！回報單文章</h3>
-        <div class="result-textbox" id="result-text"></div>
-        <button class="btn btn-primary" onclick="copyResult()">📋 點擊複製文章</button>
+        <h3>✅ 送出成功！</h3>
+        <p id="result-text" style="font-size:13px; color:var(--success); margin:0; line-height:1.7;"></p>
       </div>
     </div>
   </div>
@@ -505,8 +504,7 @@ input[type="number"] { -moz-appearance: textfield; }
       <div id="admin-result-section">
         <div class="result-card">
           <h3>✅ 結帳完成！</h3>
-          <div class="result-textbox" id="admin-result-text"></div>
-          <button class="btn btn-primary" onclick="copyAdminResult()">📋 點擊複製文章</button>
+          <p id="admin-result-text" style="font-size:13px; color:var(--success); margin:0; line-height:1.7;"></p>
         </div>
       </div>
     </div>
@@ -778,7 +776,7 @@ async function submitDeposit() {
       _$('dep-preview').style.display = 'none'; depScreenshotB64 = null;
       _$('dep-upload-area').querySelector('.upload-text').textContent = '點擊上傳匯款截圖';
       _$('dep-upload-area').querySelector('.upload-sub').textContent  = '支援 JPG / PNG，建議 5MB 以內';
-      showResult(makeCopy({ type: '儲值回報', date, amount, note: '帳號末五碼：' + last5, status: '待審核' }));
+      showResult('儲值回報', date, amount);
     } else { showAlert('global-alert', '❌ ' + (data.message || '送出失敗')); }
   } catch { showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試'); }
   finally  { hideLoading(); }
@@ -820,7 +818,7 @@ async function submitCheckout() {
       _$('ck-preview').style.display = 'none'; ckScreenshotB64 = null;
       _$('ck-upload-area').querySelector('.upload-text').textContent = '點擊上傳購物車截圖';
       _$('ck-upload-area').querySelector('.upload-sub').textContent  = '支援 JPG / PNG，建議 5MB 以內';
-      showResult(makeCopy({ type: '結帳申請', date, amount, note, status: '待官方審核・勿重複送出' }));
+      showResult('結帳申請', date, amount);
     } else { showAlert('global-alert', '❌ ' + (data.message || '送出失敗')); }
   } catch { showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試'); }
   finally  { hideLoading(); }
@@ -847,27 +845,13 @@ function calcKrw() {
 }
 function applyKrw(v) { _$('ck-amount').value = v; checkCkBalance(); }
 
-function makeCopy({ type, date, amount, note, status }) {
-  const now  = new Date().toLocaleString('zh-TW', { hour12: false });
-  const icon = type === '儲值回報' ? '💰' : '🛒';
-  return [`🥜 DouDou 代理${type}單`, `────────────────────`,
-    `${icon} 類型：${type}`, `👤 代理編號：${currentAgent}`,
-    `📅 日期：${date}`, `💵 金額：NT$ ${fmtNum(amount)}`,
-    `📝 備註：${note}`, `📋 狀態：${status}`,
-    `⏰ 送出時間：${now}`, `────────────────────`,
-    `感謝您的回報，請等待對帳確認 🙏`].join('\n');
-}
-function showResult(text) {
-  _$('result-text').textContent = text; show('result-section');
+function showResult(type, date, amount) {
+  const msg = type === '儲值回報'
+    ? `儲值回報已送出 ✅\n金額：NT$ ${fmtNum(amount)}　日期：${date}\n官方確認後將自動入帳，無需私訊通知。`
+    : `結帳申請已送出 ✅\n金額：NT$ ${fmtNum(amount)}　日期：${date}\n官方核對後將自動扣款，無需私訊通知。`;
+  _$('result-text').textContent = msg;
+  show('result-section');
   setTimeout(() => _$('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
-}
-async function copyResult() {
-  const btn = event.currentTarget; const text = _$('result-text').textContent;
-  try {
-    await navigator.clipboard.writeText(text);
-    const orig = btn.textContent; btn.textContent = '✅ 已複製！';
-    setTimeout(() => { btn.textContent = orig; }, 2200);
-  } catch { alert('請手動選取文字並複製'); }
 }
 
 /* ── 管理員 tab ── */
@@ -1115,20 +1099,7 @@ async function submitAdminCheckout() {
       if (opt) opt.dataset.balance = data.newBalance;
       _$('admin-agent-balance').textContent = 'NT$ ' + fmtNum(data.newBalance) + '　（匯率 ×' + getSelectedRate() + '）';
       _$('admin-agent-balance').style.color = data.newBalance >= 0 ? 'var(--success)' : 'var(--accent)';
-      const now = new Date().toLocaleString('zh-TW', { hour12: false });
-      const typeLabel = currentCheckoutType === 'batch' ? '批發網扣帳' : '官網&記事本扣帳';
-      const txt = [
-        `🥜 DouDou ${typeLabel}`, `────────────────────`,
-        `👤 代理：${agentCode}`, `📅 日期：${payload.date}`,
-        currentCheckoutType === 'online' ? `🏷️ 品項：${payload.product}` : '',
-        payload.qty ? `📦 件數：${payload.qty}` : '',
-        currentCheckoutType === 'batch' && payload.krwTotal ? `🇰🇷 韓幣：${fmtNum(payload.krwTotal)}` : '',
-        `💵 台幣：NT$ ${fmtNum(payload.amount)}`,
-        payload.note ? `📝 備註：${payload.note}` : '',
-        `💰 結帳後餘額：NT$ ${fmtNum(data.newBalance)}`,
-        `⏰ 操作時間：${now}`
-      ].filter(Boolean).join('\n');
-      _$('admin-result-text').textContent = txt;
+      _$('admin-result-text').textContent = `已扣款 NT$ ${fmtNum(payload.amount)}　代理剩餘 NT$ ${fmtNum(data.newBalance)}`;
       show('admin-result-section');
       _$('admin-result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
       showAlert('admin-global-alert', '✅ 結帳成功！代理餘額已扣除。', 'success');
@@ -1140,14 +1111,6 @@ async function submitAdminCheckout() {
   finally  { hideLoading(); }
 }
 
-async function copyAdminResult() {
-  const btn = event.currentTarget; const text = _$('admin-result-text').textContent;
-  try {
-    await navigator.clipboard.writeText(text);
-    const orig = btn.textContent; btn.textContent = '✅ 已複製！';
-    setTimeout(() => { btn.textContent = orig; }, 2200);
-  } catch { alert('請手動選取文字並複製'); }
-}
 
 function renderAgentSettingsTable(agents) {
   const tbody = _$('agent-settings-body');
