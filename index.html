@@ -335,9 +335,9 @@ input[type="number"] { -moz-appearance: textfield; }
         </div>
         <div class="form-row"><label>🏦 匯款帳號末五碼</label><input type="text" id="dep-last5" placeholder="請輸入末五碼數字" maxlength="5" inputmode="numeric"></div>
 
-        <!-- 截圖上傳（儲值） -->
+        <!-- 截圖上傳（儲值，非必填） -->
         <div class="form-row">
-          <label>📸 匯款截圖（必填）</label>
+          <label>📸 匯款截圖（選填）</label>
           <div class="upload-area" id="dep-upload-area">
             <input type="file" id="dep-screenshot" accept="image/*" onchange="handleUpload('dep')">
             <div class="upload-icon">📷</div>
@@ -360,25 +360,24 @@ input[type="number"] { -moz-appearance: textfield; }
       <div class="card">
         <div class="card-title">🛒 結帳申請</div>
 
-        <!-- 流程說明 -->
-        <div class="flow-banner">
-          <div class="flow-step"><span class="flow-num">1</span>填寫結帳資訊並上傳購物車截圖</div>
-          <div class="flow-step"><span class="flow-num">2</span>送出後狀態為「待審核」</div>
-          <div class="flow-step"><span class="flow-num">3</span>官方核對後從儲值餘額扣除</div>
-          <strong>⚠️ 餘額不足時無法送出，請先完成儲值</strong>
+        <!-- Step 1：選結帳類型 -->
+        <div class="form-row">
+          <label>📦 結帳類型</label>
+          <div class="type-toggle">
+            <div class="type-btn active" id="ck-type-btn-batch"  onclick="switchCkType('batch')">🛍️ 批發網</div>
+            <div class="type-btn"        id="ck-type-btn-online" onclick="switchCkType('online')">🌐 官網 &amp; 記事本</div>
+          </div>
         </div>
 
-        <!-- 餘額不足警示 -->
-        <div class="balance-block" id="balance-block"></div>
-
+        <!-- 共用：日期 + 金額 -->
         <div class="form-grid-2">
           <div class="form-row"><label>📅 結帳日期</label><input type="date" id="ck-date"></div>
-          <div class="form-row"><label>💵 結帳台幣總額（NT$）</label><input type="number" id="ck-amount" placeholder="請輸入或使用計算機" min="1" oninput="checkCkBalance()"></div>
+          <div class="form-row"><label>💵 結帳台幣總額（NT$）</label><input type="number" id="ck-amount" placeholder="請輸入或使用計算機" min="1" oninput="onCkAmountChange()"></div>
         </div>
         <div class="form-row"><label>📝 訂單項目說明</label><input type="text" id="ck-note" placeholder="例：批網4件 ／ 記事本湊單米菲兔"></div>
 
-        <!-- 截圖上傳（結帳） -->
-        <div class="form-row">
+        <!-- 批發網：購物車截圖（必填） -->
+        <div id="ck-screenshot-section" class="form-row">
           <label>📸 購物車截圖（必填）</label>
           <div class="upload-area" id="ck-upload-area">
             <input type="file" id="ck-screenshot" accept="image/*" onchange="handleUpload('ck')">
@@ -389,8 +388,9 @@ input[type="number"] { -moz-appearance: textfield; }
           </div>
         </div>
 
+        <!-- 韓元計算機 -->
         <div class="calc-box">
-          <div class="calc-title">📊 多品項韓元計價小工具 <span>（匯率固定 ×40，無條件進位）</span></div>
+          <div class="calc-title">📊 韓元計價小工具 <span>（匯率固定 ×40，無條件進位）</span></div>
           <div class="krw-list" id="krw-list">
             <div class="krw-row"><input type="number" class="krw-input" placeholder="輸入韓元金額 (KRW)" min="0"><button class="btn-rm" onclick="removeKrwRow(this)">✕</button></div>
           </div>
@@ -400,6 +400,42 @@ input[type="number"] { -moz-appearance: textfield; }
           </div>
           <div class="calc-result" id="calc-result"></div>
         </div>
+
+        <!-- Step 2：選付款方式 -->
+        <div class="form-row">
+          <label>💳 付款方式</label>
+          <div class="type-toggle" style="flex-wrap:wrap; gap:6px;">
+            <div class="type-btn active" id="ck-pay-btn-balance"  onclick="switchCkPay('balance')"  style="flex:1; min-width:120px;">💰 扣儲值餘額</div>
+            <div class="type-btn"        id="ck-pay-btn-partial"  onclick="switchCkPay('partial')"  style="flex:1; min-width:120px;">💸 扣餘額＋補差款</div>
+            <div class="type-btn"        id="ck-pay-btn-transfer" onclick="switchCkPay('transfer')" style="flex:1; min-width:120px;">🏦 直接匯款</div>
+          </div>
+        </div>
+
+        <!-- 餘額預覽（扣餘額 / 補差款時顯示） -->
+        <div id="ck-balance-preview" style="display:none; margin-bottom:14px;">
+          <div class="after-balance-box" style="margin-bottom:0;">
+            <span class="after-balance-label" id="ck-bal-label">扣款後餘額</span>
+            <span class="after-balance-value" id="ck-bal-value">NT$ 0</span>
+          </div>
+        </div>
+
+        <!-- 補差款 / 直接匯款 → 填匯款資訊（不用截圖） -->
+        <div id="ck-transfer-section" style="display:none;">
+          <div style="background:var(--warning-bg); border:1.5px solid #ffccbc; border-radius:var(--radius-sm); padding:13px 15px; margin-bottom:14px; font-size:13px; line-height:1.85;">
+            <strong>📍 匯款帳戶資訊</strong><br>銀行：台新銀行（812）<br>帳號：<strong>2888-10-2335157-5</strong>
+          </div>
+          <div id="ck-partial-note" style="display:none; margin-bottom:12px;" class="flow-banner">
+            <span id="ck-partial-shortage-text"></span>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-row"><label>📅 匯款日期</label><input type="date" id="ck-transfer-date"></div>
+            <div class="form-row"><label>💵 匯款金額（NT$）</label><input type="number" id="ck-transfer-amount" placeholder="請輸入匯款金額" min="1"></div>
+          </div>
+          <div class="form-row"><label>🏦 匯款帳號末五碼</label><input type="text" id="ck-transfer-last5" placeholder="請輸入末五碼數字" maxlength="5" inputmode="numeric"></div>
+        </div>
+
+        <!-- 餘額不足警示（純扣餘額時才顯示擋回） -->
+        <div class="balance-block" id="balance-block"></div>
 
         <button class="btn btn-accent btn-full" onclick="submitCheckout()">📋 送出結帳申請</button>
         <p style="font-size:12px; color:var(--text-light); text-align:center; margin-top:10px;">送出後請勿重複送出，等候官方審核通知</p>
@@ -634,7 +670,7 @@ function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
     sel.appendChild(opt);
   }
   const today = new Date().toISOString().slice(0, 10);
-  ['dep-date','ck-date','batch-date','online-date'].forEach(id => { if (_$(id)) _$(id).value = today; });
+  ['dep-date','ck-date','ck-transfer-date','batch-date','online-date'].forEach(id => { if (_$(id)) _$(id).value = today; });
   const session = loadSession();
   if (session) {
     currentAgent   = session.agentCode;
@@ -722,8 +758,7 @@ function updateBalance(v) {
   _$('dash-balance').textContent = fmtNum(v);
   checkBalanceWarning(currentBalance);
 }
-function checkBalanceWarning(bal) { _$('balance-warning').style.display = bal < 0 ? 'block' : 'none'; }
-function renderHistory(list) {
+function checkBalanceWarning(bal) { _$('balance-warning').style.display = bal < 0 ? 'block' : 'none'; }function renderHistory(list) {
   const box = _$('history-box');
   if (!list.length) { box.innerHTML = '<div class="history-empty">尚無交易紀錄</div>'; return; }
   box.innerHTML = list.map(h => {
@@ -750,24 +785,100 @@ function switchTab(tab) {
   clearAlert('global-alert'); hide('result-section');
 }
 
-/* ── 儲值送出 ── */
+/* ── 結帳類型 / 付款方式切換 ── */
+let currentCkType = 'batch';   // 'batch' | 'online'
+let currentCkPay  = 'balance'; // 'balance' | 'partial' | 'transfer'
+
+function switchCkType(type) {
+  currentCkType = type;
+  _$('ck-type-btn-batch').classList.toggle('active',  type === 'batch');
+  _$('ck-type-btn-online').classList.toggle('active', type === 'online');
+  // 批發網才需要購物車截圖
+  _$('ck-screenshot-section').style.display = type === 'batch' ? 'block' : 'none';
+  onCkAmountChange();
+}
+
+function switchCkPay(pay) {
+  currentCkPay = pay;
+  ['balance','partial','transfer'].forEach(p =>
+    _$('ck-pay-btn-' + p).classList.toggle('active', p === pay)
+  );
+  // 補差款或直接匯款才顯示匯款資訊區
+  const needTransfer = pay === 'partial' || pay === 'transfer';
+  _$('ck-transfer-section').style.display = needTransfer ? 'block' : 'none';
+  // 補差款額外提示
+  _$('ck-partial-note').style.display = pay === 'partial' ? 'block' : 'none';
+  onCkAmountChange();
+}
+
+function onCkAmountChange() {
+  const amount   = Number(_$('ck-amount').value) || 0;
+  const block    = _$('balance-block');
+  const preview  = _$('ck-balance-preview');
+  const balVal   = _$('ck-bal-value');
+  const balLabel = _$('ck-bal-label');
+  const partNote = _$('ck-partial-shortage-text');
+
+  block.classList.remove('show');
+
+  if (!amount) { preview.style.display = 'none'; return; }
+
+  if (currentCkPay === 'balance') {
+    // 純扣餘額：不夠就顯示警示
+    if (amount > currentBalance) {
+      const shortage = amount - currentBalance;
+      block.innerHTML = `⚠️ 餘額不足！目前餘額 NT$ ${fmtNum(currentBalance)}，尚缺 NT$ ${fmtNum(shortage)}。<br>可改選「扣餘額＋補差款」或「直接匯款」。`;
+      block.classList.add('show');
+      preview.style.display = 'none';
+    } else {
+      preview.style.display = 'block';
+      balLabel.textContent  = '扣款後餘額';
+      balVal.textContent    = 'NT$ ' + fmtNum(currentBalance - amount);
+      balVal.style.color    = 'var(--success)';
+    }
+  } else if (currentCkPay === 'partial') {
+    // 扣餘額 + 補差款
+    const deduct  = Math.min(currentBalance, amount);
+    const shortage = amount - deduct;
+    preview.style.display = 'block';
+    balLabel.textContent  = '扣完餘額後剩';
+    balVal.textContent    = 'NT$ 0';
+    balVal.style.color    = 'var(--color-text-secondary)';
+    if (shortage > 0) {
+      partNote.innerHTML = `餘額 NT$ ${fmtNum(deduct)} 將全數扣除，<strong>請另外匯款 NT$ ${fmtNum(shortage)}</strong> 補足差額`;
+      // 自動帶入補差款金額
+      if (_$('ck-transfer-amount')) _$('ck-transfer-amount').value = shortage;
+    } else {
+      partNote.textContent = '餘額足夠，無需額外匯款';
+    }
+  } else {
+    // 直接匯款：不扣餘額
+    preview.style.display = 'none';
+  }
+}
+
+/* ── 儲值送出（截圖改非必填）── */
 async function submitDeposit() {
   clearAlert('global-alert');
-  const date = _$('dep-date').value, raw = _$('dep-amount').value;
-  const amount = Number(raw), last5 = _$('dep-last5').value.trim(), chk = _$('dep-confirm').checked;
+  const date   = _$('dep-date').value;
+  const raw    = _$('dep-amount').value;
+  const amount = Number(raw);
+  const last5  = _$('dep-last5').value.trim();
+  const chk    = _$('dep-confirm').checked;
+
   if (!date)                  { showAlert('global-alert', '⚠️ 請選擇匯款日期'); return; }
   if (!raw || amount <= 0)    { showAlert('global-alert', '⚠️ 請輸入儲值金額'); return; }
   if (amount < 2000)          { showAlert('global-alert', '⚠️ 儲值金額最低為 NT$ 2,000'); return; }
   if (amount % 1000 !== 0)    { showAlert('global-alert', '⚠️ 儲值金額須為 1,000 的倍數'); return; }
   if (!/^\d{5}$/.test(last5)) { showAlert('global-alert', '⚠️ 請輸入正確的帳號末五碼（5 位數字）'); return; }
-  if (!depScreenshotB64)      { showAlert('global-alert', '⚠️ 請上傳匯款截圖'); return; }
   if (!chk)                   { showAlert('global-alert', '⚠️ 請勾選確認已完成匯款'); return; }
+  // ★ 截圖非必填，有就送，沒有也沒關係
   showLoading();
   try {
     const data = await callScript({
       action: 'transaction', type: '儲值', agentCode: currentAgent,
       amount, date, note: '帳號末五碼：' + last5,
-      screenshot: depScreenshotB64
+      screenshot: depScreenshotB64 || ''
     });
     if (data.success) {
       updateBalance(data.newBalance); renderHistory(data.history || []);
@@ -782,7 +893,7 @@ async function submitDeposit() {
   finally  { hideLoading(); }
 }
 
-/* ── 結帳申請送出（全部轉待審核，餘額不足擋回）── */
+/* ── 結帳送出（新邏輯）── */
 async function submitCheckout() {
   clearAlert('global-alert');
   const date   = _$('ck-date').value;
@@ -792,32 +903,74 @@ async function submitCheckout() {
   if (!date)                  { showAlert('global-alert', '⚠️ 請選擇結帳日期'); return; }
   if (!amount || amount <= 0) { showAlert('global-alert', '⚠️ 請輸入正確的結帳金額'); return; }
   if (!note)                  { showAlert('global-alert', '⚠️ 請填寫訂單項目說明'); return; }
-  if (!ckScreenshotB64)       { showAlert('global-alert', '⚠️ 請上傳購物車截圖'); return; }
 
-  // ★ 核心改動：餘額不足直接擋回
-  if (amount > currentBalance) {
-    const shortage = amount - currentBalance;
-    showAlert('global-alert', `⚠️ 餘額不足，無法送出！目前餘額 NT$ ${fmtNum(currentBalance)}，尚缺 NT$ ${fmtNum(shortage)}。請先完成儲值。`);
+  // 批發網必須上傳購物車截圖
+  if (currentCkType === 'batch' && !ckScreenshotB64) {
+    showAlert('global-alert', '⚠️ 批發網結帳請上傳購物車截圖'); return;
+  }
+
+  // 純扣餘額：餘額不足直接擋
+  if (currentCkPay === 'balance' && amount > currentBalance) {
+    showAlert('global-alert', `⚠️ 餘額不足！目前餘額 NT$ ${fmtNum(currentBalance)}，請改選其他付款方式。`);
     return;
   }
+
+  // 匯款相關欄位驗證（補差款 / 直接匯款）
+  let transferDate = '', transferAmount = 0, transferLast5 = '';
+  if (currentCkPay === 'partial' || currentCkPay === 'transfer') {
+    transferDate   = _$('ck-transfer-date').value;
+    transferAmount = Number(_$('ck-transfer-amount').value);
+    transferLast5  = _$('ck-transfer-last5').value.trim();
+    if (!transferDate)                        { showAlert('global-alert', '⚠️ 請選擇匯款日期'); return; }
+    if (!transferAmount || transferAmount <= 0){ showAlert('global-alert', '⚠️ 請輸入匯款金額'); return; }
+    if (!/^\d{5}$/.test(transferLast5))       { showAlert('global-alert', '⚠️ 請輸入正確的匯款帳號末五碼'); return; }
+  }
+
+  // 計算實際扣餘額金額
+  let deductAmount = 0;
+  let txType = '結帳待審';
+  if (currentCkPay === 'balance') {
+    deductAmount = amount;
+  } else if (currentCkPay === 'partial') {
+    deductAmount = Math.min(currentBalance, amount);
+  } else {
+    deductAmount = 0; // 直接匯款不扣餘額
+  }
+
+  const payNote = [
+    note,
+    currentCkType === 'batch' ? '【批發網】' : '【官網&記事本】',
+    currentCkPay === 'balance'  ? '付款：扣儲值餘額' :
+    currentCkPay === 'partial'  ? `付款：扣餘額NT$${fmtNum(deductAmount)}＋補匯NT$${fmtNum(transferAmount)}（末五碼：${transferLast5}，${transferDate}）` :
+                                  `付款：直接匯款NT$${fmtNum(transferAmount)}（末五碼：${transferLast5}，${transferDate}）`
+  ].join('　');
 
   showLoading();
   try {
     const data = await callScript({
-      action: 'transaction', type: '結帳待審', agentCode: currentAgent,
-      amount, date, note,
-      screenshot: ckScreenshotB64
-      // ★ 注意：這裡不傳 last5，結帳不需要匯款末五碼
+      action: 'transaction', type: txType,
+      agentCode: currentAgent,
+      amount, deductAmount, date, note: payNote,
+      ckType: currentCkType, payMethod: currentCkPay,
+      transferDate, transferAmount, transferLast5,
+      screenshot: ckScreenshotB64 || ''
     });
     if (data.success) {
-      // ★ 待審核：不更新餘額，讓代理知道餘額尚未扣除
       renderHistory(data.history || []);
+      // 若有扣餘額才更新顯示
+      if (deductAmount > 0) updateBalance(data.newBalance);
+      // 清空表單
       _$('ck-amount').value = ''; _$('ck-note').value = '';
       _$('calc-result').style.display = 'none';
+      if (_$('ck-transfer-date'))   _$('ck-transfer-date').value   = '';
+      if (_$('ck-transfer-amount')) _$('ck-transfer-amount').value = '';
+      if (_$('ck-transfer-last5'))  _$('ck-transfer-last5').value  = '';
       _$('ck-upload-area').classList.remove('has-file');
       _$('ck-preview').style.display = 'none'; ckScreenshotB64 = null;
       _$('ck-upload-area').querySelector('.upload-text').textContent = '點擊上傳購物車截圖';
       _$('ck-upload-area').querySelector('.upload-sub').textContent  = '支援 JPG / PNG，建議 5MB 以內';
+      _$('ck-balance-preview').style.display = 'none';
+      _$('balance-block').classList.remove('show');
       showResult('結帳申請', date, amount);
     } else { showAlert('global-alert', '❌ ' + (data.message || '送出失敗')); }
   } catch { showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試'); }
