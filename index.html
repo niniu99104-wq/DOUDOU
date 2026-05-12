@@ -317,7 +317,19 @@ input[type="number"] { -moz-appearance: textfield; }
     <div class="history-box" id="history-box"><div class="history-empty">載入中...</div></div>
   </div>
 
-  <!-- ★ Item 6: 下次下單截止日與活躍度規定 -->
+  <div id="notice-banner">
+    <div class="notice-title">📢 最新公告・請注意⚠️</div>
+    <div class="notice-body">
+      💰 儲值入帳時間改為固定兩天：<strong>🗓️ 每週三 ／ 每週日</strong><br><br>
+      <span class="notice-tag">週三入帳</span>請於 <strong>週三前</strong> 完成匯款<br>
+      <span class="notice-tag">週日入帳</span>請於 <strong>週日前</strong> 完成匯款<br><br>
+      ⚠️ 當天才匯款的話，會順延到下一個入帳日唷！<br>
+      麻煩大家提前備好款項，避免下單時額度不足 🥹<br>
+      謝謝大家的配合與理解 ♡
+    </div>
+  </div>
+
+  <!-- ★ Item 6: 下次下單截止日與活躍度規定（登入後顯示）-->
   <div id="activity-info-banner" style="display:none; background:linear-gradient(135deg,#fff9e6,#fff3e0); border:1.5px solid #ffcc80; border-left:5px solid #e65100; border-radius:10px; padding:13px 16px; margin-bottom:14px; animation:fadeUp 0.35s ease;">
     <div style="font-size:12px; font-weight:700; color:#e65100; margin-bottom:8px; display:flex; align-items:center; gap:6px;">📅 下單紀錄</div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
@@ -332,18 +344,6 @@ input[type="number"] { -moz-appearance: textfield; }
     </div>
     <div style="font-size:11.5px; color:#5d4037; line-height:1.75; background:rgba(255,255,255,0.5); border-radius:6px; padding:8px 10px;">
       ⚠️ 規定每月需完成一次批發網下單（以最後下單日往後推算 1 個月）。系統給予 2 個月緩衝期，若第 3 個月仍未下單，帳號將自動關閉且儲值金不予退回。如需再次開通需收取手續費 <strong>NT$ 300 元</strong>。
-    </div>
-  </div>
-
-  <div id="notice-banner">
-    <div class="notice-title">📢 最新公告・請注意⚠️</div>
-    <div class="notice-body">
-      💰 儲值入帳時間改為固定兩天：<strong>🗓️ 每週三 ／ 每週日</strong><br><br>
-      <span class="notice-tag">週三入帳</span>請於 <strong>週三前</strong> 完成匯款<br>
-      <span class="notice-tag">週日入帳</span>請於 <strong>週日前</strong> 完成匯款<br><br>
-      ⚠️ 當天才匯款的話，會順延到下一個入帳日唷！<br>
-      麻煩大家提前備好款項，避免下單時額度不足 🥹<br>
-      謝謝大家的配合與理解 ♡
     </div>
   </div>
 
@@ -798,6 +798,7 @@ function doLogout() {
   currentAgent = null; currentBalance = 0; currentBatchBalance = 0; clearSession();
   depScreenshotB64 = null; ckScreenshotB64 = null;
   hide('dashboard'); hide('notice-banner'); hide('main-section'); hide('result-section');
+  hide('activity-info-banner'); // ★ 修正：登出時隱藏下單紀錄 banner
   show('login-section'); clearAlert('global-alert');
 }
 
