@@ -685,24 +685,19 @@ function handleUpload(prefix) {
   reader.readAsDataURL(file);
 }
 
-/* ── 結帳餘額即時檢查 ── */
-function checkCkBalance() {
-  const amount = Number(_$('ck-amount').value) || 0;
-  const block  = _$('balance-block');
-  if (amount > 0 && amount > currentBalance) {
-    const shortage = amount - currentBalance;
-    block.innerHTML = `⚠️ 餘額不足！目前餘額 NT$ ${fmtNum(currentBalance)}，尚缺 NT$ ${fmtNum(shortage)}。<br>請先至「儲值回報」完成儲值。`;
-    block.classList.add('show');
-  } else {
-    block.classList.remove('show');
-  }
-}
+/* ── 結帳餘額即時檢查（已整合進 onCkAmountChange）── */
 
 /* ── Session 管理 ── */
 const SESSION_KEY     = 'doudou_session';
 const SESSION_TIMEOUT = 10 * 60 * 1000;
 function saveSession(data) {
-  const s = { agentCode: data.agentCode, agentName: data.agentName, balance: data.balance, batchBalance: data.batchBalance || 0, history: data.history, ts: Date.now() };
+  const s = {
+    agentCode: data.agentCode, agentName: data.agentName,
+    balance: data.balance, batchBalance: data.batchBalance || 0,
+    history: data.history,
+    activityStatus: data.activityStatus || null,  // ★ Fix 4: 存入 activityStatus
+    ts: Date.now()
+  };
   sessionStorage.setItem(SESSION_KEY, JSON.stringify(s));
 }
 function loadSession() {
@@ -734,6 +729,7 @@ function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
     renderDashboard(session);
     hide('login-section'); show('dashboard'); show('notice-banner'); show('main-section');
     setTimeout(updateCkWalletIndicator, 50); // ★ Item 1
+    session.ts = Date.now();
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
   }
 })();
@@ -1056,9 +1052,11 @@ async function submitCheckout() {
     showAlert('global-alert', '⚠️ 批發網結帳請上傳購物車截圖'); return;
   }
 
-  // 純扣餘額：餘額不足直接擋
-  if (currentCkPay === 'balance' && amount > currentBalance) {
-    showAlert('global-alert', `⚠️ 餘額不足！目前餘額 NT$ ${fmtNum(currentBalance)}，請改選其他付款方式。`);
+  // 純扣餘額：餘額不足直接擋（用對應錢包餘額判斷）
+  const walletBal = currentCkType === 'batch' ? currentBatchBalance : currentBalance;
+  if (currentCkPay === 'balance' && amount > walletBal) {
+    const walletName = currentCkType === 'batch' ? '批發網儲值金' : '一般儲值金';
+    showAlert('global-alert', `⚠️ ${walletName}不足！目前 NT$ ${fmtNum(walletBal)}，請改選其他付款方式。`);
     return;
   }
 
@@ -1073,13 +1071,13 @@ async function submitCheckout() {
     if (!/^\d{5}$/.test(transferLast5))       { showAlert('global-alert', '⚠️ 請輸入正確的匯款帳號末五碼'); return; }
   }
 
-  // 計算實際扣餘額金額
+  // 計算實際扣餘額金額（用對應錢包餘額）
   let deductAmount = 0;
   let txType = '結帳待審';
   if (currentCkPay === 'balance') {
     deductAmount = amount;
   } else if (currentCkPay === 'partial') {
-    deductAmount = Math.min(currentBalance, amount);
+    deductAmount = Math.min(walletBal, amount);
   } else {
     deductAmount = 0; // 直接匯款不扣餘額
   }
@@ -1132,7 +1130,7 @@ function calcKrw() {
   el.style.display = 'block';
   el.innerHTML = `🇰🇷 ${fmtNum(total)} KRW &nbsp;→&nbsp; 🇹🇼 <span style="color:var(--accent);font-size:15px;font-weight:800;">NT$ ${fmtNum(twd)}</span> <button class="btn btn-outline btn-sm" style="margin-left:8px;" onclick="applyKrw(${twd})">帶入總額</button>`;
 }
-function applyKrw(v) { _$('ck-amount').value = v; checkCkBalance(); }
+function applyKrw(v) { _$('ck-amount').value = v; onCkAmountChange(); }
 
 function showResult(type, date, amount) {
   const msg = type === '儲值回報'
