@@ -506,7 +506,7 @@ input[type="number"] { -moz-appearance: textfield; }
         <div class="result-card">
           <h3>✅ 結帳完成！</h3>
           <div class="result-textbox" id="admin-result-text"></div>
-          <button class="btn btn-primary" onclick="copyAdminResult()">📋 點擊複製文案</button>
+          <button class="btn btn-primary" onclick="copyAdminResult()">📋 點擊複製文章</button>
         </div>
       </div>
     </div>
@@ -527,7 +527,7 @@ input[type="number"] { -moz-appearance: textfield; }
           <div class="settings-label">👥 代理資料管理</div>
           <div style="overflow-x:auto;">
             <table class="agent-list-table">
-              <thead><tr><th>代理代碼</th><th>名稱</th><th>手機號碼</th><th>匯率</th><th>餘額</th><th>儲存</th></tr></thead>
+              <thead><tr><th>代理代碼</th><th>名稱</th><th>手機號碼</th><th>匯率</th><th>餘額</th><th>狀態</th><th>操作</th></tr></thead>
               <tbody id="agent-settings-body"><tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:16px;">載入中...</td></tr></tbody>
             </table>
           </div>
@@ -548,7 +548,7 @@ input[type="number"] { -moz-appearance: textfield; }
 </div>
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxxlIcYp0uHrDbZmntTDp8GXq_epvvKMfWfkGuSXj-5O4DHWHoX6YmQKiM7tPhdiBgcXw/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzt4uAsv14JTNCEeb9la3d2en4faLW7YQYhlEX9k-8gsupljzCSbUzq6GhvWGn3VnHHBQ/exec';
 const ADMIN_USER = 'doudouNi';
 const ADMIN_PASS = 'nini99104';
 
@@ -650,16 +650,16 @@ function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
 
 /* ── 活躍 Modal ── */
 function showActivityModal(activityStatus, onConfirm) {
-  const { status, lastOrderDate, daysAgo } = activityStatus;
+  const { status, lastOrderDate, nextDeadline, daysOverdue } = activityStatus;
   const icon = _$('activity-modal-icon'), title = _$('activity-modal-title');
   const body = _$('activity-modal-body'), btn   = _$('activity-modal-btn');
   if (status === 'blocked') {
     icon.textContent  = '🔒'; title.textContent = '帳號已停用';
-    body.innerHTML    = `您的帳號已超過 <strong>3 個月</strong>未有下單紀錄（最後下單：${lastOrderDate || '無紀錄'}）。<br><br>請私訊 <strong>阿霓</strong> 協助開通，開通費 <strong>NT$ 300</strong>。`;
+    body.innerHTML    = `您的帳號因超過3個月未下單已自動停用。<br>最後下單：<strong>${lastOrderDate || '無紀錄'}</strong><br>截止日：<strong>${nextDeadline || '－'}</strong><br><br>請私訊 <strong>阿霓</strong> 協助開通，開通費 <strong>NT$ 300</strong>。`;
     btn.textContent   = '關閉'; btn.onclick = () => { _$('activity-modal').classList.remove('active'); };
   } else {
     icon.textContent  = '⚠️'; title.textContent = '帳號即將停用提醒';
-    body.innerHTML    = `您的帳號已 <strong>${daysAgo} 天</strong>未有下單紀錄（最後下單：${lastOrderDate}）。<br><br>若超過 <strong>3 個月</strong>未下單，帳號將停用。請把握時間下單！`;
+    body.innerHTML    = `您的上次下單日為 <strong>${lastOrderDate}</strong>，<br>本月下單截止日為 <strong>${nextDeadline}</strong>。<br><br>若超過截止日起 <strong>3 個月</strong>未下單，帳號將停用。請把握時間下單！`;
     btn.textContent   = '我知道了，繼續使用'; btn.onclick = () => { _$('activity-modal').classList.remove('active'); if (onConfirm) onConfirm(); };
   }
   _$('activity-modal').classList.add('active');
@@ -1151,16 +1151,32 @@ async function copyAdminResult() {
 
 function renderAgentSettingsTable(agents) {
   const tbody = _$('agent-settings-body');
-  if (!agents || !agents.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:16px;">無代理資料</td></tr>'; return; }
-  tbody.innerHTML = agents.map((a, i) => `
-    <tr>
+  if (!agents || !agents.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-light);padding:16px;">無代理資料</td></tr>';
+    return;
+  }
+  tbody.innerHTML = agents.map((a, i) => {
+    const isBlocked = (a.status || 'active') === 'blocked';
+    const statusBadge = isBlocked
+      ? `<span style="display:inline-block;background:#fbe9e7;color:var(--accent);font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid #ffccbc;">🔒 停用</span>`
+      : `<span style="display:inline-block;background:var(--success-bg);color:var(--success);font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid #aed581;">✅ 正常</span>`;
+    const toggleBtn = isBlocked
+      ? `<button class="btn btn-success btn-xs" onclick="toggleAgentStatus('${a.code}', 'active', ${i})">開通</button>`
+      : `<button class="btn btn-danger btn-xs"  onclick="toggleAgentStatus('${a.code}', 'blocked', ${i})">關閉</button>`;
+    return `
+    <tr id="agent-row-${i}">
       <td><strong>${a.code}</strong></td>
       <td><input type="text"   id="st-name-${i}"  value="${a.name  || ''}" placeholder="名稱"></td>
       <td><input type="text"   id="st-phone-${i}" value="${a.phone || ''}" placeholder="手機號碼" inputmode="tel"></td>
       <td><input type="number" id="st-rate-${i}"  value="${a.rate  || 40}" min="1" max="100" style="width:70px;"></td>
       <td style="font-weight:700; color:var(--primary-dark);">NT$ ${fmtNum(a.balance)}</td>
-      <td><button class="btn btn-admin btn-xs" onclick="saveAgentRow('${a.code}', ${i})">儲存</button></td>
-    </tr>`).join('');
+      <td id="st-status-${i}">${statusBadge}</td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn-admin btn-xs" onclick="saveAgentRow('${a.code}', ${i})">儲存</button>
+        ${toggleBtn}
+      </td>
+    </tr>`;
+  }).join('');
 }
 
 async function saveAgentRow(code, i) {
@@ -1176,6 +1192,46 @@ async function saveAgentRow(code, i) {
       if (agent) { agent.name = name; agent.phone = phone; agent.rate = rate; }
       Array.from(_$('admin-agent-select').options).forEach(opt => { if (opt.value === code) opt.dataset.rate = rate; });
     } else { showAlert('admin-global-alert', '❌ ' + (data.message || '更新失敗')); }
+  } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
+}
+
+async function toggleAgentStatus(code, newStatus, i) {
+  const action   = newStatus === 'blocked' ? '關閉' : '開通';
+  const emoji    = newStatus === 'blocked' ? '🔒' : '✅';
+  if (!confirm(`確定要${action}代理「${code}」的帳號？`)) return;
+  showLoading();
+  try {
+    const data = await callScript({ action: 'toggleAgentStatus', code, status: newStatus });
+    if (data.success) {
+      // 更新本地資料
+      const agent = adminAgentData.find(a => a.code === code);
+      if (agent) agent.status = newStatus;
+
+      // 更新狀態欄 badge
+      const statusCell = _$('st-status-' + i);
+      const isBlocked  = newStatus === 'blocked';
+      if (statusCell) {
+        statusCell.innerHTML = isBlocked
+          ? `<span style="display:inline-block;background:#fbe9e7;color:var(--accent);font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid #ffccbc;">🔒 停用</span>`
+          : `<span style="display:inline-block;background:var(--success-bg);color:var(--success);font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid #aed581;">✅ 正常</span>`;
+      }
+
+      // 更新按鈕
+      const row = _$('agent-row-' + i);
+      if (row) {
+        const btnCell = row.querySelector('td:last-child');
+        if (btnCell) {
+          const saveBtn = btnCell.querySelector('.btn-admin');
+          const saveBtnHtml = saveBtn ? saveBtn.outerHTML : `<button class="btn btn-admin btn-xs" onclick="saveAgentRow('${code}', ${i})">儲存</button>`;
+          btnCell.innerHTML = saveBtnHtml + ' ' + (isBlocked
+            ? `<button class="btn btn-success btn-xs" onclick="toggleAgentStatus('${code}', 'active', ${i})">開通</button>`
+            : `<button class="btn btn-danger btn-xs"  onclick="toggleAgentStatus('${code}', 'blocked', ${i})">關閉</button>`);
+        }
+      }
+
+      showAlert('admin-global-alert', `${emoji} ${code} 帳號已${action}`, 'success');
+    } else { showAlert('admin-global-alert', '❌ ' + (data.message || '操作失敗')); }
   } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
   finally  { hideLoading(); }
 }
