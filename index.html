@@ -80,6 +80,8 @@ input[type="number"] { -moz-appearance: textfield; }
 .btn-admin:hover { background: var(--admin-dark); transform: translateY(-1px); box-shadow: var(--shadow); }
 .btn-ghost { background: transparent; color: rgba(255,255,255,0.82); border: 1px solid rgba(255,255,255,0.32); border-radius: 20px; }
 .btn-ghost:hover { background: rgba(255,255,255,0.12); }
+.btn-danger { background: #c62828; color: #fff; }
+.btn-danger:hover { background: #b71c1c; transform: translateY(-1px); }
 .btn-sm  { padding: 7px 13px; font-size: 12.5px; }
 .btn-xs  { padding: 5px 10px; font-size: 12px; }
 .btn-full { width: 100%; }
@@ -110,12 +112,34 @@ input[type="number"] { -moz-appearance: textfield; }
 .history-amt   { font-weight: 700; font-size: 12.5px; white-space: nowrap; flex-shrink: 0; }
 .clr-plus  { color: #a5d6a7; }
 .clr-minus { color: #ffccbc; }
+.clr-pending { color: #ffe082; }
 .history-empty { font-size: 12px; opacity: 0.48; text-align: center; padding: 10px 0; }
 #notice-banner { display: none; background: linear-gradient(135deg, #fff9e6, #fff3e0); border: 1.5px solid #ffcc80; border-left: 5px solid var(--warning); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 16px; animation: fadeUp 0.35s ease; }
 .notice-title { font-size: 13px; font-weight: 800; color: var(--warning); margin-bottom: 9px; display: flex; align-items: center; gap: 6px; }
 .notice-body  { font-size: 13px; color: #5d4037; line-height: 1.85; }
 .notice-body strong { color: #bf360c; }
 .notice-tag { display: inline-block; background: var(--warning); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px; margin-right: 4px; vertical-align: middle; }
+
+/* ── 新增：結帳流程說明 banner ── */
+.flow-banner { background: linear-gradient(135deg, #e8f5e9, #f1f8e9); border: 1.5px solid #a5d6a7; border-left: 5px solid var(--success); border-radius: var(--radius-sm); padding: 12px 15px; margin-bottom: 16px; font-size: 13px; color: #2e7d32; line-height: 1.8; }
+.flow-banner strong { color: #1b5e20; }
+.flow-step { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.flow-num { background: var(--success); color: #fff; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+/* ── 新增：截圖上傳區 ── */
+.upload-area { border: 2px dashed var(--border); border-radius: var(--radius-sm); padding: 20px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; background: #fff; position: relative; }
+.upload-area:hover { border-color: var(--primary); background: var(--card-inner); }
+.upload-area.has-file { border-color: var(--success); border-style: solid; background: var(--success-bg); }
+.upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.upload-icon { font-size: 28px; margin-bottom: 6px; }
+.upload-text { font-size: 13px; color: var(--text-muted); font-weight: 600; }
+.upload-sub  { font-size: 11.5px; color: var(--text-light); margin-top: 3px; }
+.upload-preview { max-width: 100%; max-height: 160px; border-radius: 8px; margin-top: 10px; display: none; object-fit: contain; }
+
+/* ── 餘額不足警示 ── */
+.balance-block { background: #fbe9e7; border: 1.5px solid #ffccbc; border-left: 4px solid var(--accent); border-radius: var(--radius-sm); padding: 12px 15px; margin-bottom: 14px; display: none; font-size: 13px; color: var(--accent); font-weight: 600; line-height: 1.6; }
+.balance-block.show { display: block; animation: fadeUp 0.25s ease; }
+
 #main-section  { display: none; }
 #admin-section { display: none; }
 .tab-bar { display: flex; gap: 4px; background: var(--card-inner); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 16px; }
@@ -153,14 +177,22 @@ input[type="number"] { -moz-appearance: textfield; }
 .admin-tab-btn { flex: 1; padding: 10px 6px; background: transparent; border: none; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: var(--admin); cursor: pointer; font-family: inherit; transition: all 0.2s; }
 .admin-tab-btn.active { background: var(--admin); color: #fff; box-shadow: 0 2px 8px rgba(74,20,140,0.28); }
 .pending-list  { display: flex; flex-direction: column; gap: 10px; }
-.pending-item { background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 13px 15px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.pending-item { background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 13px 15px; }
 .pending-item.approved { opacity: 0.45; pointer-events: none; }
+.pending-item.rejected { opacity: 0.45; pointer-events: none; border-color: #ffccbc; }
 .pending-info   { flex: 1; min-width: 0; }
 .pending-agent  { font-size: 13.5px; font-weight: 700; color: var(--primary-dark); }
 .pending-detail { font-size: 12px; color: var(--text-muted); margin-top: 3px; line-height: 1.7; }
 .pending-amount { font-size: 16px; font-weight: 800; color: var(--success); white-space: nowrap; }
 .pending-amount.minus { color: var(--accent); }
 .pending-empty  { text-align: center; color: var(--text-light); font-size: 13px; padding: 20px 0; }
+.pending-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.pending-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+/* ── 截圖預覽（管理員端）── */
+.screenshot-link { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--admin); text-decoration: none; background: #ede7f6; border-radius: 6px; padding: 4px 10px; margin-top: 6px; font-weight: 600; }
+.screenshot-link:hover { background: #d1c4e9; }
+
 .balance-display { padding: 11px 13px; background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-weight: 700; color: var(--success); font-size: 15px; }
 .after-balance-box { background: linear-gradient(135deg, #f3e5f5, #ede7f6); border: 1.5px solid #b39ddb; border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
 .after-balance-label { font-size: 13px; color: var(--admin); font-weight: 600; }
@@ -184,6 +216,12 @@ input[type="number"] { -moz-appearance: textfield; }
 .modal-title { font-size: 16px; font-weight: 700; color: var(--text); text-align: center; margin-bottom: 8px; }
 .modal-body  { font-size: 13px; color: var(--text-muted); text-align: center; line-height: 1.7; margin-bottom: 20px; }
 .modal-body strong { color: var(--accent); }
+
+/* ── 管理員截圖 modal ── */
+#img-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9998; align-items: center; justify-content: center; padding: 20px; cursor: zoom-out; }
+#img-modal.active { display: flex; }
+#img-modal img { max-width: 100%; max-height: 90vh; border-radius: 12px; }
+
 @media (max-width: 520px) {
   .page-wrapper  { padding: 0 14px 60px; }
   .card          { padding: 20px 16px 18px; }
@@ -194,6 +232,7 @@ input[type="number"] { -moz-appearance: textfield; }
   .calc-actions  { flex-direction: column; }
   .admin-tab-btn { font-size: 11px; padding: 9px 4px; }
   .type-toggle   { flex-direction: column; }
+  .pending-top   { flex-direction: column; }
 }
 </style>
 </head>
@@ -202,6 +241,11 @@ input[type="number"] { -moz-appearance: textfield; }
 <div id="loading-overlay">
   <div class="spinner"></div>
   <div class="loading-text">⏳ 資料處理中，請稍候...</div>
+</div>
+
+<!-- 截圖放大 modal -->
+<div id="img-modal" onclick="closeImgModal()">
+  <img id="img-modal-src" src="" alt="截圖">
 </div>
 
 <div class="page-wrapper">
@@ -276,10 +320,11 @@ input[type="number"] { -moz-appearance: textfield; }
   <div id="main-section">
     <div class="tab-bar">
       <button class="tab-btn active" id="tab-btn-deposit"  onclick="switchTab('deposit')">💰 儲值回報</button>
-      <button class="tab-btn"        id="tab-btn-checkout" onclick="switchTab('checkout')">🛒 單筆結帳</button>
+      <button class="tab-btn"        id="tab-btn-checkout" onclick="switchTab('checkout')">🛒 結帳申請</button>
     </div>
     <div id="global-alert" class="alert error"></div>
 
+    <!-- ── 儲值 tab ── -->
     <div id="tab-deposit" class="tab-panel active">
       <div class="card">
         <div class="card-title">💰 儲值回報</div>
@@ -289,6 +334,19 @@ input[type="number"] { -moz-appearance: textfield; }
           <div class="form-row"><label>💵 儲值金額（最低 2,000 · 以千為單位）</label><input type="number" id="dep-amount" placeholder="例：5000" min="2000" step="1000"></div>
         </div>
         <div class="form-row"><label>🏦 匯款帳號末五碼</label><input type="text" id="dep-last5" placeholder="請輸入末五碼數字" maxlength="5" inputmode="numeric"></div>
+
+        <!-- 截圖上傳（儲值） -->
+        <div class="form-row">
+          <label>📸 匯款截圖（必填）</label>
+          <div class="upload-area" id="dep-upload-area">
+            <input type="file" id="dep-screenshot" accept="image/*" onchange="handleUpload('dep')">
+            <div class="upload-icon">📷</div>
+            <div class="upload-text">點擊上傳匯款截圖</div>
+            <div class="upload-sub">支援 JPG / PNG，建議 5MB 以內</div>
+            <img class="upload-preview" id="dep-preview" alt="預覽">
+          </div>
+        </div>
+
         <label class="checkbox-row" for="dep-confirm">
           <input type="checkbox" id="dep-confirm">
           <span>✅ 我確認已完成匯款，以上資訊均正確無誤</span>
@@ -297,23 +355,40 @@ input[type="number"] { -moz-appearance: textfield; }
       </div>
     </div>
 
+    <!-- ── 結帳 tab ── -->
     <div id="tab-checkout" class="tab-panel">
       <div class="card">
-        <div class="card-title">🛒 單筆結帳</div>
-        <div class="bank-info"><strong>📍 匯款帳戶資訊</strong><br>銀行：台新銀行（812）<br>帳號：<strong>2888-10-2335157-5</strong></div>
-        <div class="form-row">
-          <label>💳 付款方式</label>
-          <div class="type-toggle">
-            <div class="type-btn active" id="pay-btn-balance" onclick="switchPayMethod('balance')">💰 扣除儲值餘額</div>
-            <div class="type-btn"        id="pay-btn-transfer" onclick="switchPayMethod('transfer')">🏦 直接匯款送出</div>
-          </div>
+        <div class="card-title">🛒 結帳申請</div>
+
+        <!-- 流程說明 -->
+        <div class="flow-banner">
+          <div class="flow-step"><span class="flow-num">1</span>填寫結帳資訊並上傳購物車截圖</div>
+          <div class="flow-step"><span class="flow-num">2</span>送出後狀態為「待審核」</div>
+          <div class="flow-step"><span class="flow-num">3</span>官方核對後從儲值餘額扣除</div>
+          <strong>⚠️ 餘額不足時無法送出，請先完成儲值</strong>
         </div>
+
+        <!-- 餘額不足警示 -->
+        <div class="balance-block" id="balance-block"></div>
+
         <div class="form-grid-2">
           <div class="form-row"><label>📅 結帳日期</label><input type="date" id="ck-date"></div>
-          <div class="form-row"><label>💵 結帳台幣總額（NT$）</label><input type="number" id="ck-amount" placeholder="請輸入或使用計算機" min="1"></div>
+          <div class="form-row"><label>💵 結帳台幣總額（NT$）</label><input type="number" id="ck-amount" placeholder="請輸入或使用計算機" min="1" oninput="checkCkBalance()"></div>
         </div>
         <div class="form-row"><label>📝 訂單項目說明</label><input type="text" id="ck-note" placeholder="例：批網4件 ／ 記事本湊單米菲兔"></div>
-        <div class="form-row"><label>🏦 匯款帳號末五碼</label><input type="text" id="ck-last5" placeholder="請輸入末五碼數字" maxlength="5" inputmode="numeric"></div>
+
+        <!-- 截圖上傳（結帳） -->
+        <div class="form-row">
+          <label>📸 購物車截圖（必填）</label>
+          <div class="upload-area" id="ck-upload-area">
+            <input type="file" id="ck-screenshot" accept="image/*" onchange="handleUpload('ck')">
+            <div class="upload-icon">🛒</div>
+            <div class="upload-text">點擊上傳購物車截圖</div>
+            <div class="upload-sub">支援 JPG / PNG，建議 5MB 以內</div>
+            <img class="upload-preview" id="ck-preview" alt="預覽">
+          </div>
+        </div>
+
         <div class="calc-box">
           <div class="calc-title">📊 多品項韓元計價小工具 <span>（匯率固定 ×40，無條件進位）</span></div>
           <div class="krw-list" id="krw-list">
@@ -325,7 +400,9 @@ input[type="number"] { -moz-appearance: textfield; }
           </div>
           <div class="calc-result" id="calc-result"></div>
         </div>
-        <button class="btn btn-accent btn-full" onclick="submitCheckout()">💳 送出結帳申請</button>
+
+        <button class="btn btn-accent btn-full" onclick="submitCheckout()">📋 送出結帳申請</button>
+        <p style="font-size:12px; color:var(--text-light); text-align:center; margin-top:10px;">送出後請勿重複送出，等候官方審核通知</p>
       </div>
     </div>
 
@@ -338,6 +415,7 @@ input[type="number"] { -moz-appearance: textfield; }
     </div>
   </div>
 
+  <!-- ── 管理員 ── -->
   <div id="admin-dashboard">
     <div class="admin-dash-top">
       <div><div class="admin-greeting">歡迎回來，</div><div class="admin-name">👑 阿霓</div></div>
@@ -351,27 +429,37 @@ input[type="number"] { -moz-appearance: textfield; }
   <div id="admin-section">
     <div class="admin-tab-bar">
       <button class="admin-tab-btn active" id="atab-btn-deposit"  onclick="switchAdminTab('deposit')">📥 儲值審核</button>
-      <button class="admin-tab-btn"        id="atab-btn-checkout" onclick="switchAdminTab('checkout')">💳 結帳專用</button>
+      <button class="admin-tab-btn"        id="atab-btn-checkout" onclick="switchAdminTab('checkout')">💳 結帳審核</button>
+      <button class="admin-tab-btn"        id="atab-btn-manual"   onclick="switchAdminTab('manual')">✏️ 手動扣帳</button>
       <button class="admin-tab-btn"        id="atab-btn-settings" onclick="switchAdminTab('settings')">⚙️ 系統設定</button>
     </div>
     <div id="admin-global-alert" class="alert error"></div>
 
+    <!-- 儲值審核 -->
     <div id="atab-deposit" class="tab-panel active">
       <div class="card">
         <div class="card-title admin-color">📥 待審核儲值清單</div>
         <div id="pending-list" class="pending-list"><div class="pending-empty">⏳ 載入中...</div></div>
         <div style="margin-top:14px;"><button class="btn btn-outline btn-sm" onclick="loadPendingDeposits()">🔄 重新整理</button></div>
       </div>
+    </div>
+
+    <!-- 結帳審核（新）-->
+    <div id="atab-checkout" class="tab-panel">
       <div class="card">
-        <div class="card-title admin-color">🛒 代理單筆結帳紀錄</div>
-        <div id="checkout-list" class="pending-list"><div class="pending-empty">⏳ 載入中...</div></div>
-        <div style="margin-top:14px;"><button class="btn btn-outline btn-sm" onclick="loadPendingDeposits()">🔄 重新整理</button></div>
+        <div class="card-title admin-color">🛒 待審核結帳申請</div>
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:14px; line-height:1.6;">
+          審核通過後系統將自動從代理儲值餘額扣除。<br>餘額不足時無法審核通過。
+        </p>
+        <div id="checkout-pending-list" class="pending-list"><div class="pending-empty">⏳ 載入中...</div></div>
+        <div style="margin-top:14px;"><button class="btn btn-outline btn-sm" onclick="loadCheckoutPending()">🔄 重新整理</button></div>
       </div>
     </div>
 
-    <div id="atab-checkout" class="tab-panel">
+    <!-- 手動扣帳（原結帳專用）-->
+    <div id="atab-manual" class="tab-panel">
       <div class="card">
-        <div class="card-title admin-color">💳 結帳專用</div>
+        <div class="card-title admin-color">✏️ 手動扣帳（批發網 ／ 官網）</div>
         <div class="form-grid-2" style="margin-bottom:16px;">
           <div class="form-row" style="margin:0;"><label>選擇代理</label><select id="admin-agent-select" onchange="onAdminAgentChange()"><option value="">請選擇代理</option></select></div>
           <div class="form-row" style="margin:0;"><label>目前可用餘額</label><div id="admin-agent-balance" class="balance-display">－</div></div>
@@ -390,7 +478,7 @@ input[type="number"] { -moz-appearance: textfield; }
           </div>
           <div class="form-grid-2" style="margin-bottom:14px;">
             <div class="form-row" style="margin:0;"><label>🇰🇷 韓幣總計</label><input type="number" id="batch-krw" placeholder="0" min="0" oninput="autoCalcBatchTwd()"></div>
-            <div class="form-row" style="margin:0;"><label>💵 台幣總計（NT$）</label><input type="number" id="batch-twd" placeholder="自動換算或手動輸入" min="0"></div>
+            <div class="form-row" style="margin:0;"><label>💵 台幣總計（NT$）</label><input type="number" id="batch-twd" placeholder="自動換算或手動輸入" min="0" oninput="updateAfterBalance()"></div>
           </div>
           <div class="form-row"><label>📝 備註</label><input type="text" id="batch-note" placeholder="例：以上結帳0307"></div>
         </div>
@@ -423,6 +511,7 @@ input[type="number"] { -moz-appearance: textfield; }
       </div>
     </div>
 
+    <!-- 系統設定 -->
     <div id="atab-settings" class="tab-panel">
       <div class="card">
         <div class="card-title admin-color">⚙️ 系統設定</div>
@@ -459,7 +548,7 @@ input[type="number"] { -moz-appearance: textfield; }
 </div>
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGrLXWhbdv1UmUJHnkgwN7Et6YDJY3FlQQN71jB31Lp8pWgOyeM76zCWzNMlZGRgG1pQ/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxxlIcYp0uHrDbZmntTDp8GXq_epvvKMfWfkGuSXj-5O4DHWHoX6YmQKiM7tPhdiBgcXw/exec';
 const ADMIN_USER = 'doudouNi';
 const ADMIN_PASS = 'nini99104';
 
@@ -468,11 +557,14 @@ let currentBalance      = 0;
 let isAdmin             = false;
 let adminAgentData      = [];
 let currentCheckoutType = 'batch';
-let currentPayMethod    = 'balance';
+
+// 儲存 base64 截圖
+let depScreenshotB64 = null;
+let ckScreenshotB64  = null;
 
 const _$   = id => document.getElementById(id);
-const show = id => _$(id).style.display = 'block';
-const hide = id => _$(id).style.display = 'none';
+const show = id => { const el = _$(id); if(el) el.style.display = 'block'; };
+const hide = id => { const el = _$(id); if(el) el.style.display = 'none'; };
 function showLoading() { _$('loading-overlay').classList.add('active'); }
 function hideLoading() { _$('loading-overlay').classList.remove('active'); }
 function showAlert(id, msg, type = 'error') { const el = _$(id); el.textContent = msg; el.className = 'alert ' + type + ' show'; }
@@ -483,10 +575,43 @@ async function callScript(payload) {
 }
 function fmtNum(n) { return Number(n || 0).toLocaleString(); }
 
-/* ── Session 管理（必須在 init 前定義）── */
+/* ── 截圖上傳 ── */
+function handleUpload(prefix) {
+  const input = _$(prefix + '-screenshot');
+  const file  = input.files[0];
+  if (!file) return;
+  if (file.size > 8 * 1024 * 1024) { alert('圖片太大，請選擇 8MB 以內的截圖'); input.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const b64 = e.target.result; // data:image/...;base64,...
+    if (prefix === 'dep') depScreenshotB64 = b64;
+    else                  ckScreenshotB64  = b64;
+    const area    = _$(prefix + '-upload-area');
+    const preview = _$(prefix + '-preview');
+    area.classList.add('has-file');
+    preview.src = b64; preview.style.display = 'block';
+    area.querySelector('.upload-text').textContent = '✅ ' + file.name;
+    area.querySelector('.upload-sub').textContent  = '點擊可重新選擇';
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ── 結帳餘額即時檢查 ── */
+function checkCkBalance() {
+  const amount = Number(_$('ck-amount').value) || 0;
+  const block  = _$('balance-block');
+  if (amount > 0 && amount > currentBalance) {
+    const shortage = amount - currentBalance;
+    block.innerHTML = `⚠️ 餘額不足！目前餘額 NT$ ${fmtNum(currentBalance)}，尚缺 NT$ ${fmtNum(shortage)}。<br>請先至「儲值回報」完成儲值。`;
+    block.classList.add('show');
+  } else {
+    block.classList.remove('show');
+  }
+}
+
+/* ── Session 管理 ── */
 const SESSION_KEY     = 'doudou_session';
 const SESSION_TIMEOUT = 10 * 60 * 1000;
-
 function saveSession(data) {
   const s = { agentCode: data.agentCode, agentName: data.agentName, balance: data.balance, history: data.history, ts: Date.now() };
   sessionStorage.setItem(SESSION_KEY, JSON.stringify(s));
@@ -503,7 +628,7 @@ function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
 
 /* ── Init ── */
 (function init() {
-  const sel = document.getElementById('login-select');
+  const sel = _$('login-select');
   for (let i = 1; i <= 30; i++) {
     const code = 'doudou' + String(i).padStart(3, '0');
     const opt  = document.createElement('option');
@@ -512,7 +637,6 @@ function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
   }
   const today = new Date().toISOString().slice(0, 10);
   ['dep-date','ck-date','batch-date','online-date'].forEach(id => { if (_$(id)) _$(id).value = today; });
-
   const session = loadSession();
   if (session) {
     currentAgent   = session.agentCode;
@@ -524,23 +648,19 @@ function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
   }
 })();
 
-/* ── 活躍狀態 Modal ── */
+/* ── 活躍 Modal ── */
 function showActivityModal(activityStatus, onConfirm) {
   const { status, lastOrderDate, daysAgo } = activityStatus;
   const icon = _$('activity-modal-icon'), title = _$('activity-modal-title');
   const body = _$('activity-modal-body'), btn   = _$('activity-modal-btn');
   if (status === 'blocked') {
-    icon.textContent  = '🔒';
-    title.textContent = '帳號已停用';
+    icon.textContent  = '🔒'; title.textContent = '帳號已停用';
     body.innerHTML    = `您的帳號已超過 <strong>3 個月</strong>未有下單紀錄（最後下單：${lastOrderDate || '無紀錄'}）。<br><br>請私訊 <strong>阿霓</strong> 協助開通，開通費 <strong>NT$ 300</strong>。`;
-    btn.textContent   = '關閉';
-    btn.onclick = () => { _$('activity-modal').classList.remove('active'); };
+    btn.textContent   = '關閉'; btn.onclick = () => { _$('activity-modal').classList.remove('active'); };
   } else {
-    icon.textContent  = '⚠️';
-    title.textContent = '帳號即將停用提醒';
+    icon.textContent  = '⚠️'; title.textContent = '帳號即將停用提醒';
     body.innerHTML    = `您的帳號已 <strong>${daysAgo} 天</strong>未有下單紀錄（最後下單：${lastOrderDate}）。<br><br>若超過 <strong>3 個月</strong>未下單，帳號將停用。請把握時間下單！`;
-    btn.textContent   = '我知道了，繼續使用';
-    btn.onclick = () => { _$('activity-modal').classList.remove('active'); if (onConfirm) onConfirm(); };
+    btn.textContent   = '我知道了，繼續使用'; btn.onclick = () => { _$('activity-modal').classList.remove('active'); if (onConfirm) onConfirm(); };
   }
   _$('activity-modal').classList.add('active');
 }
@@ -551,8 +671,7 @@ function showAgentLogin()  { hide('admin-login-section'); show('login-section');
 
 async function doLogin() {
   clearAlert('login-alert');
-  const agentCode = _$('login-select').value;
-  const phone     = _$('login-phone').value.trim();
+  const agentCode = _$('login-select').value, phone = _$('login-phone').value.trim();
   if (!agentCode) { showAlert('login-alert', '請選擇代理代碼'); return; }
   if (!phone)     { showAlert('login-alert', '請輸入手機後六碼'); return; }
   showLoading();
@@ -574,18 +693,18 @@ async function doLogin() {
 
 function doLogout() {
   currentAgent = null; currentBalance = 0; clearSession();
+  depScreenshotB64 = null; ckScreenshotB64 = null;
   hide('dashboard'); hide('notice-banner'); hide('main-section'); hide('result-section');
   show('login-section'); clearAlert('global-alert');
 }
 
 function doAdminLogin() {
   clearAlert('admin-login-alert');
-  const u = _$('admin-username').value.trim();
-  const p = _$('admin-password').value;
+  const u = _$('admin-username').value.trim(), p = _$('admin-password').value;
   if (u !== ADMIN_USER || p !== ADMIN_PASS) { showAlert('admin-login-alert', '❌ 帳號或密碼錯誤'); return; }
   isAdmin = true;
   hide('admin-login-section'); show('admin-dashboard'); show('admin-section');
-  loadPendingDeposits(); loadAdminAgents();
+  loadPendingDeposits(); loadCheckoutPending(); loadAdminAgents();
 }
 function doAdminLogout() {
   isAdmin = false;
@@ -609,17 +728,21 @@ function checkBalanceWarning(bal) { _$('balance-warning').style.display = bal < 
 function renderHistory(list) {
   const box = _$('history-box');
   if (!list.length) { box.innerHTML = '<div class="history-empty">尚無交易紀錄</div>'; return; }
-  box.innerHTML = list.map(h => `
+  box.innerHTML = list.map(h => {
+    const isPlus    = h.type === '儲值' || h.type === '退款';
+    const isPending = h.status === '待審核';
+    return `
     <div class="history-row">
       <div class="history-info">
         <div class="history-type">${h.note || h.type}</div>
         <div class="history-date">${h.date || ''}</div>
       </div>
       <span class="history-badge">${h.status}</span>
-      <span class="history-amt ${h.type === '儲值' || h.type === '退款' ? 'clr-plus' : 'clr-minus'}">
-        ${h.type === '儲值' || h.type === '退款' ? '+' : '−'}${fmtNum(h.amount)}
+      <span class="history-amt ${isPending ? 'clr-pending' : isPlus ? 'clr-plus' : 'clr-minus'}">
+        ${isPlus ? '+' : '−'}${fmtNum(h.amount)}
       </span>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function switchTab(tab) {
@@ -629,12 +752,7 @@ function switchTab(tab) {
   clearAlert('global-alert'); hide('result-section');
 }
 
-function switchPayMethod(method) {
-  currentPayMethod = method;
-  _$('pay-btn-balance').classList.toggle('active',  method === 'balance');
-  _$('pay-btn-transfer').classList.toggle('active', method === 'transfer');
-}
-
+/* ── 儲值送出 ── */
 async function submitDeposit() {
   clearAlert('global-alert');
   const date = _$('dep-date').value, raw = _$('dep-amount').value;
@@ -644,48 +762,65 @@ async function submitDeposit() {
   if (amount < 2000)          { showAlert('global-alert', '⚠️ 儲值金額最低為 NT$ 2,000'); return; }
   if (amount % 1000 !== 0)    { showAlert('global-alert', '⚠️ 儲值金額須為 1,000 的倍數'); return; }
   if (!/^\d{5}$/.test(last5)) { showAlert('global-alert', '⚠️ 請輸入正確的帳號末五碼（5 位數字）'); return; }
+  if (!depScreenshotB64)      { showAlert('global-alert', '⚠️ 請上傳匯款截圖'); return; }
   if (!chk)                   { showAlert('global-alert', '⚠️ 請勾選確認已完成匯款'); return; }
   showLoading();
   try {
-    const data = await callScript({ action: 'transaction', type: '儲值', agentCode: currentAgent, amount, date, note: '帳號末五碼：' + last5 });
+    const data = await callScript({
+      action: 'transaction', type: '儲值', agentCode: currentAgent,
+      amount, date, note: '帳號末五碼：' + last5,
+      screenshot: depScreenshotB64
+    });
     if (data.success) {
       updateBalance(data.newBalance); renderHistory(data.history || []);
       _$('dep-amount').value = ''; _$('dep-last5').value = ''; _$('dep-confirm').checked = false;
+      _$('dep-upload-area').classList.remove('has-file');
+      _$('dep-preview').style.display = 'none'; depScreenshotB64 = null;
+      _$('dep-upload-area').querySelector('.upload-text').textContent = '點擊上傳匯款截圖';
+      _$('dep-upload-area').querySelector('.upload-sub').textContent  = '支援 JPG / PNG，建議 5MB 以內';
       showResult(makeCopy({ type: '儲值回報', date, amount, note: '帳號末五碼：' + last5, status: '待審核' }));
     } else { showAlert('global-alert', '❌ ' + (data.message || '送出失敗')); }
   } catch { showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試'); }
   finally  { hideLoading(); }
 }
 
+/* ── 結帳申請送出（全部轉待審核，餘額不足擋回）── */
 async function submitCheckout() {
   clearAlert('global-alert');
-  const date = _$('ck-date').value, amount = Number(_$('ck-amount').value);
-  const note = _$('ck-note').value.trim(), last5 = _$('ck-last5').value.trim();
+  const date   = _$('ck-date').value;
+  const amount = Number(_$('ck-amount').value);
+  const note   = _$('ck-note').value.trim();
+
   if (!date)                  { showAlert('global-alert', '⚠️ 請選擇結帳日期'); return; }
   if (!amount || amount <= 0) { showAlert('global-alert', '⚠️ 請輸入正確的結帳金額'); return; }
   if (!note)                  { showAlert('global-alert', '⚠️ 請填寫訂單項目說明'); return; }
-  if (!/^\d{5}$/.test(last5)) { showAlert('global-alert', '⚠️ 請輸入正確的帳號末五碼（5 位數字）'); return; }
-  const isTransfer = currentPayMethod === 'transfer';
-  let txType, statusMsg;
-  if (isTransfer) {
-    txType = '結帳待審'; statusMsg = '待審核（直接匯款）';
-  } else if (amount <= currentBalance) {
-    txType = '消費'; statusMsg = '已確認（扣除餘額）';
-  } else {
+  if (!ckScreenshotB64)       { showAlert('global-alert', '⚠️ 請上傳購物車截圖'); return; }
+
+  // ★ 核心改動：餘額不足直接擋回
+  if (amount > currentBalance) {
     const shortage = amount - currentBalance;
-    if (!confirm(`⚠️ 餘額不足！\n目前餘額：NT$ ${fmtNum(currentBalance)}\n結帳金額：NT$ ${fmtNum(amount)}\n需補匯差額：NT$ ${fmtNum(shortage)}\n\n送出後狀態為「待審核」，待您補匯後會對帳確認。\n確定送出？`)) return;
-    txType = '結帳待審'; statusMsg = `待審核（需補匯 NT$ ${fmtNum(shortage)}）`;
+    showAlert('global-alert', `⚠️ 餘額不足，無法送出！目前餘額 NT$ ${fmtNum(currentBalance)}，尚缺 NT$ ${fmtNum(shortage)}。請先完成儲值。`);
+    return;
   }
+
   showLoading();
   try {
-    const fullNote = note + '｜末五碼：' + last5;
-    const data = await callScript({ action: 'transaction', type: txType, agentCode: currentAgent, amount, date, note: fullNote });
+    const data = await callScript({
+      action: 'transaction', type: '結帳待審', agentCode: currentAgent,
+      amount, date, note,
+      screenshot: ckScreenshotB64
+      // ★ 注意：這裡不傳 last5，結帳不需要匯款末五碼
+    });
     if (data.success) {
-      if (txType === '消費') updateBalance(data.newBalance);
+      // ★ 待審核：不更新餘額，讓代理知道餘額尚未扣除
       renderHistory(data.history || []);
-      _$('ck-amount').value = ''; _$('ck-note').value = ''; _$('ck-last5').value = '';
+      _$('ck-amount').value = ''; _$('ck-note').value = '';
       _$('calc-result').style.display = 'none';
-      showResult(makeCopy({ type: '單筆結帳', date, amount, note: fullNote, status: statusMsg }));
+      _$('ck-upload-area').classList.remove('has-file');
+      _$('ck-preview').style.display = 'none'; ckScreenshotB64 = null;
+      _$('ck-upload-area').querySelector('.upload-text').textContent = '點擊上傳購物車截圖';
+      _$('ck-upload-area').querySelector('.upload-sub').textContent  = '支援 JPG / PNG，建議 5MB 以內';
+      showResult(makeCopy({ type: '結帳申請', date, amount, note, status: '待官方審核・勿重複送出' }));
     } else { showAlert('global-alert', '❌ ' + (data.message || '送出失敗')); }
   } catch { showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試'); }
   finally  { hideLoading(); }
@@ -710,10 +845,10 @@ function calcKrw() {
   el.style.display = 'block';
   el.innerHTML = `🇰🇷 ${fmtNum(total)} KRW &nbsp;→&nbsp; 🇹🇼 <span style="color:var(--accent);font-size:15px;font-weight:800;">NT$ ${fmtNum(twd)}</span> <button class="btn btn-outline btn-sm" style="margin-left:8px;" onclick="applyKrw(${twd})">帶入總額</button>`;
 }
-function applyKrw(v) { _$('ck-amount').value = v; }
+function applyKrw(v) { _$('ck-amount').value = v; checkCkBalance(); }
 
 function makeCopy({ type, date, amount, note, status }) {
-  const now = new Date().toLocaleString('zh-TW', { hour12: false });
+  const now  = new Date().toLocaleString('zh-TW', { hour12: false });
   const icon = type === '儲值回報' ? '💰' : '🛒';
   return [`🥜 DouDou 代理${type}單`, `────────────────────`,
     `${icon} 類型：${type}`, `👤 代理編號：${currentAgent}`,
@@ -735,6 +870,7 @@ async function copyResult() {
   } catch { alert('請手動選取文字並複製'); }
 }
 
+/* ── 管理員 tab ── */
 function switchAdminTab(tab) {
   document.querySelectorAll('#admin-section .tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
@@ -742,49 +878,79 @@ function switchAdminTab(tab) {
   clearAlert('admin-global-alert'); hide('admin-result-section');
 }
 
+/* ── 儲值待審 ── */
 async function loadPendingDeposits() {
-  _$('pending-list').innerHTML = _$('checkout-list').innerHTML = '<div class="pending-empty">⏳ 載入中...</div>';
+  _$('pending-list').innerHTML = '<div class="pending-empty">⏳ 載入中...</div>';
   showLoading();
   try {
-    const [depData, ckData] = await Promise.all([
-      callScript({ action: 'getPendingDeposits' }),
-      callScript({ action: 'getCheckoutList' })
-    ]);
+    const depData = await callScript({ action: 'getPendingDeposits' });
     const el = _$('pending-list');
     if (depData.success && depData.list.length > 0) {
       el.innerHTML = depData.list.map((item, i) => `
         <div class="pending-item" id="pending-${i}">
-          <div class="pending-info">
-            <div class="pending-agent">👤 ${item.agentCode}${item.agentName ? '（' + item.agentName + '）' : ''}</div>
-            <div class="pending-detail">📅 匯款日期：${item.date}<br>🏦 帳號末五碼：${item.last5 || '－'}<br>🕐 送出：${item.time}</div>
-          </div>
-          <div style="text-align:right; flex-shrink:0;">
+          <div class="pending-top">
+            <div class="pending-info">
+              <div class="pending-agent">👤 ${item.agentCode}${item.agentName ? '（' + item.agentName + '）' : ''}</div>
+              <div class="pending-detail">📅 匯款日期：${item.date}<br>🏦 帳號末五碼：${item.last5 || '－'}<br>🕐 送出：${item.time}</div>
+              ${item.screenshotUrl ? `<a class="screenshot-link" href="${item.screenshotUrl}" target="_blank">📸 查看匯款截圖</a>` : ''}
+            </div>
             <div class="pending-amount">+NT$ ${fmtNum(item.amount)}</div>
-            <button class="btn btn-success btn-sm" style="margin-top:6px;" onclick="approveDeposit(${item.row}, ${i})">✅ 確認入帳</button>
+          </div>
+          <div class="pending-actions">
+            <button class="btn btn-success btn-sm" onclick="approveDeposit(${item.row}, ${i})">✅ 確認入帳</button>
+            <button class="btn btn-danger btn-sm"  onclick="rejectDeposit(${item.row}, ${i})">❌ 拒絕</button>
           </div>
         </div>`).join('');
     } else { el.innerHTML = '<div class="pending-empty">✅ 目前沒有待審核的儲值</div>'; }
-    const ckEl = _$('checkout-list');
-    if (ckData.success && ckData.list.length > 0) {
-      ckEl.innerHTML = ckData.list.map((item, i) => `
-        <div class="pending-item" id="ck-item-${i}">
-          <div class="pending-info">
-            <div class="pending-agent">👤 ${item.agentCode}${item.agentName ? '（' + item.agentName + '）' : ''}</div>
-            <div class="pending-detail">📅 ${item.date}<br>📝 ${item.note || '無說明'}<br>🏦 末五碼：${item.last5 || '－'}<br>📋 ${item.status}</div>
-          </div>
-          <div style="text-align:right; flex-shrink:0;">
-            <div class="pending-amount minus">−NT$ ${fmtNum(item.amount)}</div>
-            ${item.status === '待審核'
-              ? `<button class="btn btn-success btn-sm" style="margin-top:6px;" onclick="approveCheckout(${item.row}, ${i})">✅ 確認入帳</button>`
-              : `<span style="font-size:11px; color:var(--success); margin-top:4px; display:block;">✅ 已確認</span>`}
-          </div>
-        </div>`).join('');
-    } else { ckEl.innerHTML = '<div class="pending-empty">尚無結帳紀錄</div>'; }
   } catch {
-    _$('pending-list').innerHTML = _$('checkout-list').innerHTML = '<div class="pending-empty">❌ 載入失敗，請重試</div>';
+    _$('pending-list').innerHTML = '<div class="pending-empty">❌ 載入失敗，請重試</div>';
   } finally { hideLoading(); }
 }
 
+/* ── 結帳待審（新）── */
+async function loadCheckoutPending() {
+  const el = _$('checkout-pending-list');
+  el.innerHTML = '<div class="pending-empty">⏳ 載入中...</div>';
+  showLoading();
+  try {
+    const data = await callScript({ action: 'getCheckoutPending' });
+    if (data.success && data.list.length > 0) {
+      el.innerHTML = data.list.map((item, i) => `
+        <div class="pending-item" id="ck-pending-${i}">
+          <div class="pending-top">
+            <div class="pending-info">
+              <div class="pending-agent">👤 ${item.agentCode}${item.agentName ? '（' + item.agentName + '）' : ''}</div>
+              <div class="pending-detail">
+                📅 ${item.date}<br>
+                📝 ${item.note || '無說明'}<br>
+                💰 代理目前餘額：<strong style="color:${item.agentBalance >= item.amount ? 'var(--success)' : 'var(--accent)'}">NT$ ${fmtNum(item.agentBalance)}</strong>
+              </div>
+              ${item.screenshotUrl ? `<a class="screenshot-link" href="${item.screenshotUrl}" target="_blank" onclick="openImg('${item.screenshotUrl}',event)">🛒 查看購物車截圖</a>` : '<span style="font-size:12px;color:var(--text-light);">無截圖</span>'}
+            </div>
+            <div class="pending-amount minus">−NT$ ${fmtNum(item.amount)}</div>
+          </div>
+          <div class="pending-actions">
+            ${item.agentBalance >= item.amount
+              ? `<button class="btn btn-success btn-sm" onclick="approveCheckoutItem(${item.row}, ${i}, ${item.amount})">✅ 審核通過・扣款</button>`
+              : `<span style="font-size:12px;color:var(--accent);font-weight:600;">⚠️ 餘額不足，無法通過</span>`}
+            <button class="btn btn-danger btn-sm" onclick="rejectCheckoutItem(${item.row}, ${i})">❌ 拒絕</button>
+          </div>
+        </div>`).join('');
+    } else { el.innerHTML = '<div class="pending-empty">✅ 目前沒有待審核的結帳申請</div>'; }
+  } catch {
+    el.innerHTML = '<div class="pending-empty">❌ 載入失敗，請重試</div>';
+  } finally { hideLoading(); }
+}
+
+/* ── 圖片放大 ── */
+function openImg(url, e) {
+  if (e) e.preventDefault();
+  _$('img-modal-src').src = url;
+  _$('img-modal').classList.add('active');
+}
+function closeImgModal() { _$('img-modal').classList.remove('active'); }
+
+/* ── 審核：儲值 ── */
 async function approveDeposit(rowNum, idx) {
   if (!confirm('確認將此筆儲值標記為「已確認」並入帳？')) return;
   showLoading();
@@ -792,31 +958,55 @@ async function approveDeposit(rowNum, idx) {
     const data = await callScript({ action: 'approveDeposit', rowNum });
     if (data.success) {
       const item = _$('pending-' + idx);
-      if (item) { item.classList.add('approved'); item.querySelector('button').textContent = '✅ 已入帳'; }
+      if (item) { item.classList.add('approved'); item.querySelector('.pending-actions').innerHTML = '<span style="font-size:12px;color:var(--success);font-weight:600;">✅ 已入帳</span>'; }
       showAlert('admin-global-alert', '✅ 入帳成功！代理餘額已更新。', 'success');
     } else { showAlert('admin-global-alert', '❌ ' + (data.message || '審核失敗')); }
   } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
   finally  { hideLoading(); }
 }
-
-async function approveCheckout(rowNum, idx) {
-  if (!confirm('確認此筆直接匯款已收到，標記為已確認？')) return;
+async function rejectDeposit(rowNum, idx) {
+  if (!confirm('確定拒絕此筆儲值申請？')) return;
   showLoading();
   try {
-    const data = await callScript({ action: 'approveCheckout', rowNum });
+    const data = await callScript({ action: 'rejectDeposit', rowNum });
     if (data.success) {
-      const item = _$('ck-item-' + idx);
-      if (item) {
-        item.classList.add('approved');
-        const btn = item.querySelector('button');
-        if (btn) btn.outerHTML = '<span style="font-size:11px; color:var(--success); margin-top:4px; display:block;">✅ 已確認</span>';
-      }
-      showAlert('admin-global-alert', '✅ 已確認入帳！', 'success');
-    } else { showAlert('admin-global-alert', '❌ ' + (data.message || '確認失敗')); }
+      const item = _$('pending-' + idx);
+      if (item) { item.classList.add('rejected'); item.querySelector('.pending-actions').innerHTML = '<span style="font-size:12px;color:var(--accent);font-weight:600;">❌ 已拒絕</span>'; }
+      showAlert('admin-global-alert', '已拒絕此筆儲值申請。', 'success');
+    } else { showAlert('admin-global-alert', '❌ ' + (data.message || '操作失敗')); }
   } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
   finally  { hideLoading(); }
 }
 
+/* ── 審核：結帳（★ 這裡才真正扣款）── */
+async function approveCheckoutItem(rowNum, idx, amount) {
+  if (!confirm(`確認審核通過並從代理餘額扣除 NT$ ${fmtNum(amount)}？`)) return;
+  showLoading();
+  try {
+    const data = await callScript({ action: 'approveCheckout', rowNum });
+    if (data.success) {
+      const item = _$('ck-pending-' + idx);
+      if (item) { item.classList.add('approved'); item.querySelector('.pending-actions').innerHTML = `<span style="font-size:12px;color:var(--success);font-weight:600;">✅ 已扣款・餘額剩 NT$ ${fmtNum(data.newBalance)}</span>`; }
+      showAlert('admin-global-alert', `✅ 審核通過！已扣款 NT$ ${fmtNum(amount)}，代理剩餘 NT$ ${fmtNum(data.newBalance)}。`, 'success');
+    } else { showAlert('admin-global-alert', '❌ ' + (data.message || '審核失敗')); }
+  } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
+}
+async function rejectCheckoutItem(rowNum, idx) {
+  if (!confirm('確定拒絕此筆結帳申請？')) return;
+  showLoading();
+  try {
+    const data = await callScript({ action: 'rejectCheckout', rowNum });
+    if (data.success) {
+      const item = _$('ck-pending-' + idx);
+      if (item) { item.classList.add('rejected'); item.querySelector('.pending-actions').innerHTML = '<span style="font-size:12px;color:var(--accent);font-weight:600;">❌ 已拒絕</span>'; }
+      showAlert('admin-global-alert', '已拒絕此筆結帳申請。', 'success');
+    } else { showAlert('admin-global-alert', '❌ ' + (data.message || '操作失敗')); }
+  } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
+}
+
+/* ── 管理員手動扣帳 ── */
 async function loadAdminAgents() {
   showLoading();
   try {
@@ -830,8 +1020,7 @@ async function loadAdminAgents() {
       sel.innerHTML = '<option value="">請選擇代理</option>';
       agentData.agents.forEach(a => {
         const opt = document.createElement('option');
-        opt.value = a.code;
-        opt.textContent = a.code + (a.name ? '（' + a.name + '）' : '');
+        opt.value = a.code; opt.textContent = a.code + (a.name ? '（' + a.name + '）' : '');
         opt.dataset.balance = a.balance; opt.dataset.rate = a.rate || 40;
         sel.appendChild(opt);
       });
@@ -842,8 +1031,7 @@ async function loadAdminAgents() {
       pSel.innerHTML = '<option value="">請選擇品項</option>';
       productData.products.forEach(p => {
         const opt = document.createElement('option');
-        opt.value = p.name;
-        opt.textContent = p.name + (p.closeDate ? '（截止：' + p.closeDate + '）' : '');
+        opt.value = p.name; opt.textContent = p.name + (p.closeDate ? '（截止：' + p.closeDate + '）' : '');
         pSel.appendChild(opt);
       });
     }
@@ -858,7 +1046,6 @@ function switchCheckoutType(type) {
   _$('form-online').style.display = type === 'online' ? 'block' : 'none';
   updateAfterBalance();
 }
-
 function onAdminAgentChange() {
   const sel = _$('admin-agent-select'), opt = sel.options[sel.selectedIndex];
   const balEl = _$('admin-agent-balance');
@@ -874,10 +1061,7 @@ function getSelectedRate()    { const sel = _$('admin-agent-select'), opt = sel.
 function getCurrentAmount() {
   if (currentCheckoutType === 'batch') return Number(_$('batch-twd').value) || 0;
   const twd = Number(_$('online-twd').value) || 0;
-  const intl = Number(_$('online-intl-fee').value) || 0;
-  const loc  = Number(_$('online-local-fee').value) || 0;
-  const srt  = Number(_$('online-sort-fee').value) || 0;
-  return twd + intl + loc + srt;
+  return twd + (Number(_$('online-intl-fee').value)||0) + (Number(_$('online-local-fee').value)||0) + (Number(_$('online-sort-fee').value)||0);
 }
 function updateAfterBalance() {
   const amount = getCurrentAmount(), bal = getSelectedBalance();
@@ -906,8 +1090,8 @@ async function submitAdminCheckout() {
     if (!twd)  { showAlert('admin-global-alert', '⚠️ 請輸入台幣總計'); return; }
     Object.assign(payload, { date, qty, krwTotal: krw, amount: twd, note });
   } else {
-    const date    = _$('online-date').value, product = _$('online-product').value;
-    const qty     = Number(_$('online-qty').value) || 0, twd = Number(_$('online-twd').value) || 0;
+    const date = _$('online-date').value, product = _$('online-product').value;
+    const qty  = Number(_$('online-qty').value) || 0, twd = Number(_$('online-twd').value) || 0;
     const intlFee = Number(_$('online-intl-fee').value) || 0;
     const localFee= Number(_$('online-local-fee').value) || 0;
     const sortFee = Number(_$('online-sort-fee').value) || 0;
@@ -1007,7 +1191,6 @@ async function saveAnnounceDates() {
   } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
   finally  { hideLoading(); }
 }
-
 function updateMarquee(wed, sun) {
   const wedStr = wed ? `週三（${wed}）` : '週三', sunStr = sun ? `週日（${sun}）` : '週日';
   const text = `📢 儲值入帳時間調整通知 ・ 🗓️ 下次入帳日：${wedStr} & ${sunStr} ・ ⚠️ 週三入帳→請週三前完成匯款 ・ ⚠️ 週日入帳→請週日前完成匯款 ・ 當天匯款將順延至下一個入帳日 ・ 請提前儲值，避免額度不足 🥹 ・ 謝謝大家的配合與理解 ♡`;
