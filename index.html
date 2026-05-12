@@ -232,7 +232,15 @@ input[type="number"] { -moz-appearance: textfield; }
 .agent-list-table tr:hover td { background: #f3e5f5; }
 .agent-list-table input { border: 1px solid #b39ddb; border-radius: 6px; padding: 5px 8px; font-size: 13px; width: 100%; }
 
-/* Responsive */
+/* Modal */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 8888; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.active { display: flex; }
+.modal-box { background: var(--card-bg); border-radius: var(--radius); padding: 28px 24px; max-width: 360px; width: 100%; box-shadow: var(--shadow-lg); animation: fadeUp 0.3s ease; }
+.modal-icon { font-size: 40px; text-align: center; margin-bottom: 12px; }
+.modal-title { font-size: 16px; font-weight: 700; color: var(--text); text-align: center; margin-bottom: 8px; }
+.modal-body  { font-size: 13px; color: var(--text-muted); text-align: center; line-height: 1.7; margin-bottom: 20px; }
+.modal-body strong { color: var(--accent); }
+
 @media (max-width: 520px) {
   .page-wrapper  { padding: 0 14px 60px; }
   .card          { padding: 20px 16px 18px; }
@@ -432,15 +440,15 @@ input[type="number"] { -moz-appearance: textfield; }
           </div>
           <div class="calc-result" id="calc-result"></div>
         </div>
-        <button class="btn btn-accent btn-full" onclick="submitCheckout()">💳 匯款完成，送出審核</button>
+        <button class="btn btn-accent btn-full" onclick="submitCheckout()">💳 送出結帳申請</button>
       </div>
     </div>
 
     <div id="result-section">
       <div class="result-card">
-        <h3>✅ 送出成功！回報單文章</h3>
+        <h3>✅ 送出成功！回報單文案</h3>
         <div class="result-textbox" id="result-text"></div>
-        <button class="btn btn-primary" onclick="copyResult()">📋 點擊複製文章</button>
+        <button class="btn btn-primary" onclick="copyResult()">📋 點擊複製文案</button>
       </div>
     </div>
   </div>
@@ -566,7 +574,21 @@ input[type="number"] { -moz-appearance: textfield; }
           </div>
           <div class="form-row">
             <label>💵 台幣總計（NT$）</label>
-            <input type="number" id="online-twd" placeholder="請輸入金額" min="0">
+            <input type="number" id="online-twd" placeholder="請輸入金額" min="0" oninput="updateAfterBalance()">
+          </div>
+          <div class="form-grid-2" style="margin-bottom:14px;">
+            <div class="form-row" style="margin:0;">
+              <label>🚢 國際運費（NT$）</label>
+              <input type="number" id="online-intl-fee" placeholder="0" min="0" oninput="updateAfterBalance()">
+            </div>
+            <div class="form-row" style="margin:0;">
+              <label>🚚 國內運費（NT$）</label>
+              <input type="number" id="online-local-fee" placeholder="0" min="0" oninput="updateAfterBalance()">
+            </div>
+          </div>
+          <div class="form-row">
+            <label>📋 整理費（NT$）</label>
+            <input type="number" id="online-sort-fee" placeholder="0" min="0" oninput="updateAfterBalance()">
           </div>
           <div class="form-row">
             <label>📝 備註</label>
@@ -621,10 +643,20 @@ input[type="number"] { -moz-appearance: textfield; }
     </div>
 
   </div><!-- /admin-section -->
+  <!-- 活躍狀態警告 Modal -->
+  <div class="modal-overlay" id="activity-modal">
+    <div class="modal-box">
+      <div class="modal-icon" id="activity-modal-icon">⚠️</div>
+      <div class="modal-title" id="activity-modal-title">帳號提醒</div>
+      <div class="modal-body" id="activity-modal-body"></div>
+      <button class="btn btn-primary btn-full" id="activity-modal-btn" onclick="closeActivityModal()">我知道了</button>
+    </div>
+  </div>
+
 </div><!-- /page-wrapper -->
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxa4BzrAgj0cYHyqC-5YSln2Dy6m25tD0h3wBd_bIihADx1nu-mGeprK3NHE_Du8SW7uw/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGrLXWhbdv1UmUJHnkgwN7Et6YDJY3FlQQN71jB31Lp8pWgOyeM76zCWzNMlZGRgG1pQ/exec';
 const ADMIN_USER = 'doudouNi';
 const ADMIN_PASS = 'nini99104';
 
@@ -649,118 +681,132 @@ async function callScript(payload) {
 }
 function fmtNum(n) { return Number(n || 0).toLocaleString(); }
 
-/* ── Init 初始化設定與自動登入檢查 ── */
+/* ── Init ── */
 (function init() {
-  const sel = document.getElementById('login-select');
-  for (let i = 1; i <= 30; i++) {
-    const code = 'doudou' + String(i).padStart(3, '0');
-    const opt  = document.createElement('option');
-    opt.value = code; opt.textContent = code;
-    sel.appendChild(opt);
-  }
-  const today = new Date().toISOString().slice(0, 10);
-  document.getElementById('dep-date').value      = today;
-  document.getElementById('ck-date').value       = today;
-  document.getElementById('admin-ck-date').value = today;
+  const sel = document.getElementById('login-select');
+  for (let i = 1; i <= 30; i++) {
+    const code = 'doudou' + String(i).padStart(3, '0');
+    const opt  = document.createElement('option');
+    opt.value = code; opt.textContent = code;
+    sel.appendChild(opt);
+  }
+  const today = new Date().toISOString().slice(0, 10);
+  ['dep-date','ck-date','batch-date','online-date'].forEach(id => {
+    if (_$(id)) _$(id).value = today;
+  });
 
-  // 🔍 自動登入檢查：先看有沒有管理員紀錄，再看有沒有代理紀錄
-  const savedAdminUser = localStorage.getItem('doudouAdminUser');
-  const savedAdminPass = localStorage.getItem('doudouAdminPass');
-  const savedAgent     = localStorage.getItem('doudouAgent');
-  const savedPhone     = localStorage.getItem('doudouPhone');
-
-  if (savedAdminUser && savedAdminPass) {
-    // 自動登入管理員
-    hide('login-section'); show('admin-login-section');
-    _$('admin-username').value = savedAdminUser;
-    _$('admin-password').value = savedAdminPass;
-    doAdminLogin(savedAdminUser, savedAdminPass);
-  } else if (savedAgent && savedPhone) {
-    // 自動登入代理
-    _$('login-select').value = savedAgent;
-    _$('login-phone').value = savedPhone;
-    doLogin(savedAgent, savedPhone);
-  }
+  // 嘗試還原 session
+  const session = loadSession();
+  if (session) {
+    currentAgent   = session.agentCode;
+    currentBalance = Number(session.balance);
+    renderDashboard(session);
+    hide('login-section'); show('dashboard'); show('notice-banner'); show('main-section');
+    // 刷新 session 時間戳
+    session.ts = Date.now();
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  }
 })();
-  
-/* ── 登入切換 ── */
+
+const SESSION_KEY     = 'doudou_session';
+const SESSION_TIMEOUT = 10 * 60 * 1000; // 10分鐘
+
+/* ── Session 管理 ── */
+function saveSession(data) {
+  const session = { agentCode: data.agentCode, agentName: data.agentName, balance: data.balance, history: data.history, ts: Date.now() };
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+}
+function loadSession() {
+  try {
+    const s = JSON.parse(sessionStorage.getItem(SESSION_KEY));
+    if (!s) return null;
+    if (Date.now() - s.ts > SESSION_TIMEOUT) { sessionStorage.removeItem(SESSION_KEY); return null; }
+    return s;
+  } catch { return null; }
+}
+function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
+
+/* ── 活躍狀態 Modal ── */
+function showActivityModal(activityStatus, onConfirm) {
+  const { status, lastOrderDate, daysAgo } = activityStatus;
+  const icon  = _$('activity-modal-icon');
+  const title = _$('activity-modal-title');
+  const body  = _$('activity-modal-body');
+  const btn   = _$('activity-modal-btn');
+
+  if (status === 'blocked') {
+    icon.textContent  = '🔒';
+    title.textContent = '帳號已停用';
+    body.innerHTML    = `您的帳號已超過 <strong>3 個月</strong>未有下單紀錄（最後下單：${lastOrderDate || '無紀錄'}）。<br><br>請私訊 <strong>阿霓</strong> 協助開通，開通費 <strong>NT$ 300</strong>。`;
+    btn.textContent   = '關閉';
+    btn.onclick = () => { _$('activity-modal').classList.remove('active'); };
+  } else {
+    icon.textContent  = '⚠️';
+    title.textContent = '帳號即將停用提醒';
+    body.innerHTML    = `您的帳號已 <strong>${daysAgo} 天</strong>未有下單紀錄（最後下單：${lastOrderDate}）。<br><br>若超過 <strong>3 個月</strong>未下單，帳號將停用。請把握時間下單！`;
+    btn.textContent   = '我知道了，繼續使用';
+    btn.onclick = () => { _$('activity-modal').classList.remove('active'); if (onConfirm) onConfirm(); };
+  }
+  _$('activity-modal').classList.add('active');
+}
+function closeActivityModal() { _$('activity-modal').classList.remove('active'); }
 function showAdminLogin() { hide('login-section'); show('admin-login-section'); }
 function showAgentLogin()  { hide('admin-login-section'); show('login-section'); }
 
-/* ── 代理登入 / 登出 (自動記憶版) ── */
-async function doLogin(savedCode, savedPhone) {
-  clearAlert('login-alert');
-  const agentCode = savedCode || _$('login-select').value;
-  const phone     = savedPhone || _$('login-phone').value.trim();
-  
-  if (!agentCode) { showAlert('login-alert', '請選擇代理代碼'); return; }
-  if (!phone)     { showAlert('login-alert', '請輸入手機後六碼'); return; }
-  
-  showLoading();
-  try {
-    const data = await callScript({ action: 'login', agentCode, phone });
-    if (data.success) {
-      currentAgent   = data.agentCode;
-      currentBalance = Number(data.balance);
-      
-      // ✅ 登入成功，將資料存入瀏覽器記憶
-      localStorage.setItem('doudouAgent', agentCode);
-      localStorage.setItem('doudouPhone', phone);
-
-      renderDashboard(data);
-      hide('login-section'); show('dashboard'); show('notice-banner'); show('main-section');
-    } else {
-      showAlert('login-alert', data.message || '登入失敗，請確認代理代碼與手機後六碼');
-      // ❌ 登入失敗（例如密碼被改了），清除錯誤的記憶
-      localStorage.removeItem('doudouAgent');
-      localStorage.removeItem('doudouPhone');
-    }
-  } catch { showAlert('login-alert', '⚠️ 無法連線至伺服器，請稍後再試'); }
-  finally  { hideLoading(); }
+/* ── 代理登入 / 登出 ── */
+async function doLogin() {
+  clearAlert('login-alert');
+  const agentCode = _$('login-select').value;
+  const phone     = _$('login-phone').value.trim();
+  if (!agentCode) { showAlert('login-alert', '請選擇代理代碼'); return; }
+  if (!phone)     { showAlert('login-alert', '請輸入手機後六碼'); return; }
+  showLoading();
+  try {
+    const data = await callScript({ action: 'login', agentCode, phone });
+    if (data.success) {
+      const activity = data.activityStatus;
+      // 封鎖帳號
+      if (activity && activity.status === 'blocked') {
+        showActivityModal(activity, null);
+        return;
+      }
+      currentAgent   = data.agentCode;
+      currentBalance = Number(data.balance);
+      saveSession(data);
+      renderDashboard(data);
+      hide('login-section'); show('dashboard'); show('notice-banner'); show('main-section');
+      // 警告提醒（不擋登入）
+      if (activity && activity.status === 'warn') {
+        setTimeout(() => showActivityModal(activity, null), 500);
+      }
+    } else { showAlert('login-alert', data.message || '登入失敗'); }
+  } catch { showAlert('login-alert', '⚠️ 無法連線至伺服器，請稍後再試'); }
+  finally  { hideLoading(); }
 }
 
 function doLogout() {
-  currentAgent = null; currentBalance = 0;
-  // ✅ 登出時，清除瀏覽器記憶
-  localStorage.removeItem('doudouAgent');
-  localStorage.removeItem('doudouPhone');
-  
-  hide('dashboard'); hide('notice-banner'); hide('main-section'); hide('result-section');
-  show('login-section'); clearAlert('global-alert');
+  currentAgent = null; currentBalance = 0;
+  clearSession();
+  hide('dashboard'); hide('notice-banner'); hide('main-section'); hide('result-section');
+  show('login-section'); clearAlert('global-alert');
 }
 
-/* ── 管理員登入 / 登出 (自動記憶版) ── */
-function doAdminLogin(savedUser, savedPass) {
-  clearAlert('admin-login-alert');
-  const u = savedUser || _$('admin-username').value.trim();
-  const p = savedPass || _$('admin-password').value;
-  
-  if (u !== ADMIN_USER || p !== ADMIN_PASS) { 
-    showAlert('admin-login-alert', '❌ 帳號或密碼錯誤'); 
-    localStorage.removeItem('doudouAdminUser');
-    localStorage.removeItem('doudouAdminPass');
-    return; 
-  }
-  
-  isAdmin = true;
-  // ✅ 登入成功，存入瀏覽器記憶
-  localStorage.setItem('doudouAdminUser', u);
-  localStorage.setItem('doudouAdminPass', p);
-
-  hide('admin-login-section'); show('admin-dashboard'); show('admin-section');
-  loadPendingDeposits(); loadAdminAgents();
+/* ── 管理員登入 / 登出 ── */
+function doAdminLogin() {
+  clearAlert('admin-login-alert');
+  const u = _$('admin-username').value.trim();
+  const p = _$('admin-password').value;
+  if (u !== ADMIN_USER || p !== ADMIN_PASS) { showAlert('admin-login-alert', '❌ 帳號或密碼錯誤'); return; }
+  isAdmin = true;
+  hide('admin-login-section'); show('admin-dashboard'); show('admin-section');
+  loadPendingDeposits(); loadAdminAgents();
 }
-
 function doAdminLogout() {
-  isAdmin = false;
-  // ✅ 登出時清除記憶
-  localStorage.removeItem('doudouAdminUser');
-  localStorage.removeItem('doudouAdminPass');
-  
-  hide('admin-dashboard'); hide('admin-section'); show('login-section');
-  clearAlert('admin-global-alert');
+  isAdmin = false;
+  hide('admin-dashboard'); hide('admin-section'); show('login-section');
+  clearAlert('admin-global-alert');
 }
-  
+
 /* ── 代理儀表板 ── */
 function renderDashboard(data) {
   const label = data.agentName ? data.agentCode + '（' + data.agentName + '）' : data.agentCode;
@@ -866,7 +912,7 @@ async function submitCheckout() {
     } else {
       // 餘額不足：差額需補匯，待審核
       const shortage = amount - currentBalance;
-      if (!confirm(`⚠️ 餘額不足！\n目前餘額：NT$ ${fmtNum(currentBalance)}\n結帳金額：NT$ ${fmtNum(amount)}\n需補匯差額：NT$ ${fmtNum(shortage)}\n\n送出後狀態為「待審核」，待您補匯後由板娘確認。\n確定送出？`)) return;
+      if (!confirm(`⚠️ 餘額不足！\n目前餘額：NT$ ${fmtNum(currentBalance)}\n結帳金額：NT$ ${fmtNum(amount)}\n需補匯差額：NT$ ${fmtNum(shortage)}\n\n送出後狀態為「待審核」，待您補匯後會對帳確認。\n確定送出？`)) return;
       txType    = '結帳待審';
       statusMsg = `待審核（需補匯 NT$ ${fmtNum(shortage)}）`;
     }
@@ -1157,11 +1203,21 @@ async function submitAdminCheckout() {
     const product = _$('online-product').value;
     const qty     = Number(_$('online-qty').value) || 0;
     const twd     = Number(_$('online-twd').value) || 0;
+    const intlFee = Number(_$('online-intl-fee').value) || 0;
+    const localFee= Number(_$('online-local-fee').value) || 0;
+    const sortFee = Number(_$('online-sort-fee').value) || 0;
     const note    = _$('online-note').value.trim();
+    const totalAmt = twd + intlFee + localFee + sortFee;
     if (!date)    { showAlert('admin-global-alert', '⚠️ 請選擇結單日期'); return; }
     if (!product) { showAlert('admin-global-alert', '⚠️ 請選擇開團品項'); return; }
     if (!twd)     { showAlert('admin-global-alert', '⚠️ 請輸入台幣總計'); return; }
-    Object.assign(payload, { date, product, qty, amount: twd, note });
+    const feeNote = [
+      note,
+      intlFee  ? `國際運費：NT$${fmtNum(intlFee)}`  : '',
+      localFee ? `國內運費：NT$${fmtNum(localFee)}` : '',
+      sortFee  ? `整理費：NT$${fmtNum(sortFee)}`    : ''
+    ].filter(Boolean).join('／');
+    Object.assign(payload, { date, product, qty, amount: totalAmt, note: feeNote, intlFee, localFee, sortFee });
   }
 
   const bal = getSelectedBalance();
@@ -1200,7 +1256,9 @@ async function submitAdminCheckout() {
       showAlert('admin-global-alert', '✅ 結帳成功！代理餘額已扣除。', 'success');
 
       // 重置
-      ['batch-qty','batch-krw','batch-twd','batch-note','online-qty','online-twd','online-note'].forEach(id => { if(_$(id)) _$(id).value = ''; });
+      ['batch-qty','batch-krw','batch-twd','batch-note',
+       'online-qty','online-twd','online-intl-fee','online-local-fee','online-sort-fee','online-note'
+      ].forEach(id => { if(_$(id)) _$(id).value = ''; });
       if (_$('online-product')) _$('online-product').value = '';
       hide('after-balance-box');
     } else { showAlert('admin-global-alert', '❌ ' + (data.message || '送出失敗')); }
