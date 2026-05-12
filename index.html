@@ -293,9 +293,20 @@ input[type="number"] { -moz-appearance: textfield; }
         <div class="agentname" id="dash-name">－</div>
       </div>
       <div class="dash-right">
-        <div class="bal-label">可用餘額</div>
-        <div class="bal-amount">NT$&nbsp;<span id="dash-balance">0</span></div>
-        <button class="btn btn-ghost btn-sm" style="margin-top:9px;" onclick="doLogout()">登出重選</button>
+        <button class="btn btn-ghost btn-sm" style="margin-top:4px;" onclick="doLogout()">登出重選</button>
+      </div>
+    </div>
+    <!-- ★ v7：雙餘額顯示 -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+      <div style="background:rgba(255,255,255,0.10); border-radius:10px; padding:10px 12px;">
+        <div style="font-size:10.5px; opacity:0.65; margin-bottom:3px;">一般儲值金</div>
+        <div style="font-size:18px; font-weight:800; color:#ffccbc;">NT$&nbsp;<span id="dash-balance">0</span></div>
+        <div style="font-size:10px; opacity:0.5; margin-top:2px;">官網 / 記事本</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.10); border-radius:10px; padding:10px 12px;">
+        <div style="font-size:10.5px; opacity:0.65; margin-bottom:3px;">批發網儲值金</div>
+        <div style="font-size:18px; font-weight:800; color:#a5d6a7;">NT$&nbsp;<span id="dash-batch-balance">0</span></div>
+        <div style="font-size:10px; opacity:0.5; margin-top:2px;">批發網下單專用</div>
       </div>
     </div>
     <div class="dash-history-label">最近交易紀錄</div>
@@ -329,6 +340,16 @@ input[type="number"] { -moz-appearance: textfield; }
       <div class="card">
         <div class="card-title">💰 儲值回報</div>
         <div class="bank-info"><strong>📍 匯款帳戶資訊</strong><br>銀行：台新銀行（812）<br>帳號：<strong>2888-10-2335157-5</strong></div>
+
+        <!-- ★ v7：選錢包類型 -->
+        <div class="form-row">
+          <label>💼 儲值類型</label>
+          <div class="type-toggle">
+            <div class="type-btn active" id="dep-wallet-btn-general" onclick="switchDepWallet('general')">💰 一般儲值金<br><span style="font-size:11px;font-weight:400;">官網 / 記事本用</span></div>
+            <div class="type-btn"        id="dep-wallet-btn-batch"   onclick="switchDepWallet('batch')">🛍️ 批發網儲值金<br><span style="font-size:11px;font-weight:400;">批發網下單專用</span></div>
+          </div>
+        </div>
+
         <div class="form-grid-2">
           <div class="form-row"><label>📅 匯款日期</label><input type="date" id="dep-date"></div>
           <div class="form-row"><label>💵 儲值金額（最低 2,000 · 以千為單位）</label><input type="number" id="dep-amount" placeholder="例：5000" min="2000" step="1000"></div>
@@ -582,15 +603,17 @@ input[type="number"] { -moz-appearance: textfield; }
 </div>
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzt4uAsv14JTNCEeb9la3d2en4faLW7YQYhlEX9k-8gsupljzCSbUzq6GhvWGn3VnHHBQ/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfK12598eeDmmk-EQ2WTOKxheQGgz3IUlwoHV6TE7YW41wLUHExEngJ-oryohG_9GwNA/exec';
 const ADMIN_USER = 'doudouNi';
 const ADMIN_PASS = 'nini99104';
 
 let currentAgent        = null;
-let currentBalance      = 0;
+let currentBalance      = 0;       // 一般儲值金
+let currentBatchBalance = 0;       // ★ v7 批發網儲值金
 let isAdmin             = false;
 let adminAgentData      = [];
 let currentCheckoutType = 'batch';
+let currentDepWallet    = 'general'; // ★ v7 儲值錢包：'general' | 'batch'
 
 // 儲存 base64 截圖
 let depScreenshotB64 = null;
@@ -647,7 +670,7 @@ function checkCkBalance() {
 const SESSION_KEY     = 'doudou_session';
 const SESSION_TIMEOUT = 10 * 60 * 1000;
 function saveSession(data) {
-  const s = { agentCode: data.agentCode, agentName: data.agentName, balance: data.balance, history: data.history, ts: Date.now() };
+  const s = { agentCode: data.agentCode, agentName: data.agentName, balance: data.balance, batchBalance: data.batchBalance || 0, history: data.history, ts: Date.now() };
   sessionStorage.setItem(SESSION_KEY, JSON.stringify(s));
 }
 function loadSession() {
@@ -673,8 +696,9 @@ function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
   ['dep-date','ck-date','ck-transfer-date','batch-date','online-date'].forEach(id => { if (_$(id)) _$(id).value = today; });
   const session = loadSession();
   if (session) {
-    currentAgent   = session.agentCode;
-    currentBalance = Number(session.balance);
+    currentAgent        = session.agentCode;
+    currentBalance      = Number(session.balance);
+    currentBatchBalance = Number(session.batchBalance || 0);
     renderDashboard(session);
     hide('login-section'); show('dashboard'); show('notice-banner'); show('main-section');
     session.ts = Date.now();
@@ -714,8 +738,9 @@ async function doLogin() {
     if (data.success) {
       const activity = data.activityStatus;
       if (activity && activity.status === 'blocked') { showActivityModal(activity, null); return; }
-      currentAgent   = data.agentCode;
-      currentBalance = Number(data.balance);
+      currentAgent        = data.agentCode;
+      currentBalance      = Number(data.balance);
+      currentBatchBalance = Number(data.batchBalance || 0);
       saveSession(data);
       renderDashboard(data);
       hide('login-section'); show('dashboard'); show('notice-banner'); show('main-section');
@@ -726,7 +751,7 @@ async function doLogin() {
 }
 
 function doLogout() {
-  currentAgent = null; currentBalance = 0; clearSession();
+  currentAgent = null; currentBalance = 0; currentBatchBalance = 0; clearSession();
   depScreenshotB64 = null; ckScreenshotB64 = null;
   hide('dashboard'); hide('notice-banner'); hide('main-section'); hide('result-section');
   show('login-section'); clearAlert('global-alert');
@@ -748,14 +773,23 @@ function doAdminLogout() {
 
 function renderDashboard(data) {
   const label = data.agentName ? data.agentCode + '（' + data.agentName + '）' : data.agentCode;
-  _$('dash-name').textContent    = label;
-  _$('dash-balance').textContent = fmtNum(data.balance);
+  _$('dash-name').textContent         = label;
+  _$('dash-balance').textContent      = fmtNum(data.balance);
+  _$('dash-batch-balance').textContent = fmtNum(data.batchBalance || 0);
+  currentBalance      = Number(data.balance);
+  currentBatchBalance = Number(data.batchBalance || 0);
   checkBalanceWarning(Number(data.balance));
   renderHistory(data.history || []);
 }
-function updateBalance(v) {
-  currentBalance = Number(v);
-  _$('dash-balance').textContent = fmtNum(v);
+function updateBalance(newBalance, newBatchBalance) {
+  if (newBalance !== undefined) {
+    currentBalance = Number(newBalance);
+    _$('dash-balance').textContent = fmtNum(currentBalance);
+  }
+  if (newBatchBalance !== undefined) {
+    currentBatchBalance = Number(newBatchBalance);
+    _$('dash-batch-balance').textContent = fmtNum(currentBatchBalance);
+  }
   checkBalanceWarning(currentBalance);
 }
 function checkBalanceWarning(bal) { _$('balance-warning').style.display = bal < 0 ? 'block' : 'none'; }function renderHistory(list) {
@@ -785,9 +819,16 @@ function switchTab(tab) {
   clearAlert('global-alert'); hide('result-section');
 }
 
+/* ── ★ v7 儲值錢包切換 ── */
+function switchDepWallet(wallet) {
+  currentDepWallet = wallet;
+  _$('dep-wallet-btn-general').classList.toggle('active', wallet === 'general');
+  _$('dep-wallet-btn-batch').classList.toggle('active',   wallet === 'batch');
+}
+
 /* ── 結帳類型 / 付款方式切換 ── */
-let currentCkType = 'batch';   // 'batch' | 'online'
-let currentCkPay  = 'balance'; // 'balance' | 'partial' | 'transfer'
+let currentCkType = 'batch';
+let currentCkPay  = 'balance';
 
 function switchCkType(type) {
   currentCkType = type;
@@ -819,40 +860,38 @@ function onCkAmountChange() {
   const balLabel = _$('ck-bal-label');
   const partNote = _$('ck-partial-shortage-text');
 
-  block.classList.remove('show');
+  // ★ v7：依結帳類型用對應錢包餘額
+  const walletBal  = currentCkType === 'batch' ? currentBatchBalance : currentBalance;
+  const walletName = currentCkType === 'batch' ? '批發網儲值金' : '一般儲值金';
 
+  block.classList.remove('show');
   if (!amount) { preview.style.display = 'none'; return; }
 
   if (currentCkPay === 'balance') {
-    // 純扣餘額：不夠就顯示警示
-    if (amount > currentBalance) {
-      const shortage = amount - currentBalance;
-      block.innerHTML = `⚠️ 餘額不足！目前餘額 NT$ ${fmtNum(currentBalance)}，尚缺 NT$ ${fmtNum(shortage)}。<br>可改選「扣餘額＋補差款」或「直接匯款」。`;
+    if (amount > walletBal) {
+      block.innerHTML = `⚠️ ${walletName}不足！目前 NT$ ${fmtNum(walletBal)}，尚缺 NT$ ${fmtNum(amount - walletBal)}。<br>可改選「扣餘額＋補差款」或「直接匯款」。`;
       block.classList.add('show');
       preview.style.display = 'none';
     } else {
       preview.style.display = 'block';
-      balLabel.textContent  = '扣款後餘額';
-      balVal.textContent    = 'NT$ ' + fmtNum(currentBalance - amount);
+      balLabel.textContent  = '扣款後' + walletName;
+      balVal.textContent    = 'NT$ ' + fmtNum(walletBal - amount);
       balVal.style.color    = 'var(--success)';
     }
   } else if (currentCkPay === 'partial') {
-    // 扣餘額 + 補差款
-    const deduct  = Math.min(currentBalance, amount);
+    const deduct   = Math.min(walletBal, amount);
     const shortage = amount - deduct;
     preview.style.display = 'block';
-    balLabel.textContent  = '扣完餘額後剩';
+    balLabel.textContent  = walletName + '扣完後剩';
     balVal.textContent    = 'NT$ 0';
     balVal.style.color    = 'var(--color-text-secondary)';
     if (shortage > 0) {
-      partNote.innerHTML = `餘額 NT$ ${fmtNum(deduct)} 將全數扣除，<strong>請另外匯款 NT$ ${fmtNum(shortage)}</strong> 補足差額`;
-      // 自動帶入補差款金額
+      partNote.innerHTML = `${walletName} NT$ ${fmtNum(deduct)} 將全數扣除，<strong>請另外匯款 NT$ ${fmtNum(shortage)}</strong> 補足差額`;
       if (_$('ck-transfer-amount')) _$('ck-transfer-amount').value = shortage;
     } else {
-      partNote.textContent = '餘額足夠，無需額外匯款';
+      partNote.textContent = walletName + '足夠，無需額外匯款';
     }
   } else {
-    // 直接匯款：不扣餘額
     preview.style.display = 'none';
   }
 }
@@ -878,10 +917,11 @@ async function submitDeposit() {
     const data = await callScript({
       action: 'transaction', type: '儲值', agentCode: currentAgent,
       amount, date, note: '帳號末五碼：' + last5,
-      screenshot: depScreenshotB64 || ''
+      screenshot: depScreenshotB64 || '',
+      walletType: currentDepWallet === 'batch' ? '批發網' : '一般'  // ★ v7
     });
     if (data.success) {
-      updateBalance(data.newBalance); renderHistory(data.history || []);
+      updateBalance(data.newBalance, data.newBatchBalance); renderHistory(data.history || []);
       _$('dep-amount').value = ''; _$('dep-last5').value = ''; _$('dep-confirm').checked = false;
       _$('dep-upload-area').classList.remove('has-file');
       _$('dep-preview').style.display = 'none'; depScreenshotB64 = null;
@@ -952,13 +992,13 @@ async function submitCheckout() {
       agentCode: currentAgent,
       amount, deductAmount, date, note: payNote,
       ckType: currentCkType, payMethod: currentCkPay,
+      walletType: currentCkType === 'batch' ? '批發網' : '一般',  // ★ v7
       transferDate, transferAmount, transferLast5,
       screenshot: ckScreenshotB64 || ''
     });
     if (data.success) {
       renderHistory(data.history || []);
-      // 若有扣餘額才更新顯示
-      if (deductAmount > 0) updateBalance(data.newBalance);
+      if (deductAmount > 0) updateBalance(data.newBalance, data.newBatchBalance);
       // 清空表單
       _$('ck-amount').value = ''; _$('ck-note').value = '';
       _$('calc-result').style.display = 'none';
@@ -1285,7 +1325,10 @@ function renderAgentSettingsTable(agents) {
       <td><input type="text"   id="st-name-${i}"  value="${a.name  || ''}" placeholder="名稱"></td>
       <td><input type="text"   id="st-phone-${i}" value="${a.phone || ''}" placeholder="手機號碼" inputmode="tel"></td>
       <td><input type="number" id="st-rate-${i}"  value="${a.rate  || 40}" min="1" max="100" style="width:70px;"></td>
-      <td style="font-weight:700; color:var(--primary-dark);">NT$ ${fmtNum(a.balance)}</td>
+      <td style="font-size:12px; color:var(--primary-dark);">
+        <div style="font-weight:700;">一般：NT$ ${fmtNum(a.balance)}</div>
+        <div style="color:#085041; margin-top:2px;">批發：NT$ ${fmtNum(a.batchBalance || 0)}</div>
+      </td>
       <td id="st-status-${i}">${statusBadge}</td>
       <td style="display:flex;gap:6px;flex-wrap:wrap;">
         <button class="btn btn-admin btn-xs" onclick="saveAgentRow('${a.code}', ${i})">儲存</button>
