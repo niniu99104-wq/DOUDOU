@@ -310,10 +310,29 @@ input[type="number"] { -moz-appearance: textfield; }
       </div>
     </div>
     <div class="dash-history-label">最近交易紀錄</div>
-    <div id="balance-warning" style="display:none; background:rgba(216,67,21,0.18); border:1px solid rgba(216,67,21,0.5); border-radius:8px; padding:8px 12px; margin-bottom:10px; font-size:12.5px; color:#ffccbc; font-weight:600; text-align:center;">
-      ⚠️ 餘額不足了，請儘速儲值。
+    <!-- ★ Item 7: 雙向餘額不足警示 -->
+    <div id="balance-warning" style="display:none; background:rgba(216,67,21,0.22); border:1px solid rgba(216,67,21,0.6); border-radius:8px; padding:8px 12px; margin-bottom:10px; font-size:12.5px; color:#ffccbc; font-weight:600; text-align:center;">
+      ⚠️ <span id="balance-warning-text">餘額不足，請儘速儲值。</span>
     </div>
     <div class="history-box" id="history-box"><div class="history-empty">載入中...</div></div>
+  </div>
+
+  <!-- ★ Item 6: 下次下單截止日與活躍度規定 -->
+  <div id="activity-info-banner" style="display:none; background:linear-gradient(135deg,#fff9e6,#fff3e0); border:1.5px solid #ffcc80; border-left:5px solid #e65100; border-radius:10px; padding:13px 16px; margin-bottom:14px; animation:fadeUp 0.35s ease;">
+    <div style="font-size:12px; font-weight:700; color:#e65100; margin-bottom:8px; display:flex; align-items:center; gap:6px;">📅 下單紀錄</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+      <div style="background:rgba(255,255,255,0.7); border-radius:8px; padding:8px 10px;">
+        <div style="font-size:10.5px; color:#795548; margin-bottom:2px;">最後下單日</div>
+        <div style="font-size:14px; font-weight:700; color:#4e342e;" id="activity-last-order">－</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.7); border-radius:8px; padding:8px 10px;">
+        <div style="font-size:10.5px; color:#795548; margin-bottom:2px;">下次截止日</div>
+        <div style="font-size:14px; font-weight:700; color:#bf360c;" id="activity-next-deadline">－</div>
+      </div>
+    </div>
+    <div style="font-size:11.5px; color:#5d4037; line-height:1.75; background:rgba(255,255,255,0.5); border-radius:6px; padding:8px 10px;">
+      ⚠️ 規定每月需完成一次批發網下單（以最後下單日往後推算 1 個月）。系統給予 2 個月緩衝期，若第 3 個月仍未下單，帳號將自動關閉且儲值金不予退回。如需再次開通需收取手續費 <strong>NT$ 300 元</strong>。
+    </div>
   </div>
 
   <div id="notice-banner">
@@ -390,6 +409,12 @@ input[type="number"] { -moz-appearance: textfield; }
           </div>
         </div>
 
+        <!-- ★ Item 1: 動態錢包指示器 -->
+        <div id="ck-wallet-indicator" style="display:flex; align-items:center; justify-content:space-between; background:var(--card-inner); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:14px; font-size:13px;">
+          <span id="ck-wallet-label" style="color:var(--text-muted); font-weight:600;">💼 使用錢包</span>
+          <span id="ck-wallet-amount" style="font-weight:800; color:var(--success);">NT$ 0</span>
+        </div>
+
         <!-- 共用：日期 + 金額 -->
         <div class="form-grid-2">
           <div class="form-row"><label>📅 結帳日期</label><input type="date" id="ck-date"></div>
@@ -397,6 +422,8 @@ input[type="number"] { -moz-appearance: textfield; }
         </div>
         <div class="form-row"><label>📝 訂單項目說明</label><input type="text" id="ck-note" placeholder="例：批網4件 ／ 記事本湊單米菲兔"></div>
 
+        <!-- ★ Item 2: 批發網專屬區塊（截圖 + 韓元計算機） -->
+        <div id="ck-batch-only-section">
         <!-- 批發網：購物車截圖（必填） -->
         <div id="ck-screenshot-section" class="form-row">
           <label>📸 購物車截圖（必填）</label>
@@ -421,6 +448,7 @@ input[type="number"] { -moz-appearance: textfield; }
           </div>
           <div class="calc-result" id="calc-result"></div>
         </div>
+        </div><!-- end ck-batch-only-section -->
 
         <!-- Step 2：選付款方式 -->
         <div class="form-row">
@@ -458,7 +486,11 @@ input[type="number"] { -moz-appearance: textfield; }
         <!-- 餘額不足警示（純扣餘額時才顯示擋回） -->
         <div class="balance-block" id="balance-block"></div>
 
-        <button class="btn btn-accent btn-full" onclick="submitCheckout()">📋 送出結帳申請</button>
+        <!-- ★ Item 5: 送出 + 清除按鈕 -->
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-accent" style="flex:1;" onclick="submitCheckout()">📋 送出結帳申請</button>
+          <button class="btn btn-outline" style="flex:0 0 auto;" onclick="clearCheckoutForm()">🗑️ 清除重填</button>
+        </div>
         <p style="font-size:12px; color:var(--text-light); text-align:center; margin-top:10px;">送出後請勿重複送出，等候官方審核通知</p>
       </div>
     </div>
@@ -603,7 +635,7 @@ input[type="number"] { -moz-appearance: textfield; }
 </div>
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfK12598eeDmmk-EQ2WTOKxheQGgz3IUlwoHV6TE7YW41wLUHExEngJ-oryohG_9GwNA/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzt4uAsv14JTNCEeb9la3d2en4faLW7YQYhlEX9k-8gsupljzCSbUzq6GhvWGn3VnHHBQ/exec';
 const ADMIN_USER = 'doudouNi';
 const ADMIN_PASS = 'nini99104';
 
@@ -701,7 +733,7 @@ function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
     currentBatchBalance = Number(session.batchBalance || 0);
     renderDashboard(session);
     hide('login-section'); show('dashboard'); show('notice-banner'); show('main-section');
-    session.ts = Date.now();
+    setTimeout(updateCkWalletIndicator, 50); // ★ Item 1
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
   }
 })();
@@ -744,6 +776,7 @@ async function doLogin() {
       saveSession(data);
       renderDashboard(data);
       hide('login-section'); show('dashboard'); show('notice-banner'); show('main-section');
+      setTimeout(updateCkWalletIndicator, 50); // ★ Item 1: 初始化錢包指示器
       if (activity && activity.status === 'warn') setTimeout(() => showActivityModal(activity, null), 500);
     } else { showAlert('login-alert', data.message || '登入失敗'); }
   } catch { showAlert('login-alert', '⚠️ 無法連線至伺服器，請稍後再試'); }
@@ -763,6 +796,11 @@ function doAdminLogin() {
   if (u !== ADMIN_USER || p !== ADMIN_PASS) { showAlert('admin-login-alert', '❌ 帳號或密碼錯誤'); return; }
   isAdmin = true;
   hide('admin-login-section'); show('admin-dashboard'); show('admin-section');
+  // ★ Item 4: 從 localStorage 還原公告日期
+  const savedWed = localStorage.getItem('doudou_wed_date');
+  const savedSun = localStorage.getItem('doudou_sun_date');
+  if (savedWed && _$('setting-wed-date')) _$('setting-wed-date').value = savedWed;
+  if (savedSun && _$('setting-sun-date')) _$('setting-sun-date').value = savedSun;
   loadPendingDeposits(); loadCheckoutPending(); loadAdminAgents();
 }
 function doAdminLogout() {
@@ -773,13 +811,28 @@ function doAdminLogout() {
 
 function renderDashboard(data) {
   const label = data.agentName ? data.agentCode + '（' + data.agentName + '）' : data.agentCode;
-  _$('dash-name').textContent         = label;
-  _$('dash-balance').textContent      = fmtNum(data.balance);
+  _$('dash-name').textContent          = label;
+  _$('dash-balance').textContent       = fmtNum(data.balance);
   _$('dash-batch-balance').textContent = fmtNum(data.batchBalance || 0);
   currentBalance      = Number(data.balance);
   currentBatchBalance = Number(data.batchBalance || 0);
-  checkBalanceWarning(Number(data.balance));
+  checkBalanceWarning(currentBalance, currentBatchBalance);
   renderHistory(data.history || []);
+
+  // ★ Item 6: 顯示活躍狀態資訊
+  const activity = data.activityStatus;
+  if (activity) {
+    const banner = _$('activity-info-banner');
+    const lastEl = _$('activity-last-order');
+    const nextEl = _$('activity-next-deadline');
+    banner.style.display = 'block';
+    lastEl.textContent = activity.lastOrderDate || '尚未有下單紀錄';
+    nextEl.textContent = activity.nextDeadline  || '－';
+    // 依狀態改顏色
+    nextEl.style.color = activity.status === 'warn'    ? '#e65100'
+                       : activity.status === 'blocked' ? '#c62828'
+                       : '#558b2f';
+  }
 }
 function updateBalance(newBalance, newBatchBalance) {
   if (newBalance !== undefined) {
@@ -790,9 +843,23 @@ function updateBalance(newBalance, newBatchBalance) {
     currentBatchBalance = Number(newBatchBalance);
     _$('dash-batch-balance').textContent = fmtNum(currentBatchBalance);
   }
-  checkBalanceWarning(currentBalance);
+  checkBalanceWarning(currentBalance, currentBatchBalance);
 }
-function checkBalanceWarning(bal) { _$('balance-warning').style.display = bal < 0 ? 'block' : 'none'; }function renderHistory(list) {
+function checkBalanceWarning(generalBal, batchBal) {
+  const warn    = _$('balance-warning');
+  const warnTxt = _$('balance-warning-text');
+  const genNeg   = (generalBal ?? currentBalance)      < 0;
+  const batchNeg = (batchBal   ?? currentBatchBalance) < 0;
+  if (genNeg || batchNeg) {
+    warn.style.display = 'block';
+    const parts = [];
+    if (genNeg)   parts.push('一般儲值金');
+    if (batchNeg) parts.push('批發網儲值金');
+    warnTxt.textContent = parts.join('、') + '餘額不足，請儘速補款。';
+  } else {
+    warn.style.display = 'none';
+  }
+}function renderHistory(list) {
   const box = _$('history-box');
   if (!list.length) { box.innerHTML = '<div class="history-empty">尚無交易紀錄</div>'; return; }
   box.innerHTML = list.map(h => {
@@ -819,6 +886,35 @@ function switchTab(tab) {
   clearAlert('global-alert'); hide('result-section');
 }
 
+/* ── ★ Item 5: 清除結帳表單 ── */
+function clearCheckoutForm() {
+  // 金額、備註
+  _$('ck-amount').value = '';
+  _$('ck-note').value   = '';
+  // 匯款資訊
+  if (_$('ck-transfer-date'))   _$('ck-transfer-date').value   = new Date().toISOString().slice(0,10);
+  if (_$('ck-transfer-amount')) _$('ck-transfer-amount').value = '';
+  if (_$('ck-transfer-last5'))  _$('ck-transfer-last5').value  = '';
+  // 截圖清除
+  _$('ck-upload-area').classList.remove('has-file');
+  _$('ck-preview').style.display = 'none';
+  ckScreenshotB64 = null;
+  _$('ck-upload-area').querySelector('.upload-text').textContent = '點擊上傳購物車截圖';
+  _$('ck-upload-area').querySelector('.upload-sub').textContent  = '支援 JPG / PNG，建議 5MB 以內';
+  // 韓元計算機重置為一行
+  _$('krw-list').innerHTML = '<div class="krw-row"><input type="number" class="krw-input" placeholder="輸入韓元金額 (KRW)" min="0"><button class="btn-rm" onclick="removeKrwRow(this)">✕</button></div>';
+  _$('calc-result').style.display = 'none';
+  // 警示隱藏
+  _$('balance-block').classList.remove('show');
+  _$('ck-balance-preview').style.display = 'none';
+  // 付款方式 & 匯款區塊重置
+  switchCkPay('balance');
+  // 結帳類型重置回批發網
+  switchCkType('batch');
+  // 更新錢包指示器
+  updateCkWalletIndicator();
+}
+
 /* ── ★ v7 儲值錢包切換 ── */
 function switchDepWallet(wallet) {
   currentDepWallet = wallet;
@@ -834,9 +930,21 @@ function switchCkType(type) {
   currentCkType = type;
   _$('ck-type-btn-batch').classList.toggle('active',  type === 'batch');
   _$('ck-type-btn-online').classList.toggle('active', type === 'online');
-  // 批發網才需要購物車截圖
-  _$('ck-screenshot-section').style.display = type === 'batch' ? 'block' : 'none';
+  // ★ Item 2: 批發網才顯示截圖 + 韓元計算機
+  _$('ck-batch-only-section').style.display = type === 'batch' ? 'block' : 'none';
+  // ★ Item 1: 更新錢包指示器
+  updateCkWalletIndicator();
   onCkAmountChange();
+}
+
+// ★ Item 1: 錢包指示器更新
+function updateCkWalletIndicator() {
+  const isBatch = currentCkType === 'batch';
+  const bal     = isBatch ? currentBatchBalance : currentBalance;
+  const label   = isBatch ? '🛍️ 批發網儲值金' : '💰 一般儲值金';
+  _$('ck-wallet-label').textContent  = label;
+  _$('ck-wallet-amount').textContent = 'NT$ ' + fmtNum(bal);
+  _$('ck-wallet-amount').style.color = bal >= 0 ? 'var(--success)' : 'var(--accent)';
 }
 
 function switchCkPay(pay) {
@@ -844,11 +952,10 @@ function switchCkPay(pay) {
   ['balance','partial','transfer'].forEach(p =>
     _$('ck-pay-btn-' + p).classList.toggle('active', p === pay)
   );
-  // 補差款或直接匯款才顯示匯款資訊區
   const needTransfer = pay === 'partial' || pay === 'transfer';
   _$('ck-transfer-section').style.display = needTransfer ? 'block' : 'none';
-  // 補差款額外提示
   _$('ck-partial-note').style.display = pay === 'partial' ? 'block' : 'none';
+  updateCkWalletIndicator(); // ★ Item 1
   onCkAmountChange();
 }
 
@@ -999,18 +1106,7 @@ async function submitCheckout() {
     if (data.success) {
       renderHistory(data.history || []);
       if (deductAmount > 0) updateBalance(data.newBalance, data.newBatchBalance);
-      // 清空表單
-      _$('ck-amount').value = ''; _$('ck-note').value = '';
-      _$('calc-result').style.display = 'none';
-      if (_$('ck-transfer-date'))   _$('ck-transfer-date').value   = '';
-      if (_$('ck-transfer-amount')) _$('ck-transfer-amount').value = '';
-      if (_$('ck-transfer-last5'))  _$('ck-transfer-last5').value  = '';
-      _$('ck-upload-area').classList.remove('has-file');
-      _$('ck-preview').style.display = 'none'; ckScreenshotB64 = null;
-      _$('ck-upload-area').querySelector('.upload-text').textContent = '點擊上傳購物車截圖';
-      _$('ck-upload-area').querySelector('.upload-sub').textContent  = '支援 JPG / PNG，建議 5MB 以內';
-      _$('ck-balance-preview').style.display = 'none';
-      _$('balance-block').classList.remove('show');
+      clearCheckoutForm(); // ★ Item 5
       showResult('結帳申請', date, amount);
     } else { showAlert('global-alert', '❌ ' + (data.message || '送出失敗')); }
   } catch { showAlert('global-alert', '⚠️ 網路錯誤，請稍後再試'); }
@@ -1198,7 +1294,9 @@ async function loadAdminAgents() {
       agentData.agents.forEach(a => {
         const opt = document.createElement('option');
         opt.value = a.code; opt.textContent = a.code + (a.name ? '（' + a.name + '）' : '');
-        opt.dataset.balance = a.balance; opt.dataset.rate = a.rate || 40;
+        opt.dataset.balance      = a.balance;
+        opt.dataset.batchBalance = a.batchBalance || 0;  // ★ Item 3
+        opt.dataset.rate         = a.rate || 40;
         sel.appendChild(opt);
       });
       renderAgentSettingsTable(agentData.agents);
@@ -1221,19 +1319,32 @@ function switchCheckoutType(type) {
   _$('type-btn-online').classList.toggle('active', type === 'online');
   _$('form-batch').style.display  = type === 'batch'  ? 'block' : 'none';
   _$('form-online').style.display = type === 'online' ? 'block' : 'none';
+  // ★ Item 3: 切換時即時更新餘額顯示
+  onAdminAgentChange();
   updateAfterBalance();
 }
 function onAdminAgentChange() {
   const sel = _$('admin-agent-select'), opt = sel.options[sel.selectedIndex];
   const balEl = _$('admin-agent-balance');
   if (opt && opt.value) {
-    const bal = Number(opt.dataset.balance) || 0, rate = Number(opt.dataset.rate) || 40;
-    balEl.textContent = 'NT$ ' + fmtNum(bal) + '　（匯率 ×' + rate + '）';
+    // ★ Item 3: 依結帳類型顯示對應錢包餘額
+    const isBatch  = currentCheckoutType === 'batch';
+    const bal      = isBatch ? (Number(opt.dataset.batchBalance) || 0) : (Number(opt.dataset.balance) || 0);
+    const rate     = Number(opt.dataset.rate) || 40;
+    const label    = isBatch ? '批發網儲值金' : '一般儲值金';
+    balEl.textContent = `NT$ ${fmtNum(bal)}　${label}（匯率 ×${rate}）`;
     balEl.style.color = bal >= 0 ? 'var(--success)' : 'var(--accent)';
     updateAfterBalance();
   } else { balEl.textContent = '－'; balEl.style.color = 'var(--text-muted)'; hide('after-balance-box'); }
 }
-function getSelectedBalance() { const sel = _$('admin-agent-select'), opt = sel.options[sel.selectedIndex]; return (opt && opt.dataset.balance) ? Number(opt.dataset.balance) : 0; }
+// ★ Item 3: getSelectedBalance 依目前結帳類型取正確錢包
+function getSelectedBalance() {
+  const sel = _$('admin-agent-select'), opt = sel.options[sel.selectedIndex];
+  if (!opt || !opt.value) return 0;
+  return currentCheckoutType === 'batch'
+    ? (Number(opt.dataset.batchBalance) || 0)
+    : (Number(opt.dataset.balance)      || 0);
+}
 function getSelectedRate()    { const sel = _$('admin-agent-select'), opt = sel.options[sel.selectedIndex]; return (opt && opt.dataset.rate)    ? Number(opt.dataset.rate)    : 40; }
 function getCurrentAmount() {
   if (currentCheckoutType === 'batch') return Number(_$('batch-twd').value) || 0;
@@ -1401,7 +1512,13 @@ async function saveAnnounceDates() {
   showLoading();
   try {
     const data = await callScript({ action: 'saveSettings', wedDate: wed, sunDate: sun });
-    if (data.success) { showAlert('admin-global-alert', '✅ 公告日期已儲存', 'success'); updateMarquee(wed, sun); }
+    if (data.success) {
+      showAlert('admin-global-alert', '✅ 公告日期已儲存', 'success');
+      updateMarquee(wed, sun);
+      // ★ Item 4: 儲存到 localStorage
+      if (wed) localStorage.setItem('doudou_wed_date', wed);
+      if (sun) localStorage.setItem('doudou_sun_date', sun);
+    }
     else { showAlert('admin-global-alert', '❌ ' + (data.message || '儲存失敗')); }
   } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
   finally  { hideLoading(); }
