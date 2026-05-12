@@ -635,7 +635,7 @@ input[type="number"] { -moz-appearance: textfield; }
 </div>
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzt4uAsv14JTNCEeb9la3d2en4faLW7YQYhlEX9k-8gsupljzCSbUzq6GhvWGn3VnHHBQ/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzQljYLayUhzc67InPqK834q-6o9PweYUNtwg6rDCzdCh2gC-fiGzMsGNZP7r6eX6uYuw/exec';
 const ADMIN_USER = 'doudouNi';
 const ADMIN_PASS = 'nini99104';
 
@@ -1188,7 +1188,14 @@ async function loadCheckoutPending() {
   try {
     const data = await callScript({ action: 'getCheckoutPending' });
     if (data.success && data.list.length > 0) {
-      el.innerHTML = data.list.map((item, i) => `
+      el.innerHTML = data.list.map((item, i) => {
+        const walletLabel = item.walletType === '批發網' ? '批發網儲值金' : '一般儲值金';
+        const balOk       = item.agentBalance >= item.amount;
+        // deductAmount：note 欄位裡若有「補匯」代表是補差款，只扣餘額部分
+        // 直接從 note 解析扣款金額，若解析不到就用全額
+        const deductMatch = (item.note || '').match(/扣餘額NT\$(\d+)/);
+        const deductAmt   = deductMatch ? Number(deductMatch[1]) : item.amount;
+        return `
         <div class="pending-item" id="ck-pending-${i}">
           <div class="pending-top">
             <div class="pending-info">
@@ -1196,19 +1203,21 @@ async function loadCheckoutPending() {
               <div class="pending-detail">
                 📅 ${item.date}<br>
                 📝 ${item.note || '無說明'}<br>
-                💰 代理目前餘額：<strong style="color:${item.agentBalance >= item.amount ? 'var(--success)' : 'var(--accent)'}">NT$ ${fmtNum(item.agentBalance)}</strong>
+                💼 錢包：<strong>${walletLabel}</strong><br>
+                💰 對應餘額：<strong style="color:${balOk ? 'var(--success)' : 'var(--accent)'}">NT$ ${fmtNum(item.agentBalance)}</strong>
               </div>
               ${item.screenshotUrl ? `<a class="screenshot-link" href="${item.screenshotUrl}" target="_blank" onclick="openImg('${item.screenshotUrl}',event)">🛒 查看購物車截圖</a>` : '<span style="font-size:12px;color:var(--text-light);">無截圖</span>'}
             </div>
             <div class="pending-amount minus">−NT$ ${fmtNum(item.amount)}</div>
           </div>
           <div class="pending-actions">
-            ${item.agentBalance >= item.amount
-              ? `<button class="btn btn-success btn-sm" onclick="approveCheckoutItem(${item.row}, ${i}, ${item.amount})">✅ 審核通過・扣款</button>`
-              : `<span style="font-size:12px;color:var(--accent);font-weight:600;">⚠️ 餘額不足，無法通過</span>`}
+            ${balOk
+              ? `<button class="btn btn-success btn-sm" onclick="approveCheckoutItem(${item.row}, ${i}, ${item.amount}, ${deductAmt})">✅ 審核通過・扣款</button>`
+              : `<span style="font-size:12px;color:var(--accent);font-weight:600;">⚠️ ${walletLabel}不足，無法通過</span>`}
             <button class="btn btn-danger btn-sm" onclick="rejectCheckoutItem(${item.row}, ${i})">❌ 拒絕</button>
           </div>
-        </div>`).join('');
+        </div>`;
+      }).join('');
     } else { el.innerHTML = '<div class="pending-empty">✅ 目前沒有待審核的結帳申請</div>'; }
   } catch {
     el.innerHTML = '<div class="pending-empty">❌ 載入失敗，請重試</div>';
@@ -1252,15 +1261,22 @@ async function rejectDeposit(rowNum, idx) {
 }
 
 /* ── 審核：結帳（★ 這裡才真正扣款）── */
-async function approveCheckoutItem(rowNum, idx, amount) {
-  if (!confirm(`確認審核通過並從代理餘額扣除 NT$ ${fmtNum(amount)}？`)) return;
+async function approveCheckoutItem(rowNum, idx, amount, deductAmount) {
+  const deduct = deductAmount || amount;
+  if (!confirm(`確認審核通過？\n將從對應錢包扣除 NT$ ${fmtNum(deduct)}${deduct < amount ? `（補差款 NT$ ${fmtNum(amount - deduct)} 需另外確認）` : ''}。`)) return;
   showLoading();
   try {
-    const data = await callScript({ action: 'approveCheckout', rowNum });
+    const data = await callScript({ action: 'approveCheckout', rowNum, deductAmount: deduct });
     if (data.success) {
       const item = _$('ck-pending-' + idx);
-      if (item) { item.classList.add('approved'); item.querySelector('.pending-actions').innerHTML = `<span style="font-size:12px;color:var(--success);font-weight:600;">✅ 已扣款・餘額剩 NT$ ${fmtNum(data.newBalance)}</span>`; }
-      showAlert('admin-global-alert', `✅ 審核通過！已扣款 NT$ ${fmtNum(amount)}，代理剩餘 NT$ ${fmtNum(data.newBalance)}。`, 'success');
+      const remGeneral = fmtNum(data.newBalance);
+      const remBatch   = fmtNum(data.newBatchBalance);
+      if (item) {
+        item.classList.add('approved');
+        item.querySelector('.pending-actions').innerHTML =
+          `<span style="font-size:12px;color:var(--success);font-weight:600;">✅ 已扣款・一般餘額 NT$ ${remGeneral}　批發網餘額 NT$ ${remBatch}</span>`;
+      }
+      showAlert('admin-global-alert', `✅ 審核通過！一般儲值金 NT$ ${remGeneral}，批發網儲值金 NT$ ${remBatch}。`, 'success');
     } else { showAlert('admin-global-alert', '❌ ' + (data.message || '審核失敗')); }
   } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
   finally  { hideLoading(); }
