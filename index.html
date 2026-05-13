@@ -347,6 +347,9 @@ input[type="number"] { -moz-appearance: textfield; }
     </div>
   </div>
 
+  <!-- ★ v10：出貨確認通知 -->
+  <div id="delivery-banner" style="display:none; animation:fadeUp 0.35s ease; margin-bottom:14px;"></div>
+
   <div id="main-section">
     <div class="tab-bar">
       <button class="tab-btn active" id="tab-btn-deposit"  onclick="switchTab('deposit')">💰 儲值回報</button>
@@ -519,6 +522,7 @@ input[type="number"] { -moz-appearance: textfield; }
       <button class="admin-tab-btn active" id="atab-btn-deposit"  onclick="switchAdminTab('deposit')">📥 儲值審核</button>
       <button class="admin-tab-btn"        id="atab-btn-checkout" onclick="switchAdminTab('checkout')">💳 結帳審核</button>
       <button class="admin-tab-btn"        id="atab-btn-manual"   onclick="switchAdminTab('manual')">✏️ 手動扣帳</button>
+      <button class="admin-tab-btn"        id="atab-btn-delivery" onclick="switchAdminTab('delivery')">📦 出貨管理</button>
       <button class="admin-tab-btn"        id="atab-btn-settings" onclick="switchAdminTab('settings')">⚙️ 系統設定</button>
     </div>
     <div id="admin-global-alert" class="alert error"></div>
@@ -636,6 +640,61 @@ input[type="number"] { -moz-appearance: textfield; }
       </div>
     </div>
 
+    <!-- ★ v10 出貨管理 -->
+    <div id="atab-delivery" class="tab-panel">
+
+      <!-- 建立出貨通知 -->
+      <div class="card">
+        <div class="card-title admin-color">📦 建立出貨確認通知</div>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">
+          填寫完成後，代理登入系統即可看到明細，並在系統內選擇出貨方式。
+        </p>
+        <div class="form-grid-2" style="margin-bottom:14px;">
+          <div class="form-row" style="margin:0;"><label>選擇代理</label>
+            <select id="dv-agent-select"><option value="">請選擇代理</option></select>
+          </div>
+          <div class="form-row" style="margin:0;"><label>📅 到貨日期</label>
+            <input type="date" id="dv-arrival-date">
+          </div>
+        </div>
+        <div class="form-row"><label>🏷️ 批次／開團名稱</label>
+          <input type="text" id="dv-batch-name" placeholder="例：0507韓國批次">
+        </div>
+        <div class="form-row"><label>📋 運費明細（代理看到的文字說明）</label>
+          <textarea id="dv-fee-detail" rows="4" placeholder="例：重量 1.2kg × $225 = NT$270&#10;國內運費 NT$100&#10;整理費 NT$50&#10;合計 NT$420" style="resize:vertical;"></textarea>
+        </div>
+        <div class="form-grid-2" style="margin-bottom:14px;">
+          <div class="form-row" style="margin:0;"><label>📷 實秤照</label>
+            <div class="upload-area" id="dv-photo1-area">
+              <input type="file" id="dv-photo1" accept="image/*" onchange="handleDeliveryUpload('photo1')">
+              <div class="upload-icon">⚖️</div>
+              <div class="upload-text">點擊上傳實秤照</div>
+              <div class="upload-sub">選填</div>
+              <img class="upload-preview" id="dv-photo1-prev" alt="">
+            </div>
+          </div>
+          <div class="form-row" style="margin:0;"><label>📷 明細照</label>
+            <div class="upload-area" id="dv-photo2-area">
+              <input type="file" id="dv-photo2" accept="image/*" onchange="handleDeliveryUpload('photo2')">
+              <div class="upload-icon">📄</div>
+              <div class="upload-text">點擊上傳明細照</div>
+              <div class="upload-sub">選填</div>
+              <img class="upload-preview" id="dv-photo2-prev" alt="">
+            </div>
+          </div>
+        </div>
+        <div id="dv-create-alert" class="alert error"></div>
+        <button class="btn btn-admin btn-full" onclick="createDelivery()">📤 發送出貨確認通知</button>
+      </div>
+
+      <!-- 出貨確認清單 -->
+      <div class="card">
+        <div class="card-title admin-color">📋 出貨確認清單</div>
+        <div id="delivery-list" class="pending-list"><div class="pending-empty">⏳ 載入中...</div></div>
+        <div style="margin-top:14px;"><button class="btn btn-outline btn-sm" onclick="loadDeliveryList()">🔄 重新整理</button></div>
+      </div>
+    </div>
+
     <!-- 系統設定 -->
     <div id="atab-settings" class="tab-panel">
       <div class="card">
@@ -670,10 +729,58 @@ input[type="number"] { -moz-appearance: textfield; }
     </div>
   </div>
 
+  <!-- ★ v10 出貨確認 Modal -->
+  <div class="modal-overlay" id="delivery-modal">
+    <div class="modal-box" style="max-width:420px;">
+      <div style="font-size:16px;font-weight:700;color:var(--primary-dark);margin-bottom:4px;" id="dm-title">📦 出貨確認</div>
+      <div style="font-size:12px;color:var(--text-light);margin-bottom:14px;" id="dm-batch"></div>
+
+      <!-- 照片 -->
+      <div id="dm-photos" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;"></div>
+
+      <!-- 費用明細 -->
+      <div id="dm-fee" style="background:var(--card-inner);border-radius:var(--radius-sm);padding:12px;font-size:13px;line-height:1.8;margin-bottom:14px;white-space:pre-wrap;color:var(--text);"></div>
+
+      <!-- 選出貨方式 -->
+      <div class="form-row" style="margin-bottom:10px;">
+        <label>📦 選擇出貨方式</label>
+        <div class="type-toggle" style="flex-wrap:wrap;gap:6px;">
+          <div class="type-btn" id="dm-btn-cvs"     onclick="selectShipMethod('賣貨便')"     style="flex:1;min-width:80px;font-size:12.5px;">🏪 賣貨便</div>
+          <div class="type-btn" id="dm-btn-hct"     onclick="selectShipMethod('新竹貨運')"   style="flex:1;min-width:80px;font-size:12.5px;">🚚 新竹貨運</div>
+          <div class="type-btn" id="dm-btn-pickup"  onclick="selectShipMethod('自取')"       style="flex:1;min-width:80px;font-size:12.5px;">🙋 自取</div>
+          <div class="type-btn" id="dm-btn-barcode" onclick="selectShipMethod('給寄件編號圖')" style="flex:1;min-width:80px;font-size:12.5px;">🔖 寄件編號</div>
+        </div>
+      </div>
+
+      <!-- 收件資料（依出貨方式動態顯示）-->
+      <div id="dm-info-section" style="display:none;">
+        <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:10px;" id="dm-info-hint"></div>
+        <div class="form-grid-2" style="margin-bottom:10px;">
+          <div class="form-row" style="margin:0;"><label>姓名</label><input type="text" id="dm-name" placeholder="收件人姓名"></div>
+          <div class="form-row" style="margin:0;"><label>電話</label><input type="text" id="dm-phone" placeholder="手機號碼" inputmode="tel"></div>
+        </div>
+        <div class="form-row" id="dm-cvs-row" style="display:none;">
+          <label>🏪 取件門市</label>
+          <input type="text" id="dm-cvs-store" placeholder="例：7-11 台南成功門市">
+        </div>
+        <div class="form-row" id="dm-address-row" style="display:none;">
+          <label>🏠 收件地址</label>
+          <input type="text" id="dm-address" placeholder="完整收件地址">
+        </div>
+      </div>
+
+      <div id="dm-alert" class="alert error"></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline" style="flex:1;" onclick="closeDeliveryModal()">稍後再說</button>
+        <button class="btn btn-primary" style="flex:2;" id="dm-confirm-btn" onclick="submitDeliveryConfirm()">✅ 確認送出</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyMbGBh2KinQmFtFbMJH6ENe6TYNgmnYj3jtp3qXYzV6UpSZPmrCq7DiGgsiPyz17BnsQ/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwm8FxHuo8Q7SKcbfZk6TBgL3pAIWq68_gsZVHRJqfGU8ug6LX52hd0srJ741lyDinlIg/exec';
 // ★ V7.1 安全性：管理員憑證已完全移至後端 GAS，前端不留存密碼
 
 let currentAgent        = null;
@@ -784,6 +891,7 @@ function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
     renderDashboard(session);
     hide('login-section'); show('dashboard'); show('notice-banner'); show('main-section');
     setTimeout(updateCkWalletIndicator, 50); // ★ Item 1
+    setTimeout(checkMyDelivery, 200); // ★ v10
     session.ts = Date.now();
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
   }
@@ -828,7 +936,8 @@ async function doLogin() {
       saveSession(data);
       renderDashboard(data);
       hide('login-section'); show('dashboard'); show('notice-banner'); show('main-section');
-      setTimeout(updateCkWalletIndicator, 50); // ★ Item 1: 初始化錢包指示器
+      setTimeout(updateCkWalletIndicator, 50);
+      setTimeout(checkMyDelivery, 200); // ★ v10 檢查出貨確認
       if (activity && activity.status === 'warn') setTimeout(() => showActivityModal(activity, null), 500);
     } else { showAlert('login-alert', data.message || '登入失敗'); }
   } catch { showAlert('login-alert', '⚠️ 無法連線至伺服器，請稍後再試'); }
@@ -839,7 +948,8 @@ function doLogout() {
   currentAgent = null; currentBalance = 0; currentBatchBalance = 0; clearSession();
   depScreenshotB64 = null; ckScreenshotB64 = null;
   hide('dashboard'); hide('notice-banner'); hide('main-section'); hide('result-section');
-  hide('activity-info-banner'); // ★ 修正：登出時隱藏下單紀錄 banner
+  hide('activity-info-banner');
+  hide('delivery-banner'); // ★ v10
   show('login-section'); clearAlert('global-alert');
 }
 
@@ -1241,6 +1351,8 @@ function switchAdminTab(tab) {
   document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
   _$('atab-' + tab).classList.add('active'); _$('atab-btn-' + tab).classList.add('active');
   clearAlert('admin-global-alert'); hide('admin-result-section');
+  // ★ v10 切到出貨管理時載入資料
+  if (tab === 'delivery') { syncDeliveryAgentSelect(); loadDeliveryList(); }
 }
 
 /* ── 儲值待審 ── */
@@ -1753,6 +1865,260 @@ function updateMarquee(wed, sun) {
   const wedStr = wed ? `週三（${wed}）` : '週三', sunStr = sun ? `週日（${sun}）` : '週日';
   const text = `📢 儲值入帳時間調整通知 ・ 🗓️ 下次入帳日：${wedStr} & ${sunStr} ・ ⚠️ 週三入帳→請週三前完成匯款 ・ ⚠️ 週日入帳→請週日前完成匯款 ・ 當天匯款將順延至下一個入帳日 ・ 請提前儲值，避免額度不足 🥹 ・ 謝謝大家的配合與理解 ♡`;
   document.querySelectorAll('.marquee-item').forEach(el => { el.textContent = text; });
+}
+
+/* ══════════════════════════════════════════
+   ★ v10 出貨確認系統
+══════════════════════════════════════════ */
+let dvPhoto1B64 = null;
+let dvPhoto2B64 = null;
+let currentDeliveryRow = null;
+let currentShipMethod  = null;
+
+// ── 圖片壓縮上傳（管理員建立通知用）──
+function handleDeliveryUpload(which) {
+  const input = _$('dv-' + which);
+  const file  = input.files[0];
+  if (!file) return;
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+  img.onload = () => {
+    URL.revokeObjectURL(url);
+    const MAX = 1200;
+    let w = img.width, h = img.height;
+    if (w > MAX || h > MAX) {
+      if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+      else        { w = Math.round(w * MAX / h); h = MAX; }
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    const b64 = canvas.toDataURL('image/jpeg', 0.78);
+    if (which === 'photo1') { dvPhoto1B64 = b64; }
+    else                    { dvPhoto2B64 = b64; }
+    const area = _$('dv-' + which + '-area');
+    const prev = _$('dv-' + which + '-prev');
+    area.classList.add('has-file');
+    prev.src = b64; prev.style.display = 'block';
+    area.querySelector('.upload-text').textContent = '✅ ' + file.name;
+  };
+  img.src = url;
+}
+
+// ── 管理員：建立出貨通知 ──
+async function createDelivery() {
+  clearAlert('dv-create-alert');
+  const agentCode   = _$('dv-agent-select').value;
+  const arrivalDate = _$('dv-arrival-date').value;
+  const batchName   = _$('dv-batch-name').value.trim();
+  const feeDetail   = _$('dv-fee-detail').value.trim();
+  if (!agentCode)   { showAlert('dv-create-alert', '⚠️ 請選擇代理'); return; }
+  if (!batchName)   { showAlert('dv-create-alert', '⚠️ 請填寫批次名稱'); return; }
+  if (!feeDetail)   { showAlert('dv-create-alert', '⚠️ 請填寫運費明細'); return; }
+  showLoading();
+  try {
+    const data = await callScript({
+      action: 'createDelivery', agentCode, arrivalDate, batchName, feeDetail,
+      photo1: dvPhoto1B64 || '', photo2: dvPhoto2B64 || ''
+    });
+    if (data.success) {
+      showAlert('dv-create-alert', '✅ 通知已發送！代理登入後即可看到。', 'success');
+      _$('dv-batch-name').value = ''; _$('dv-fee-detail').value = ''; _$('dv-arrival-date').value = '';
+      dvPhoto1B64 = null; dvPhoto2B64 = null;
+      ['dv-photo1-area','dv-photo2-area'].forEach(id => {
+        const a = _$(id); if (!a) return;
+        a.classList.remove('has-file');
+        a.querySelector('.upload-text').textContent = id.includes('photo1') ? '點擊上傳實秤照' : '點擊上傳明細照';
+        const p = a.querySelector('.upload-preview'); if (p) p.style.display = 'none';
+      });
+      loadDeliveryList();
+    } else { showAlert('dv-create-alert', '❌ ' + (data.message || '送出失敗')); }
+  } catch { showAlert('dv-create-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
+}
+
+// ── 管理員：載入出貨清單 ──
+async function loadDeliveryList() {
+  const el = _$('delivery-list');
+  el.innerHTML = '<div class="pending-empty">⏳ 載入中...</div>';
+  showLoading();
+  try {
+    const data = await callScript({ action: 'getDeliveryList' });
+    if (data.success && data.list.length > 0) {
+      el.innerHTML = data.list.map((item, i) => {
+        const info     = item.agentInfo;
+        const infoHtml = info
+          ? `<div style="font-size:11.5px;color:var(--text-muted);margin-top:4px;line-height:1.7;">
+              👤 ${info.name || '－'}　📞 ${info.phone || '－'}<br>
+              ${item.shipMethod === '賣貨便'   ? '🏪 ' + (info.cvsStore || '未填') : ''}
+              ${item.shipMethod === '新竹貨運' ? '🏠 ' + (info.address  || '未填') : ''}
+             </div>`
+          : '<div style="font-size:11.5px;color:var(--text-light);margin-top:4px;">尚未填寫收件資料</div>';
+
+        const statusColor = item.status === '已確認' ? 'var(--success)' : '#e65100';
+        const shipBadge   = item.shipMethod
+          ? `<span style="background:#e3f2fd;color:#0d47a1;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px;">${item.shipMethod}</span>`
+          : '';
+
+        return `
+        <div class="pending-item">
+          <div class="pending-top">
+            <div class="pending-info">
+              <div class="pending-agent">
+                👤 ${item.agentCode}${item.agentName ? '（' + item.agentName + '）' : ''}
+                <span style="color:${statusColor};font-size:11px;font-weight:700;margin-left:6px;">${item.status}</span>
+                ${shipBadge}
+              </div>
+              <div class="pending-detail">
+                🏷️ ${item.batchName}　📅 ${item.arrivalDate || '－'}<br>
+                ${item.feeDetail ? item.feeDetail.replace(/\n/g, '<br>') : ''}
+              </div>
+              ${item.photo1Url ? `<a class="screenshot-link" href="${item.photo1Url}" target="_blank">⚖️ 實秤照</a>` : ''}
+              ${item.photo2Url ? `<a class="screenshot-link" href="${item.photo2Url}" target="_blank" style="margin-left:6px;">📄 明細照</a>` : ''}
+              ${infoHtml}
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    } else { el.innerHTML = '<div class="pending-empty">✅ 目前沒有出貨確認紀錄</div>'; }
+  } catch { el.innerHTML = '<div class="pending-empty">❌ 載入失敗，請重試</div>'; }
+  finally  { hideLoading(); }
+}
+
+// ── 代理：登入後檢查是否有待確認出貨 ──
+async function checkMyDelivery() {
+  if (!currentAgent) return;
+  try {
+    const data = await callScript({ action: 'getMyDelivery', agentCode: currentAgent });
+    if (!data.success) return;
+    const pending = (data.list || []).filter(d => d.status === '待確認');
+    const banner  = _$('delivery-banner');
+    if (!pending.length) { banner.style.display = 'none'; return; }
+
+    banner.style.display = 'block';
+    banner.innerHTML = pending.map(item => `
+      <div style="background:linear-gradient(135deg,#e3f2fd,#e8f5e9);border:1.5px solid #90caf9;border-left:5px solid #1565c0;border-radius:10px;padding:13px 16px;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:700;color:#1565c0;margin-bottom:6px;">📦 出貨確認通知・${item.batchName}</div>
+        <div style="font-size:12.5px;color:var(--text-muted);margin-bottom:10px;">到貨日期：${item.arrivalDate || '－'}</div>
+        <button class="btn btn-primary btn-sm" onclick="openDeliveryModal(${item.row}, ${JSON.stringify(item).replace(/"/g, '&quot;')})">
+          📋 查看明細並確認出貨方式
+        </button>
+      </div>`).join('');
+
+    // 同時把收件資料暫存
+    window._agentInfoCache = data.agentInfo;
+  } catch {}
+}
+
+// ── 代理：開啟出貨確認 Modal ──
+function openDeliveryModal(row, item) {
+  currentDeliveryRow = row;
+  currentShipMethod  = null;
+
+  // 填入批次資訊
+  _$('dm-title').textContent = '📦 出貨確認・' + item.batchName;
+  _$('dm-batch').textContent = '到貨日期：' + (item.arrivalDate || '－');
+  _$('dm-fee').textContent   = item.feeDetail || '（無文字明細）';
+
+  // 照片
+  const photoDiv = _$('dm-photos');
+  photoDiv.innerHTML = '';
+  if (item.photo1Url) photoDiv.innerHTML += `<a href="${item.photo1Url}" target="_blank"><img src="${item.photo1Url}" style="width:100%;border-radius:8px;object-fit:cover;" alt="實秤照"></a>`;
+  if (item.photo2Url) photoDiv.innerHTML += `<a href="${item.photo2Url}" target="_blank"><img src="${item.photo2Url}" style="width:100%;border-radius:8px;object-fit:cover;" alt="明細照"></a>`;
+  photoDiv.style.display = (item.photo1Url || item.photo2Url) ? 'grid' : 'none';
+
+  // 重置出貨方式按鈕
+  ['cvs','hct','pickup','barcode'].forEach(k => _$('dm-btn-' + k)?.classList.remove('active'));
+  _$('dm-info-section').style.display = 'none';
+  _$('dm-cvs-row').style.display     = 'none';
+  _$('dm-address-row').style.display = 'none';
+  clearAlert('dm-alert');
+
+  // 帶入已儲存的收件資料
+  const info = window._agentInfoCache;
+  if (info) {
+    if (_$('dm-name'))      _$('dm-name').value      = info.name      || '';
+    if (_$('dm-phone'))     _$('dm-phone').value     = info.phone     || '';
+    if (_$('dm-cvs-store')) _$('dm-cvs-store').value = info.cvsStore  || '';
+    if (_$('dm-address'))   _$('dm-address').value   = info.address   || '';
+  }
+
+  _$('delivery-modal').classList.add('active');
+}
+
+function closeDeliveryModal() { _$('delivery-modal').classList.remove('active'); }
+
+function selectShipMethod(method) {
+  currentShipMethod = method;
+  const map = { '賣貨便': 'cvs', '新竹貨運': 'hct', '自取': 'pickup', '給寄件編號圖': 'barcode' };
+  Object.values(map).forEach(k => _$('dm-btn-' + k)?.classList.remove('active'));
+  _$('dm-btn-' + map[method])?.classList.add('active');
+
+  const infoSec = _$('dm-info-section');
+  if (method === '自取' || method === '給寄件編號圖') {
+    infoSec.style.display = 'none';
+  } else {
+    infoSec.style.display = 'block';
+    const hint = method === '賣貨便' ? '請填寫賣貨便取件門市（首次填寫後下次自動帶入）' : '請填寫新竹貨運收件資料（首次填寫後下次自動帶入）';
+    _$('dm-info-hint').textContent = hint;
+    _$('dm-cvs-row').style.display     = method === '賣貨便'   ? 'block' : 'none';
+    _$('dm-address-row').style.display = method === '新竹貨運' ? 'block' : 'none';
+  }
+}
+
+async function submitDeliveryConfirm() {
+  clearAlert('dm-alert');
+  if (!currentShipMethod) { showAlert('dm-alert', '⚠️ 請選擇出貨方式'); return; }
+
+  // 若需要收件資料，驗證並儲存
+  if (currentShipMethod === '賣貨便' || currentShipMethod === '新竹貨運') {
+    const name  = _$('dm-name')?.value.trim();
+    const phone = _$('dm-phone')?.value.trim();
+    if (!name)  { showAlert('dm-alert', '⚠️ 請填寫收件人姓名'); return; }
+    if (!phone) { showAlert('dm-alert', '⚠️ 請填寫手機號碼'); return; }
+    if (currentShipMethod === '賣貨便' && !_$('dm-cvs-store')?.value.trim()) {
+      showAlert('dm-alert', '⚠️ 請填寫取件門市'); return;
+    }
+    if (currentShipMethod === '新竹貨運' && !_$('dm-address')?.value.trim()) {
+      showAlert('dm-alert', '⚠️ 請填寫收件地址'); return;
+    }
+    // 儲存收件資料（自動帶入下次）
+    showLoading();
+    try {
+      await callScript({
+        action: 'saveAgentInfo', agentCode: currentAgent,
+        name, phone,
+        cvsStore: _$('dm-cvs-store')?.value.trim() || '',
+        address:  _$('dm-address')?.value.trim()   || ''
+      });
+      window._agentInfoCache = { name, phone, cvsStore: _$('dm-cvs-store')?.value.trim(), address: _$('dm-address')?.value.trim() };
+    } catch {} finally { hideLoading(); }
+  }
+
+  showLoading();
+  try {
+    const data = await callScript({ action: 'confirmDelivery', rowNum: currentDeliveryRow, shipMethod: currentShipMethod });
+    if (data.success) {
+      closeDeliveryModal();
+      await checkMyDelivery(); // 重新整理 banner
+      showAlert('global-alert', '✅ 出貨方式已確認！', 'success');
+    } else { showAlert('dm-alert', '❌ ' + (data.message || '確認失敗')); }
+  } catch { showAlert('dm-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
+}
+
+// ── 管理員出貨 tab 代理下拉同步 ──
+function syncDeliveryAgentSelect() {
+  const src  = _$('admin-agent-select');
+  const dest = _$('dv-agent-select');
+  if (!src || !dest || !adminAgentData.length) return;
+  dest.innerHTML = '<option value="">請選擇代理</option>';
+  adminAgentData.forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a.code;
+    opt.textContent = a.code + (a.name ? '（' + a.name + '）' : '');
+    dest.appendChild(opt);
+  });
 }
 </script>
 </body>
