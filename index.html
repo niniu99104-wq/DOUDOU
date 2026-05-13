@@ -361,7 +361,7 @@ input[type="number"] { -moz-appearance: textfield; }
     <div id="tab-deposit" class="tab-panel active">
       <div class="card">
         <div class="card-title">💰 儲值回報</div>
-        <div class="bank-info"><strong>📍 匯款帳戶資訊</strong><br>銀行：台新銀行（812）<br>帳號：<strong>2888-10-2335157-5</strong></div>
+        <div class="bank-info"><strong>📍 匯款帳戶資訊</strong><br>銀行：台新銀行（812）<br>帳號：<strong>2888-10-2335157-5</strong><br>也可 Line Pay Money / iPASS MONEY</div>
 
         <!-- ★ v7：選錢包類型 -->
         <div class="form-row">
@@ -380,7 +380,7 @@ input[type="number"] { -moz-appearance: textfield; }
             </div>
           </div>
         </div>
-        <div class="form-row"><label>🏦 匯款帳號末五碼</label><input type="text" id="dep-last5" placeholder="請輸入末五碼數字" maxlength="5" inputmode="numeric"></div>
+        <div class="form-row"><label>🏦 匯款帳號末五碼</label><input type="text" id="dep-last5" placeholder="請輸入末五碼數字（LINEPAY / iPASS）" maxlength="5" inputmode="numeric"></div>
 
         <!-- 截圖上傳（儲值，非必填） -->
         <div class="form-row">
@@ -478,7 +478,7 @@ input[type="number"] { -moz-appearance: textfield; }
         <!-- 補差款 / 直接匯款 → 填匯款資訊（不用截圖） -->
         <div id="ck-transfer-section" style="display:none;">
           <div style="background:var(--warning-bg); border:1.5px solid #ffccbc; border-radius:var(--radius-sm); padding:13px 15px; margin-bottom:14px; font-size:13px; line-height:1.85;">
-            <strong>📍 匯款帳戶資訊</strong><br>銀行：台新銀行（812）<br>帳號：<strong>2888-10-2335157-5</strong>
+            <strong>📍 匯款帳戶資訊</strong><br>銀行：台新銀行（812）<br>帳號：<strong>2888-10-2335157-5</strong><br>也可 Line Pay Money / iPASS MONEY
           </div>
           <div id="ck-partial-note" style="display:none; margin-bottom:12px;" class="flow-banner">
             <span id="ck-partial-shortage-text"></span>
@@ -487,7 +487,7 @@ input[type="number"] { -moz-appearance: textfield; }
             <div class="form-row"><label>📅 匯款日期</label><input type="date" id="ck-transfer-date"></div>
             <div class="form-row"><label>💵 匯款金額（NT$）</label><input type="number" id="ck-transfer-amount" placeholder="請輸入匯款金額" min="1"></div>
           </div>
-          <div class="form-row"><label>🏦 匯款帳號末五碼</label><input type="text" id="ck-transfer-last5" placeholder="請輸入末五碼數字" maxlength="5" inputmode="numeric"></div>
+          <div class="form-row"><label>🏦 匯款帳號末五碼</label><input type="text" id="ck-transfer-last5" placeholder="請輸入末五碼數字（LINEPAY / iPASS）" maxlength="5" inputmode="numeric"></div>
         </div>
 
         <!-- 餘額不足警示（純扣餘額時才顯示擋回） -->
@@ -667,7 +667,7 @@ input[type="number"] { -moz-appearance: textfield; }
         <div class="form-row"><label>📋 運費明細（代理看到的文字說明）</label>
           <textarea id="dv-fee-detail" rows="4" placeholder="例：重量 1.2kg × $225 = NT$270&#10;國內運費 NT$100&#10;整理費 NT$50&#10;合計 NT$420" style="resize:vertical;"></textarea>
         </div>
-        <div class="form-grid-2" style="margin-bottom:14px;">
+        <div class="form-row" style="margin-bottom:14px;">
           <div class="form-row" style="margin:0;"><label>📷 實秤照</label>
             <div class="upload-area" id="dv-photo1-area">
               <input type="file" id="dv-photo1" accept="image/*" onchange="handleDeliveryUpload('photo1')">
@@ -675,15 +675,6 @@ input[type="number"] { -moz-appearance: textfield; }
               <div class="upload-text">點擊上傳實秤照</div>
               <div class="upload-sub">選填</div>
               <img class="upload-preview" id="dv-photo1-prev" alt="">
-            </div>
-          </div>
-          <div class="form-row" style="margin:0;"><label>📷 明細照</label>
-            <div class="upload-area" id="dv-photo2-area">
-              <input type="file" id="dv-photo2" accept="image/*" onchange="handleDeliveryUpload('photo2')">
-              <div class="upload-icon">📄</div>
-              <div class="upload-text">點擊上傳明細照</div>
-              <div class="upload-sub">選填</div>
-              <img class="upload-preview" id="dv-photo2-prev" alt="">
             </div>
           </div>
         </div>
@@ -1942,10 +1933,10 @@ async function createDelivery() {
       showAlert('dv-create-alert', '✅ 通知已發送！代理登入後即可看到。', 'success');
       _$('dv-batch-name').value = ''; _$('dv-fee-detail').value = ''; _$('dv-arrival-date').value = '';
       dvPhoto1B64 = null; dvPhoto2B64 = null;
-      ['dv-photo1-area','dv-photo2-area'].forEach(id => {
+      ['dv-photo1-area'].forEach(id => {
         const a = _$(id); if (!a) return;
         a.classList.remove('has-file');
-        a.querySelector('.upload-text').textContent = id.includes('photo1') ? '點擊上傳實秤照' : '點擊上傳明細照';
+        a.querySelector('.upload-text').textContent = '點擊上傳實秤照';
         const p = a.querySelector('.upload-preview'); if (p) p.style.display = 'none';
       });
       loadDeliveryList();
@@ -1991,7 +1982,6 @@ async function loadDeliveryList() {
                 ${item.feeDetail ? item.feeDetail.replace(/\n/g, '<br>') : ''}
               </div>
               ${item.photo1Url ? `<a class="screenshot-link" href="${item.photo1Url}" target="_blank">⚖️ 實秤照</a>` : ''}
-              ${item.photo2Url ? `<a class="screenshot-link" href="${item.photo2Url}" target="_blank" style="margin-left:6px;">📄 明細照</a>` : ''}
               ${infoHtml}
             </div>
           </div>
@@ -2041,8 +2031,7 @@ function openDeliveryModal(row, item) {
   const photoDiv = _$('dm-photos');
   photoDiv.innerHTML = '';
   if (item.photo1Url) photoDiv.innerHTML += `<a href="${item.photo1Url}" target="_blank"><img src="${item.photo1Url}" style="width:100%;border-radius:8px;object-fit:cover;" alt="實秤照"></a>`;
-  if (item.photo2Url) photoDiv.innerHTML += `<a href="${item.photo2Url}" target="_blank"><img src="${item.photo2Url}" style="width:100%;border-radius:8px;object-fit:cover;" alt="明細照"></a>`;
-  photoDiv.style.display = (item.photo1Url || item.photo2Url) ? 'grid' : 'none';
+  photoDiv.style.display = item.photo1Url ? 'block' : 'none';
 
   // 重置出貨方式按鈕
   ['cvs','hct','pickup','barcode'].forEach(k => _$('dm-btn-' + k)?.classList.remove('active'));
@@ -2074,6 +2063,19 @@ function selectShipMethod(method) {
   const infoSec = _$('dm-info-section');
   if (method === '自取' || method === '給寄件編號圖') {
     infoSec.style.display = 'none';
+    if (method === '給寄件編號圖') {
+      _$('dm-alert').className = 'alert ok show';
+      _$('dm-alert').textContent = '📸 請另外截圖寄件編號圖，私訊給我，我會依照編號幫你寄出！';
+    } else {
+      clearAlert('dm-alert');
+    }
+    if (method === '給寄件編號圖') {
+      // ★ 提醒代理需截圖私訊
+      _$('dm-alert').className = 'alert ok show';
+      _$('dm-alert').textContent = '📸 請另外截圖寄件編號圖，私訊給我，我會依照編號幫你寄出！';
+    } else {
+      clearAlert('dm-alert');
+    }
   } else {
     infoSec.style.display = 'block';
     const hint = method === '賣貨便' ? '請填寫賣貨便取件門市（首次填寫後下次自動帶入）' : '請填寫新竹貨運收件資料（首次填寫後下次自動帶入）';
