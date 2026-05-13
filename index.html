@@ -797,7 +797,7 @@ function showActivityModal(activityStatus, onConfirm) {
   const body = _$('activity-modal-body'), btn   = _$('activity-modal-btn');
   if (status === 'blocked') {
     icon.textContent  = '🔒'; title.textContent = '帳號已停用';
-    body.innerHTML    = `您的帳號因超過3個月未下單已自動停用。<br>最後下單：<strong>${lastOrderDate || '無紀錄'}</strong><br>截止日：<strong>${nextDeadline || '－'}</strong><br><br>請私訊 <strong>阿霓</strong> 協助開通，開通費 <strong>NT$ 300</strong>。`;
+    body.innerHTML    = `您的帳號因超過3個月未下單已自動停用。<br>最後下單：<strong>${lastOrderDate || '無紀錄'}</strong><br>截止日：<strong>${nextDeadline || '－'}</strong><br><br>請私訊 <strong>管理員</strong> 協助開通，開通費 <strong>NT$ 300</strong>。`;
     btn.textContent   = '關閉'; btn.onclick = () => { _$('activity-modal').classList.remove('active'); };
   } else {
     icon.textContent  = '⚠️'; title.textContent = '帳號即將停用提醒';
