@@ -306,7 +306,7 @@ input[type="number"] { -moz-appearance: textfield; }
       <div style="background:rgba(255,255,255,0.10); border-radius:10px; padding:10px 12px;">
         <div style="font-size:10.5px; opacity:0.65; margin-bottom:3px;">批發網儲值金</div>
         <div style="font-size:18px; font-weight:800; color:#a5d6a7;">NT$&nbsp;<span id="dash-batch-balance">0</span></div>
-        <div style="font-size:10px; opacity:0.5; margin-top:2px;">批發網下單專用</div>
+        <div style="font-size:10px; opacity:0.5; margin-top:2px;">匯率 ×<span id="dash-rate">40</span>・批發網下單專用</div>
       </div>
     </div>
     <div class="dash-history-label">最近交易紀錄</div>
@@ -318,14 +318,14 @@ input[type="number"] { -moz-appearance: textfield; }
   </div>
 
   <div id="notice-banner">
-    <div class="notice-title">📢 最新公告・請注意⚠️</div>
+    <div class="notice-title">📢 最新公告・共用帳號注意事項</div>
     <div class="notice-body">
-      💰 儲值入帳時間改為固定兩天：<strong>🗓️ 每週三 ／ 每週日</strong><br><br>
-      <span class="notice-tag">週三入帳</span>請於 <strong>週三前</strong> 完成匯款<br>
-      <span class="notice-tag">週日入帳</span>請於 <strong>週日前</strong> 完成匯款<br><br>
-      ⚠️ 當天才匯款的話，會順延到下一個入帳日唷！<br>
-      麻煩大家提前備好款項，避免下單時額度不足 🥹<br>
-      謝謝大家的配合與理解 ♡
+      ⚠️ 因多人共用網站帳號，購物車商品可能因同步關係被覆蓋或異動。<br><br>
+      <span class="notice-tag">重要</span><strong>✔ 最終訂單一律以結帳截圖為主</strong><br>
+      <span class="notice-tag">提醒</span>✔ 請各位結帳前務必自行確認商品、尺寸、數量<br>
+      <span class="notice-tag">流程</span>✔ 我會依照提供的截圖內容協助下單<br>
+      <span class="notice-tag">規定</span>✔ <strong>結帳後不接受修改追加、取消、更改</strong><br><br>
+      💰 儲值入帳日：<strong>每週三 ／ 每週日</strong>（當天匯款順延下一個入帳日）
     </div>
   </div>
 
@@ -599,7 +599,7 @@ input[type="number"] { -moz-appearance: textfield; }
             <div class="form-row" style="margin:0;">
               <label>🚢 國際運費單價（NT$/kg）</label>
               <input type="number" id="ship-rate" placeholder="225" min="0" oninput="calcShipping()">
-              <div style="font-size:11px; color:var(--text-light); margin-top:4px;" id="ship-rate-hint">儲值帳號$225/kg ／ 非儲值$235/kg ／ 選物依廠商</div>
+              <div style="font-size:11px; color:var(--text-light); margin-top:4px;" id="ship-rate-hint">儲值帳號 225 ／ 非儲值 235 ／ 選物 220</div>
             </div>
           </div>
           <!-- 國際運費小計（自動計算，唯讀） -->
@@ -652,7 +652,7 @@ input[type="number"] { -moz-appearance: textfield; }
           <div class="settings-label">👥 代理資料管理</div>
           <div style="overflow-x:auto;">
             <table class="agent-list-table">
-              <thead><tr><th>代理代碼</th><th>名稱</th><th>手機號碼</th><th>匯率</th><th>餘額</th><th>狀態</th><th>操作</th></tr></thead>
+              <thead><tr><th>代理代碼</th><th>名稱</th><th>手機號碼</th><th>匯率</th><th>帳號類型</th><th>餘額</th><th>狀態</th><th>操作</th></tr></thead>
               <tbody id="agent-settings-body"><tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:16px;">載入中...</td></tr></tbody>
             </table>
           </div>
@@ -673,9 +673,8 @@ input[type="number"] { -moz-appearance: textfield; }
 </div>
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXKTkGhYmz6IqqjxKbMB9q9S8rmcKLEQw1jFXK_fxkdnTCEbYhMsmn3Py55tAvOMecCA/exec';
-const ADMIN_USER = 'doudouNi';
-const ADMIN_PASS = 'nini99104';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyMbGBh2KinQmFtFbMJH6ENe6TYNgmnYj3jtp3qXYzV6UpSZPmrCq7DiGgsiPyz17BnsQ/exec';
+// ★ V7.1 安全性：管理員憑證已完全移至後端 GAS，前端不留存密碼
 
 let currentAgent        = null;
 let currentBalance      = 0;
@@ -797,7 +796,7 @@ function showActivityModal(activityStatus, onConfirm) {
   const body = _$('activity-modal-body'), btn   = _$('activity-modal-btn');
   if (status === 'blocked') {
     icon.textContent  = '🔒'; title.textContent = '帳號已停用';
-    body.innerHTML    = `您的帳號因超過3個月未下單已自動停用。<br>最後下單：<strong>${lastOrderDate || '無紀錄'}</strong><br>截止日：<strong>${nextDeadline || '－'}</strong><br><br>請私訊 <strong>管理員</strong> 協助開通，開通費 <strong>NT$ 300</strong>。`;
+    body.innerHTML    = `您的帳號因超過3個月未下單已自動停用。<br>最後下單：<strong>${lastOrderDate || '無紀錄'}</strong><br>截止日：<strong>${nextDeadline || '－'}</strong><br><br>請私訊 <strong>阿霓</strong> 協助開通，開通費 <strong>NT$ 300</strong>。`;
     btn.textContent   = '關閉'; btn.onclick = () => { _$('activity-modal').classList.remove('active'); };
   } else {
     icon.textContent  = '⚠️'; title.textContent = '帳號即將停用提醒';
@@ -844,20 +843,29 @@ function doLogout() {
   show('login-section'); clearAlert('global-alert');
 }
 
-function doAdminLogin() {
+async function doAdminLogin() {
   clearAlert('admin-login-alert');
-  const u = _$('admin-username').value.trim(), p = _$('admin-password').value;
-  if (u !== ADMIN_USER || p !== ADMIN_PASS) { showAlert('admin-login-alert', '❌ 帳號或密碼錯誤'); return; }
-  isAdmin = true;
-  hide('admin-login-section'); show('admin-dashboard'); show('admin-section');
-  // ★ Item 4: 從 localStorage 還原公告日期
-  const savedWed = localStorage.getItem('doudou_wed_date');
-  const savedSun = localStorage.getItem('doudou_sun_date');
-  if (savedWed && _$('setting-wed-date')) _$('setting-wed-date').value = savedWed;
-  if (savedSun && _$('setting-sun-date')) _$('setting-sun-date').value = savedSun;
-  loadPendingDeposits();
-  loadCheckoutPending();
-  loadAdminAgents();
+  const u = _$('admin-username').value.trim();
+  const p = _$('admin-password').value;
+  if (!u || !p) { showAlert('admin-login-alert', '請填寫帳號與密碼'); return; }
+  showLoading();
+  try {
+    // ★ V7.1 黑箱驗證：憑證傳至後端驗證，前端不保存密碼
+    const data = await callScript({ action: 'adminLogin', username: u, password: p });
+    if (!data.success) { showAlert('admin-login-alert', '❌ ' + (data.message || '帳號或密碼錯誤')); return; }
+    isAdmin = true;
+    // 後端回傳代理列表與品項列表，直接使用
+    if (data.agents)   populateAdminAgents(data.agents);
+    if (data.products) populateProducts(data.products);
+    hide('admin-login-section'); show('admin-dashboard'); show('admin-section');
+    const savedWed = localStorage.getItem('doudou_wed_date');
+    const savedSun = localStorage.getItem('doudou_sun_date');
+    if (savedWed && _$('setting-wed-date')) _$('setting-wed-date').value = savedWed;
+    if (savedSun && _$('setting-sun-date')) _$('setting-sun-date').value = savedSun;
+    loadPendingDeposits();
+    loadCheckoutPending();
+  } catch { showAlert('admin-login-alert', '⚠️ 無法連線，請稍後再試'); }
+  finally  { hideLoading(); }
 }
 function doAdminLogout() {
   isAdmin = false;
@@ -872,6 +880,9 @@ function renderDashboard(data) {
   _$('dash-batch-balance').textContent = fmtNum(data.batchBalance || 0);
   currentBalance      = Number(data.balance);
   currentBatchBalance = Number(data.batchBalance || 0);
+  // ★ V7.1 批發網儲值金顯示匯率
+  const rateSpan = _$('dash-rate');
+  if (rateSpan) rateSpan.textContent = String(data.rate || currentAgentRate || 40);
   checkBalanceWarning(currentBalance, currentBatchBalance);
   renderHistory(data.history || []);
 
@@ -921,10 +932,29 @@ function checkBalanceWarning(generalBal, batchBal) {
   box.innerHTML = list.map(h => {
     const isPlus    = h.type === '儲值' || h.type === '退款';
     const isPending = h.status === '待審核';
+    // ★ V7.1 交易紀錄優化：有才顯示
+    let displayNote = '';
+    if (h.type === '儲值') {
+      // 明確顯示錢包類型
+      const walletLabel = h.walletType === '批發網' ? '批發網儲值金' : '一般儲值金';
+      displayNote = '儲值 · ' + walletLabel;
+      // 末五碼若有才顯示
+      const last5match = (h.note || '').match(/末五碼[：:]\s*(\d{5})/);
+      if (last5match) displayNote += '（末碼 ' + last5match[1] + '）';
+    } else if (h.note) {
+      // 過濾掉自動產生的「批次：」字樣，其餘有才顯示
+      displayNote = h.note
+        .replace(/^批次：/, '')          // 移除開頭的「批次：」
+        .replace(/\｜.*$/, '')           // 移除 | 後的系統資訊
+        .trim();
+      if (!displayNote) displayNote = h.type;
+    } else {
+      displayNote = h.type;
+    }
     return `
     <div class="history-row">
       <div class="history-info">
-        <div class="history-type">${h.note || h.type}</div>
+        <div class="history-type">${displayNote}</div>
         <div class="history-date">${h.date || ''}</div>
       </div>
       <span class="history-badge">${h.status}</span>
@@ -1358,6 +1388,7 @@ async function rejectCheckoutItem(rowNum, idx) {
 }
 
 /* ── 管理員手動扣帳 ── */
+// ★ V7.1：登入時後端直接回傳資料，此函式供重新整理用
 async function loadAdminAgents() {
   showLoading();
   try {
@@ -1365,30 +1396,39 @@ async function loadAdminAgents() {
       callScript({ action: 'getAgentList' }),
       callScript({ action: 'getProductList' })
     ]);
-    if (agentData.success) {
-      adminAgentData = agentData.agents;
-      const sel = _$('admin-agent-select');
-      sel.innerHTML = '<option value="">請選擇代理</option>';
-      agentData.agents.forEach(a => {
-        const opt = document.createElement('option');
-        opt.value = a.code; opt.textContent = a.code + (a.name ? '（' + a.name + '）' : '');
-        opt.dataset.balance      = a.balance;
-        opt.dataset.batchBalance = a.batchBalance || 0;  // ★ Item 3
-        opt.dataset.rate         = a.rate || 40;
-        sel.appendChild(opt);
-      });
-      renderAgentSettingsTable(agentData.agents);
-    }
-    if (productData.success && productData.products.length > 0) {
-      const pSel = _$('online-product');
-      pSel.innerHTML = '<option value="">請選擇品項</option>';
-      productData.products.forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p.name; opt.textContent = p.name + (p.closeDate ? '（截止：' + p.closeDate + '）' : '');
-        pSel.appendChild(opt);
-      });
-    }
-  } catch { } finally { hideLoading(); }
+    if (agentData.success) populateAdminAgents(agentData.agents);
+    if (productData.success) populateProducts(productData.products);
+  } catch {} finally { hideLoading(); }
+}
+
+function populateAdminAgents(agents) {
+  if (!agents) return;
+  adminAgentData = agents;
+  const sel = _$('admin-agent-select');
+  sel.innerHTML = '<option value="">請選擇代理</option>';
+  agents.forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a.code;
+    opt.textContent = a.code + (a.name ? '（' + a.name + '）' : '');
+    opt.dataset.balance      = a.balance;
+    opt.dataset.batchBalance = a.batchBalance || 0;
+    opt.dataset.rate         = a.rate || 40;
+    opt.dataset.accountType  = a.accountType || '非儲值帳號'; // ★ V7.1 帳號類型
+    sel.appendChild(opt);
+  });
+  renderAgentSettingsTable(agents);
+}
+
+function populateProducts(products) {
+  if (!products || !products.length) return;
+  const pSel = _$('online-product');
+  pSel.innerHTML = '<option value="">請選擇品項</option>';
+  products.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.name;
+    opt.textContent = p.name + (p.closeDate ? '（截止：' + p.closeDate + '）' : '');
+    pSel.appendChild(opt);
+  });
 }
 
 function switchCheckoutType(type) {
@@ -1409,16 +1449,14 @@ function switchCheckoutType(type) {
   updateAfterBalance();
 }
 
-// ★ 依代理帳號類型預填運費單價
+// ★ V7.1 依代理帳號類型（儲值/非儲值）預填運費單價
 function prefillShippingRate(opt) {
-  const bal  = Number(opt.dataset.balance || 0);
-  const bBal = Number(opt.dataset.batchBalance || 0);
-  // 有批發網儲值金視為儲值帳號
-  const isMember = bBal > 0 || bal > 0;
+  const accountType = opt.dataset.accountType || '非儲值帳號';
+  const isMember    = accountType === '儲值帳號';
   const rateEl = _$('ship-rate');
-  if (rateEl && !rateEl.value) {
-    rateEl.value = isMember ? 225 : 235;
-  }
+  if (rateEl) rateEl.value = isMember ? 225 : 235; // 每次選代理都重新預填
+  const hintEl = _$('ship-rate-hint');
+  if (hintEl) hintEl.textContent = isMember ? '✅ 儲值帳號適用 $225/kg' : '📦 非儲值帳號適用 $235/kg（可手動修改）';
   calcShipping();
 }
 
@@ -1532,8 +1570,8 @@ async function submitAdminCheckout() {
     const total    = intlFee + localFee + sortFee;
     if (!date)   { showAlert('admin-global-alert', '⚠️ 請選擇到貨日期'); return; }
     if (!batch)  { showAlert('admin-global-alert', '⚠️ 請填寫批次／開團名稱'); return; }
-    if (!weight) { showAlert('admin-global-alert', '⚠️ 請輸入重量'); return; }
-    if (!total)  { showAlert('admin-global-alert', '⚠️ 運費總計為 0，請確認輸入'); return; }
+    // ★ V7.1 選物結帳彈性：重量和單價非必填，可直接填各費用
+    if (!total)  { showAlert('admin-global-alert', '⚠️ 總金額為 0，請輸入至少一項費用'); return; }
     const feeNote = [
       `批次：${batch}`,
       `${weight}kg × NT$${shipRate} = NT$${fmtNum(intlFee)}`,
@@ -1551,9 +1589,9 @@ async function submitAdminCheckout() {
     const sortFee = Number(_$('online-sort-fee').value) || 0;
     const note    = _$('online-note').value.trim();
     const totalAmt = twd + intlFee + localFee + sortFee;
-    if (!date)    { showAlert('admin-global-alert', '⚠️ 請選擇結單日期'); return; }
-    if (!product) { showAlert('admin-global-alert', '⚠️ 請選擇開團品項'); return; }
-    if (!twd)     { showAlert('admin-global-alert', '⚠️ 請輸入台幣總計'); return; }
+    if (!date)     { showAlert('admin-global-alert', '⚠️ 請選擇結單日期'); return; }
+    if (!totalAmt) { showAlert('admin-global-alert', '⚠️ 請輸入台幣總計或運費'); return; }
+    // ★ V7.1 選物結帳彈性：品項非必填，可直接填總金額
     const feeNote = [note, intlFee ? `國際運費：NT$${fmtNum(intlFee)}` : '', localFee ? `國內運費：NT$${fmtNum(localFee)}` : '', sortFee ? `整理費：NT$${fmtNum(sortFee)}` : ''].filter(Boolean).join('／');
     Object.assign(payload, { date, product, qty, amount: totalAmt, note: feeNote, intlFee, localFee, sortFee });
   }
@@ -1615,6 +1653,12 @@ function renderAgentSettingsTable(agents) {
       <td><input type="text"   id="st-name-${i}"  value="${a.name  || ''}" placeholder="名稱"></td>
       <td><input type="text"   id="st-phone-${i}" value="${a.phone || ''}" placeholder="手機號碼" inputmode="tel"></td>
       <td><input type="number" id="st-rate-${i}"  value="${a.rate  || 40}" min="1" max="100" style="width:70px;"></td>
+      <td>
+        <select id="st-actype-${i}" style="border:1px solid #b39ddb;border-radius:5px;padding:4px 6px;font-size:12px;">
+          <option value="儲值帳號"  ${(a.accountType || '非儲值帳號') === '儲值帳號'  ? 'selected' : ''}>儲值帳號</option>
+          <option value="非儲值帳號" ${(a.accountType || '非儲值帳號') === '非儲值帳號' ? 'selected' : ''}>非儲值帳號</option>
+        </select>
+      </td>
       <td style="font-size:12px; color:var(--primary-dark);">
         <div style="font-weight:700;">一般：NT$ ${fmtNum(a.balance)}</div>
         <div style="color:#085041; margin-top:2px;">批發：NT$ ${fmtNum(a.batchBalance || 0)}</div>
@@ -1629,17 +1673,20 @@ function renderAgentSettingsTable(agents) {
 }
 
 async function saveAgentRow(code, i) {
-  const name  = _$('st-name-'  + i)?.value.trim() || '';
-  const phone = _$('st-phone-' + i)?.value.trim() || '';
-  const rate  = Number(_$('st-rate-' + i)?.value) || 40;
+  const name        = _$('st-name-'   + i)?.value.trim() || '';
+  const phone       = _$('st-phone-'  + i)?.value.trim() || '';
+  const rate        = Number(_$('st-rate-'  + i)?.value) || 40;
+  const accountType = _$('st-actype-' + i)?.value || '非儲值帳號'; // ★ V7.1
   showLoading();
   try {
-    const data = await callScript({ action: 'updateAgent', code, name, phone, rate });
+    const data = await callScript({ action: 'updateAgent', code, name, phone, rate, accountType });
     if (data.success) {
       showAlert('admin-global-alert', `✅ ${code} 資料已更新`, 'success');
       const agent = adminAgentData.find(a => a.code === code);
-      if (agent) { agent.name = name; agent.phone = phone; agent.rate = rate; }
-      Array.from(_$('admin-agent-select').options).forEach(opt => { if (opt.value === code) opt.dataset.rate = rate; });
+      if (agent) { agent.name = name; agent.phone = phone; agent.rate = rate; agent.accountType = accountType; }
+      Array.from(_$('admin-agent-select').options).forEach(opt => {
+        if (opt.value === code) { opt.dataset.rate = rate; opt.dataset.accountType = accountType; }
+      });
     } else { showAlert('admin-global-alert', '❌ ' + (data.message || '更新失敗')); }
   } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
   finally  { hideLoading(); }
