@@ -438,7 +438,7 @@ input[type="number"] { -moz-appearance: textfield; }
 
         <!-- 韓元計算機 -->
         <div class="calc-box">
-          <div class="calc-title">📊 韓元計價小工具 <span>（匯率固定 ×40，無條件進位）</span></div>
+          <div class="calc-title">📊 韓元計價小工具 <span id="krw-rate-label">（匯率 ×40，無條件進位）</span></div>
           <div class="krw-list" id="krw-list">
             <div class="krw-row"><input type="number" class="krw-input" placeholder="輸入韓元金額 (KRW)" min="0"><button class="btn-rm" onclick="removeKrwRow(this)">✕</button></div>
           </div>
@@ -544,19 +544,20 @@ input[type="number"] { -moz-appearance: textfield; }
       </div>
     </div>
 
-    <!-- 手動扣帳（原結帳專用）-->
+    <!-- 手動扣帳（批發網 ／ 官網 ／ 運費結算）-->
     <div id="atab-manual" class="tab-panel">
       <div class="card">
-        <div class="card-title admin-color">✏️ 手動扣帳（批發網 ／ 官網）</div>
+        <div class="card-title admin-color">✏️ 手動扣帳</div>
         <div class="form-grid-2" style="margin-bottom:16px;">
           <div class="form-row" style="margin:0;"><label>選擇代理</label><select id="admin-agent-select" onchange="onAdminAgentChange()"><option value="">請選擇代理</option></select></div>
           <div class="form-row" style="margin:0;"><label>目前可用餘額</label><div id="admin-agent-balance" class="balance-display">－</div></div>
         </div>
         <div class="form-row">
           <label>結帳類型</label>
-          <div class="type-toggle">
-            <div class="type-btn active" id="type-btn-batch"  onclick="switchCheckoutType('batch')">🛍️ 批發網</div>
-            <div class="type-btn"        id="type-btn-online" onclick="switchCheckoutType('online')">🌐 官網&amp;記事本</div>
+          <div class="type-toggle" style="flex-wrap:wrap; gap:6px;">
+            <div class="type-btn active" id="type-btn-batch"    onclick="switchCheckoutType('batch')"    style="flex:1; min-width:100px;">🛍️ 批發網</div>
+            <div class="type-btn"        id="type-btn-online"   onclick="switchCheckoutType('online')"   style="flex:1; min-width:100px;">🌐 官網&amp;記事本</div>
+            <div class="type-btn"        id="type-btn-shipping" onclick="switchCheckoutType('shipping')" style="flex:1; min-width:100px;">📦 運費結算</div>
           </div>
         </div>
         <div id="form-batch">
@@ -584,6 +585,43 @@ input[type="number"] { -moz-appearance: textfield; }
           <div class="form-row"><label>📋 整理費（NT$）</label><input type="number" id="online-sort-fee" placeholder="0" min="0" oninput="updateAfterBalance()"></div>
           <div class="form-row"><label>📝 備註</label><input type="text" id="online-note" placeholder="備註"></div>
         </div>
+        <!-- ★ 運費結算表單（扣一般儲值金）-->
+        <div id="form-shipping" style="display:none;">
+          <div style="background:#e8f5e9; border:1.5px solid #a5d6a7; border-left:4px solid var(--success); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:14px; font-size:12.5px; color:#2e7d32; font-weight:600;">
+            💰 此筆將從代理的<strong>一般儲值金</strong>扣除
+          </div>
+          <div class="form-grid-2" style="margin-bottom:14px;">
+            <div class="form-row" style="margin:0;"><label>📅 到貨日期</label><input type="date" id="ship-date"></div>
+            <div class="form-row" style="margin:0;"><label>🏷️ 批次／開團名稱</label><input type="text" id="ship-batch" placeholder="例：0507韓國批次、米菲兔記事本"></div>
+          </div>
+          <div class="form-grid-2" style="margin-bottom:14px;">
+            <div class="form-row" style="margin:0;"><label>⚖️ 重量（kg）</label><input type="number" id="ship-weight" placeholder="0.0" min="0" step="0.1" oninput="calcShipping()"></div>
+            <div class="form-row" style="margin:0;">
+              <label>🚢 國際運費單價（NT$/kg）</label>
+              <input type="number" id="ship-rate" placeholder="225" min="0" oninput="calcShipping()">
+              <div style="font-size:11px; color:var(--text-light); margin-top:4px;" id="ship-rate-hint">儲值帳號 225 ／ 非儲值 235 ／ 選物 220</div>
+            </div>
+          </div>
+          <!-- 國際運費小計（自動計算，唯讀） -->
+          <div class="form-row" style="margin-bottom:14px;">
+            <label>🚢 國際運費小計（NT$）</label>
+            <div id="ship-intl-display" style="padding:11px 13px; background:var(--card-inner); border:1.5px solid var(--border); border-radius:var(--radius-sm); font-weight:700; color:var(--success); font-size:15px;">NT$ 0</div>
+          </div>
+          <div class="form-grid-2" style="margin-bottom:14px;">
+            <div class="form-row" style="margin:0;"><label>🚚 國內運費（NT$）</label><input type="number" id="ship-local-fee" placeholder="0" min="0" oninput="calcShipping()"></div>
+            <div class="form-row" style="margin:0;"><label>📋 整理費（NT$）</label><input type="number" id="ship-sort-fee" placeholder="0" min="0" oninput="calcShipping()"></div>
+          </div>
+          <div class="form-row"><label>📝 備註</label><input type="text" id="ship-note" placeholder="選填"></div>
+          <!-- 總計 -->
+          <div style="background:linear-gradient(135deg,#f3e5f5,#ede7f6); border:1.5px solid #b39ddb; border-radius:var(--radius-sm); padding:14px 16px; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:13px; color:var(--admin); font-weight:600;">📊 運費結算總計</span>
+              <span id="ship-total-display" style="font-size:20px; font-weight:800; color:var(--accent);">NT$ 0</span>
+            </div>
+            <div id="ship-breakdown" style="font-size:12px; color:var(--text-muted); margin-top:6px; line-height:1.7;"></div>
+          </div>
+        </div>
+
         <div class="after-balance-box" id="after-balance-box" style="display:none;">
           <span class="after-balance-label">結帳後預估餘額</span>
           <span class="after-balance-value" id="after-balance-value">NT$ 0</span>
@@ -635,13 +673,14 @@ input[type="number"] { -moz-appearance: textfield; }
 </div>
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwHj2-WvtttF5Oj5e1IdrZpVM7nWAKql9MK0DrWnIY4cdvHpOcuZ6e2It9zeTHASdU3TA/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzo1DtGbLSyAPJJTLuVpSoQome4isMNVkrOC8E4OCuRgtZc63T8dcxD22Dri-1yrXdjeg/exec';
 const ADMIN_USER = 'doudouNi';
 const ADMIN_PASS = 'nini99104';
 
 let currentAgent        = null;
-let currentBalance      = 0;       // 一般儲值金
-let currentBatchBalance = 0;       // ★ v7 批發網儲值金
+let currentBalance      = 0;
+let currentBatchBalance = 0;
+let currentAgentRate    = 40;    // ★ 代理個人匯率，預設 40
 let isAdmin             = false;
 let adminAgentData      = [];
 let currentCheckoutType = 'batch';
@@ -709,8 +748,9 @@ function saveSession(data) {
   const s = {
     agentCode: data.agentCode, agentName: data.agentName,
     balance: data.balance, batchBalance: data.batchBalance || 0,
+    rate: data.rate || 40,           // ★ 存匯率
     history: data.history,
-    activityStatus: data.activityStatus || null,  // ★ Fix 4: 存入 activityStatus
+    activityStatus: data.activityStatus || null,
     ts: Date.now()
   };
   sessionStorage.setItem(SESSION_KEY, JSON.stringify(s));
@@ -741,6 +781,7 @@ function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
     currentAgent        = session.agentCode;
     currentBalance      = Number(session.balance);
     currentBatchBalance = Number(session.batchBalance || 0);
+    currentAgentRate    = Number(session.rate || 40); // ★
     renderDashboard(session);
     hide('login-section'); show('dashboard'); show('notice-banner'); show('main-section');
     setTimeout(updateCkWalletIndicator, 50); // ★ Item 1
@@ -784,6 +825,7 @@ async function doLogin() {
       currentAgent        = data.agentCode;
       currentBalance      = Number(data.balance);
       currentBatchBalance = Number(data.batchBalance || 0);
+      currentAgentRate    = Number(data.rate || 40); // ★
       saveSession(data);
       renderDashboard(data);
       hide('login-section'); show('dashboard'); show('notice-banner'); show('main-section');
@@ -959,6 +1001,9 @@ function updateCkWalletIndicator() {
   _$('ck-wallet-label').textContent  = label;
   _$('ck-wallet-amount').textContent = 'NT$ ' + fmtNum(bal);
   _$('ck-wallet-amount').style.color = bal >= 0 ? 'var(--success)' : 'var(--accent)';
+  // ★ 更新韓元計算機匯率標示
+  const rateEl = _$('krw-rate-label');
+  if (rateEl) rateEl.textContent = `（匯率 ×${currentAgentRate || 40}，無條件進位）`;
 }
 
 function switchCkPay(pay) {
@@ -1144,9 +1189,10 @@ function calcKrw() {
   document.querySelectorAll('.krw-input').forEach(i => { total += Number(i.value) || 0; });
   const el = _$('calc-result');
   if (total <= 0) { el.style.display = 'none'; return; }
-  const twd = Math.ceil(total / 40);
+  const rate = currentAgentRate || 40; // ★ 用代理個人匯率
+  const twd  = Math.ceil(total / rate);
   el.style.display = 'block';
-  el.innerHTML = `🇰🇷 ${fmtNum(total)} KRW &nbsp;→&nbsp; 🇹🇼 <span style="color:var(--accent);font-size:15px;font-weight:800;">NT$ ${fmtNum(twd)}</span> <button class="btn btn-outline btn-sm" style="margin-left:8px;" onclick="applyKrw(${twd})">帶入總額</button>`;
+  el.innerHTML = `🇰🇷 ${fmtNum(total)} KRW &nbsp;→&nbsp; 🇹🇼 <span style="color:var(--accent);font-size:15px;font-weight:800;">NT$ ${fmtNum(twd)}</span> <span style="font-size:11px;color:var(--text-light);margin-left:4px;">（匯率 ×${rate}）</span> <button class="btn btn-outline btn-sm" style="margin-left:8px;" onclick="applyKrw(${twd})">帶入總額</button>`;
 }
 function applyKrw(v) { _$('ck-amount').value = v; onCkAmountChange(); }
 
@@ -1347,35 +1393,98 @@ async function loadAdminAgents() {
 
 function switchCheckoutType(type) {
   currentCheckoutType = type;
-  _$('type-btn-batch').classList.toggle('active',  type === 'batch');
-  _$('type-btn-online').classList.toggle('active', type === 'online');
-  _$('form-batch').style.display  = type === 'batch'  ? 'block' : 'none';
-  _$('form-online').style.display = type === 'online' ? 'block' : 'none';
-  // ★ Item 3: 切換時即時更新餘額顯示
+  ['batch','online','shipping'].forEach(t => {
+    _$('type-btn-' + t)?.classList.toggle('active', t === type);
+    const f = _$('form-' + t);
+    if (f) f.style.display = t === type ? 'block' : 'none';
+  });
+  // ★ 運費結算時預設帶入運費單價
+  if (type === 'shipping') {
+    const sel = _$('admin-agent-select');
+    const opt = sel?.options[sel.selectedIndex];
+    if (opt && opt.value) prefillShippingRate(opt);
+    hide('after-balance-box');
+  }
   onAdminAgentChange();
   updateAfterBalance();
+}
+
+// ★ 依代理帳號類型預填運費單價
+function prefillShippingRate(opt) {
+  const bal  = Number(opt.dataset.balance || 0);
+  const bBal = Number(opt.dataset.batchBalance || 0);
+  // 有批發網儲值金視為儲值帳號
+  const isMember = bBal > 0 || bal > 0;
+  const rateEl = _$('ship-rate');
+  if (rateEl && !rateEl.value) {
+    rateEl.value = isMember ? 225 : 235;
+  }
+  calcShipping();
+}
+
+// ★ 運費自動計算
+function calcShipping() {
+  const weight   = Number(_$('ship-weight')?.value)   || 0;
+  const rate     = Number(_$('ship-rate')?.value)     || 0;
+  const localFee = Number(_$('ship-local-fee')?.value)|| 0;
+  const sortFee  = Number(_$('ship-sort-fee')?.value) || 0;
+
+  const intlFee = Math.ceil(weight * rate);
+  const total   = intlFee + localFee + sortFee;
+
+  const intlEl = _$('ship-intl-display');
+  if (intlEl) { intlEl.textContent = 'NT$ ' + fmtNum(intlFee); }
+
+  const totalEl = _$('ship-total-display');
+  if (totalEl) { totalEl.textContent = 'NT$ ' + fmtNum(total); }
+
+  const breakdown = _$('ship-breakdown');
+  if (breakdown) {
+    const parts = [];
+    if (intlFee)  parts.push(`國際運費 ${weight}kg × ${rate} = NT$${fmtNum(intlFee)}`);
+    if (localFee) parts.push(`國內運費 NT$${fmtNum(localFee)}`);
+    if (sortFee)  parts.push(`整理費 NT$${fmtNum(sortFee)}`);
+    breakdown.textContent = parts.join('　＋　');
+  }
+
+  // 更新預估餘額
+  const sel = _$('admin-agent-select');
+  const opt = sel?.options[sel.selectedIndex];
+  if (opt && opt.value && total > 0) {
+    const generalBal = Number(opt.dataset.balance || 0);
+    const after = generalBal - total;
+    _$('after-balance-value').textContent = 'NT$ ' + fmtNum(after);
+    _$('after-balance-value').style.color = after >= 0 ? 'var(--success)' : 'var(--accent)';
+    _$('after-balance-box').querySelector('.after-balance-label').textContent = '扣款後一般儲值金';
+    show('after-balance-box');
+  } else {
+    hide('after-balance-box');
+  }
 }
 function onAdminAgentChange() {
   const sel = _$('admin-agent-select'), opt = sel.options[sel.selectedIndex];
   const balEl = _$('admin-agent-balance');
   if (opt && opt.value) {
-    // ★ Item 3: 依結帳類型顯示對應錢包餘額
-    const isBatch  = currentCheckoutType === 'batch';
-    const bal      = isBatch ? (Number(opt.dataset.batchBalance) || 0) : (Number(opt.dataset.balance) || 0);
-    const rate     = Number(opt.dataset.rate) || 40;
-    const label    = isBatch ? '批發網儲值金' : '一般儲值金';
+    const isBatch    = currentCheckoutType === 'batch';
+    const isShipping = currentCheckoutType === 'shipping';
+    const bal  = isShipping || !isBatch
+      ? (Number(opt.dataset.balance) || 0)       // 一般儲值金
+      : (Number(opt.dataset.batchBalance) || 0);  // 批發網儲值金
+    const rate  = Number(opt.dataset.rate) || 40;
+    const label = isBatch ? '批發網儲值金' : '一般儲值金';
     balEl.textContent = `NT$ ${fmtNum(bal)}　${label}（匯率 ×${rate}）`;
     balEl.style.color = bal >= 0 ? 'var(--success)' : 'var(--accent)';
+    // ★ 運費結算：預填單價
+    if (isShipping) prefillShippingRate(opt);
     updateAfterBalance();
   } else { balEl.textContent = '－'; balEl.style.color = 'var(--text-muted)'; hide('after-balance-box'); }
 }
-// ★ Item 3: getSelectedBalance 依目前結帳類型取正確錢包
 function getSelectedBalance() {
   const sel = _$('admin-agent-select'), opt = sel.options[sel.selectedIndex];
   if (!opt || !opt.value) return 0;
-  return currentCheckoutType === 'batch'
-    ? (Number(opt.dataset.batchBalance) || 0)
-    : (Number(opt.dataset.balance)      || 0);
+  // ★ 運費結算和官網都用一般儲值金
+  if (currentCheckoutType === 'batch') return Number(opt.dataset.batchBalance) || 0;
+  return Number(opt.dataset.balance) || 0;
 }
 function getSelectedRate()    { const sel = _$('admin-agent-select'), opt = sel.options[sel.selectedIndex]; return (opt && opt.dataset.rate)    ? Number(opt.dataset.rate)    : 40; }
 function getCurrentAmount() {
@@ -1401,7 +1510,7 @@ async function submitAdminCheckout() {
   clearAlert('admin-global-alert');
   const agentCode = _$('admin-agent-select').value;
   if (!agentCode) { showAlert('admin-global-alert', '⚠️ 請選擇代理'); return; }
-  let payload = { action: 'adminCheckout', agentCode, checkoutType: currentCheckoutType === 'batch' ? '批發網' : '官網&記事本' };
+  let payload = { action: 'adminCheckout', agentCode, checkoutType: currentCheckoutType === 'batch' ? '批發網' : currentCheckoutType === 'shipping' ? '運費結算' : '官網&記事本' };
   if (currentCheckoutType === 'batch') {
     const date = _$('batch-date').value, qty = Number(_$('batch-qty').value) || 0;
     const krw  = Number(_$('batch-krw').value) || 0, twd = Number(_$('batch-twd').value) || 0;
@@ -1409,6 +1518,31 @@ async function submitAdminCheckout() {
     if (!date) { showAlert('admin-global-alert', '⚠️ 請選擇下單日期'); return; }
     if (!twd)  { showAlert('admin-global-alert', '⚠️ 請輸入台幣總計'); return; }
     Object.assign(payload, { date, qty, krwTotal: krw, amount: twd, note });
+
+  } else if (currentCheckoutType === 'shipping') {
+    // ★ 運費結算
+    const date     = _$('ship-date').value;
+    const batch    = _$('ship-batch').value.trim();
+    const weight   = Number(_$('ship-weight').value)   || 0;
+    const shipRate = Number(_$('ship-rate').value)     || 0;
+    const localFee = Number(_$('ship-local-fee').value)|| 0;
+    const sortFee  = Number(_$('ship-sort-fee').value) || 0;
+    const note     = _$('ship-note').value.trim();
+    const intlFee  = Math.ceil(weight * shipRate);
+    const total    = intlFee + localFee + sortFee;
+    if (!date)   { showAlert('admin-global-alert', '⚠️ 請選擇到貨日期'); return; }
+    if (!batch)  { showAlert('admin-global-alert', '⚠️ 請填寫批次／開團名稱'); return; }
+    if (!weight) { showAlert('admin-global-alert', '⚠️ 請輸入重量'); return; }
+    if (!total)  { showAlert('admin-global-alert', '⚠️ 運費總計為 0，請確認輸入'); return; }
+    const feeNote = [
+      `批次：${batch}`,
+      `${weight}kg × NT$${shipRate} = NT$${fmtNum(intlFee)}`,
+      localFee ? `國內運費：NT$${fmtNum(localFee)}` : '',
+      sortFee  ? `整理費：NT$${fmtNum(sortFee)}`   : '',
+      note
+    ].filter(Boolean).join('／');
+    Object.assign(payload, { date, amount: total, note: feeNote, weight, shipRate, intlFee, localFee, sortFee, batchName: batch });
+
   } else {
     const date = _$('online-date').value, product = _$('online-product').value;
     const qty  = Number(_$('online-qty').value) || 0, twd = Number(_$('online-twd').value) || 0;
@@ -1432,15 +1566,28 @@ async function submitAdminCheckout() {
     const data = await callScript(payload);
     if (data.success) {
       const sel = _$('admin-agent-select'), opt = sel.options[sel.selectedIndex];
-      if (opt) opt.dataset.balance = data.newBalance;
-      _$('admin-agent-balance').textContent = 'NT$ ' + fmtNum(data.newBalance) + '　（匯率 ×' + getSelectedRate() + '）';
-      _$('admin-agent-balance').style.color = data.newBalance >= 0 ? 'var(--success)' : 'var(--accent)';
-      _$('admin-result-text').textContent = `已扣款 NT$ ${fmtNum(payload.amount)}　代理剩餘 NT$ ${fmtNum(data.newBalance)}`;
+      // ★ 運費結算更新一般儲值金；其他依錢包類型
+      if (currentCheckoutType === 'shipping' || currentCheckoutType === 'online') {
+        if (opt) opt.dataset.balance = data.newBalance;
+      } else {
+        if (opt) opt.dataset.batchBalance = data.newBatchBalance;
+      }
+      onAdminAgentChange();
+      const remLabel = currentCheckoutType === 'batch' ? '批發網儲值金' : '一般儲值金';
+      const remAmt   = currentCheckoutType === 'batch' ? data.newBatchBalance : data.newBalance;
+      _$('admin-result-text').textContent = `已扣款 NT$ ${fmtNum(payload.amount)}　${remLabel}剩餘 NT$ ${fmtNum(remAmt)}`;
       show('admin-result-section');
       _$('admin-result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      showAlert('admin-global-alert', '✅ 結帳成功！代理餘額已扣除。', 'success');
-      ['batch-qty','batch-krw','batch-twd','batch-note','online-qty','online-twd','online-intl-fee','online-local-fee','online-sort-fee','online-note'].forEach(id => { if(_$(id)) _$(id).value = ''; });
+      showAlert('admin-global-alert', '✅ 扣款成功！', 'success');
+      // 清空表單
+      ['batch-qty','batch-krw','batch-twd','batch-note',
+       'online-qty','online-twd','online-intl-fee','online-local-fee','online-sort-fee','online-note',
+       'ship-date','ship-batch','ship-weight','ship-rate','ship-local-fee','ship-sort-fee','ship-note'
+      ].forEach(id => { if(_$(id)) _$(id).value = ''; });
       if (_$('online-product')) _$('online-product').value = '';
+      if (_$('ship-intl-display')) _$('ship-intl-display').textContent = 'NT$ 0';
+      if (_$('ship-total-display')) _$('ship-total-display').textContent = 'NT$ 0';
+      if (_$('ship-breakdown')) _$('ship-breakdown').textContent = '';
       hide('after-balance-box');
     } else { showAlert('admin-global-alert', '❌ ' + (data.message || '送出失敗')); }
   } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤，請稍後再試'); }
