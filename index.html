@@ -374,7 +374,11 @@ input[type="number"] { -moz-appearance: textfield; }
 
         <div class="form-grid-2">
           <div class="form-row"><label>📅 匯款日期</label><input type="date" id="dep-date"></div>
-          <div class="form-row"><label>💵 儲值金額（最低 2,000 · 以千為單位）</label><input type="number" id="dep-amount" placeholder="例：5000" min="2000" step="1000"></div>
+          <div class="form-row"><label>💵 儲值金額（最低 2,000 · 以千為單位）</label><input type="number" id="dep-amount" placeholder="例：5000" min="2000" step="1000">
+            <div id="dep-rate-hint" style="display:none;margin-top:6px;font-size:12px;font-weight:600;color:#558b2f;background:#f1f8e9;border:1px solid #aed581;border-radius:6px;padding:5px 10px;">
+              💱 當前專屬匯率：1 KRW : <span id="dep-rate-val">40</span> NTD
+            </div>
+          </div>
         </div>
         <div class="form-row"><label>🏦 匯款帳號末五碼</label><input type="text" id="dep-last5" placeholder="請輸入末五碼數字" maxlength="5" inputmode="numeric"></div>
 
@@ -1052,12 +1056,18 @@ function checkBalanceWarning(generalBal, batchBal) {
       const last5match = (h.note || '').match(/末五碼[：:]\s*(\d{5})/);
       if (last5match) displayNote += '（末碼 ' + last5match[1] + '）';
     } else if (h.note) {
-      // 過濾掉自動產生的「批次：」字樣，其餘有才顯示
+      // 過濾關鍵字並清理顯示文字
       displayNote = h.note
-        .replace(/^批次：/, '')          // 移除開頭的「批次：」
-        .replace(/\｜.*$/, '')           // 移除 | 後的系統資訊
+        .replace(/^批次：/g, '')               // 移除開頭的「批次：」
+        .replace(/消費/g, '結帳扣款')           // 「消費」→「結帳扣款」
+        .replace(/板娘/g, '')                  // 移除「板娘」
+        .replace(/【批發網】|【官網&記事本】/g, '') // 移除系統標籤
+        .replace(/付款：扣儲值餘額/g, '扣儲值餘額')
+        .replace(/付款：/g, '')
+        .replace(/\s*｜\s*日期：[\d/-]+/g, '') // 移除「| 日期：」
+        .replace(/\s{2,}/g, ' ')               // 合併多餘空白
         .trim();
-      if (!displayNote) displayNote = h.type;
+      if (!displayNote) displayNote = h.type === '消費' ? '結帳扣款' : h.type;
     } else {
       displayNote = h.type;
     }
@@ -1116,6 +1126,13 @@ function switchDepWallet(wallet) {
   currentDepWallet = wallet;
   _$('dep-wallet-btn-general').classList.toggle('active', wallet === 'general');
   _$('dep-wallet-btn-batch').classList.toggle('active',   wallet === 'batch');
+  // ★ 切換到批發網時顯示專屬匯率提示
+  const hint    = _$('dep-rate-hint');
+  const rateVal = _$('dep-rate-val');
+  if (hint) {
+    hint.style.display = wallet === 'batch' ? 'block' : 'none';
+    if (rateVal) rateVal.textContent = String(currentAgentRate || 40);
+  }
 }
 
 /* ── 結帳類型 / 付款方式切換 ── */
