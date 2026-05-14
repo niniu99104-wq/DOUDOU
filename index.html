@@ -323,8 +323,8 @@ input[type="number"] { -moz-appearance: textfield; }
       ⚠️ 因多人共用網站帳號，購物車商品可能因同步關係被覆蓋或異動。<br><br>
       <span class="notice-tag">重要</span><strong>✔ 最終訂單一律以結帳截圖為主</strong><br>
       <span class="notice-tag">提醒</span>✔ 請各位結帳前務必自行確認商品、尺寸、數量<br>
-      <span class="notice-tag">流程</span>✔ 會依照提供的截圖內容協助下單、進行採購<br>
-      <span class="notice-tag">規定</span>✔ <strong>結帳後不接受修改、取消、更改</strong><br><br>
+      <span class="notice-tag">流程</span>✔ 我會依照提供的截圖內容協助下單<br>
+      <span class="notice-tag">規定</span>✔ <strong>結帳後不接受修改追加、取消、更改</strong><br><br>
       💰 儲值入帳日：<strong>每週三 ／ 每週日</strong>（當天匯款順延下一個入帳日）
     </div>
   </div>
@@ -374,7 +374,9 @@ input[type="number"] { -moz-appearance: textfield; }
 
         <div class="form-grid-2">
           <div class="form-row"><label>📅 匯款日期</label><input type="date" id="dep-date"></div>
-          <div class="form-row"><label>💵 儲值金額（最低 2,000 · 以千為單位）</label><input type="number" id="dep-amount" placeholder="例：5000" min="2000" step="1000">
+          <div class="form-row">
+            <label id="dep-amount-label">💵 儲值金額（無最低限制）</label>
+            <input type="number" id="dep-amount" placeholder="請輸入金額" min="1">
             <div id="dep-rate-hint" style="display:none;margin-top:6px;font-size:12px;font-weight:600;color:#558b2f;background:#f1f8e9;border:1px solid #aed581;border-radius:6px;padding:5px 10px;">
               💱 當前專屬匯率：1 KRW : <span id="dep-rate-val">40</span> NTD
             </div>
@@ -1117,6 +1119,18 @@ function switchDepWallet(wallet) {
   currentDepWallet = wallet;
   _$('dep-wallet-btn-general').classList.toggle('active', wallet === 'general');
   _$('dep-wallet-btn-batch').classList.toggle('active',   wallet === 'batch');
+
+  // ★ 依錢包類型更新 label 和 placeholder
+  const amountInput = _$('dep-amount');
+  const amountLabel = _$('dep-amount-label');
+  if (wallet === 'batch') {
+    if (amountLabel) amountLabel.textContent = '💵 儲值金額（最低 2,000 · 以千為單位）';
+    if (amountInput) { amountInput.placeholder = '例：5000'; amountInput.min = '2000'; amountInput.step = '1000'; }
+  } else {
+    if (amountLabel) amountLabel.textContent = '💵 儲值金額（無最低限制，任意金額）';
+    if (amountInput) { amountInput.placeholder = '請輸入金額'; amountInput.min = '1'; amountInput.step = '1'; }
+  }
+
   // ★ 切換到批發網時顯示專屬匯率提示
   const hint    = _$('dep-rate-hint');
   const rateVal = _$('dep-rate-val');
@@ -1219,10 +1233,16 @@ async function submitDeposit() {
   const last5  = _$('dep-last5').value.trim();
   const chk    = _$('dep-confirm').checked;
 
-  if (!date)                  { showAlert('global-alert', '⚠️ 請選擇匯款日期'); return; }
-  if (!raw || amount <= 0)    { showAlert('global-alert', '⚠️ 請輸入儲值金額'); return; }
-  if (amount < 2000)          { showAlert('global-alert', '⚠️ 儲值金額最低為 NT$ 2,000'); return; }
-  if (amount % 1000 !== 0)    { showAlert('global-alert', '⚠️ 儲值金額須為 1,000 的倍數'); return; }
+  if (!date)               { showAlert('global-alert', '⚠️ 請選擇匯款日期'); return; }
+  if (!raw || amount <= 0) { showAlert('global-alert', '⚠️ 請輸入儲值金額'); return; }
+
+  // ★ 一般儲值金：無最低金額限制，任意金額皆可
+  // ★ 批發網儲值金：最低 2,000，須為 1,000 的倍數
+  if (currentDepWallet === 'batch') {
+    if (amount < 2000)       { showAlert('global-alert', '⚠️ 批發網儲值金最低為 NT$ 2,000'); return; }
+    if (amount % 1000 !== 0) { showAlert('global-alert', '⚠️ 批發網儲值金須為 1,000 的倍數'); return; }
+  }
+
   if (!/^\d{5}$/.test(last5)) { showAlert('global-alert', '⚠️ 請輸入正確的帳號末五碼（5 位數字）'); return; }
   if (!chk)                   { showAlert('global-alert', '⚠️ 請勾選確認已完成匯款'); return; }
   // ★ 截圖非必填，有就送，沒有也沒關係
@@ -2064,13 +2084,6 @@ function selectShipMethod(method) {
   if (method === '自取' || method === '給寄件編號圖') {
     infoSec.style.display = 'none';
     if (method === '給寄件編號圖') {
-      _$('dm-alert').className = 'alert ok show';
-      _$('dm-alert').textContent = '📸 請另外截圖寄件編號圖，私訊給我，我會依照編號幫你寄出！';
-    } else {
-      clearAlert('dm-alert');
-    }
-    if (method === '給寄件編號圖') {
-      // ★ 提醒代理需截圖私訊
       _$('dm-alert').className = 'alert ok show';
       _$('dm-alert').textContent = '📸 請另外截圖寄件編號圖，私訊給我，我會依照編號幫你寄出！';
     } else {
