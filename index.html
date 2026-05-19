@@ -579,12 +579,13 @@ input[type="number"] { -moz-appearance: textfield; }
 
   <div id="admin-section">
     <div class="admin-tab-bar">
-      <button class="admin-tab-btn active" id="atab-btn-deposit"  onclick="switchAdminTab('deposit')">📥 儲值審核</button>
-      <button class="admin-tab-btn"        id="atab-btn-checkout" onclick="switchAdminTab('checkout')">💳 結帳審核</button>
-      <button class="admin-tab-btn"        id="atab-btn-manual"   onclick="switchAdminTab('manual')">✏️ 手動扣帳</button>
-      <button class="admin-tab-btn"        id="atab-btn-group"    onclick="switchAdminTab('group')">🎁 團購管理</button>
-      <button class="admin-tab-btn"        id="atab-btn-delivery" onclick="switchAdminTab('delivery')">📦 出貨管理</button>
-      <button class="admin-tab-btn"        id="atab-btn-settings" onclick="switchAdminTab('settings')">⚙️ 系統設定</button>
+      <button class="admin-tab-btn active" id="atab-btn-deposit"  onclick="switchAdminTab('deposit')">📥 儲值</button>
+      <button class="admin-tab-btn"        id="atab-btn-checkout" onclick="switchAdminTab('checkout')">💳 結帳</button>
+      <button class="admin-tab-btn"        id="atab-btn-manual"   onclick="switchAdminTab('manual')">✏️ 扣帳</button>
+      <button class="admin-tab-btn"        id="atab-btn-group"    onclick="switchAdminTab('group')">🎁 團購</button>
+      <button class="admin-tab-btn"        id="atab-btn-vendor"   onclick="switchAdminTab('vendor')">💰 記帳</button>
+      <button class="admin-tab-btn"        id="atab-btn-delivery" onclick="switchAdminTab('delivery')">📦 出貨</button>
+      <button class="admin-tab-btn"        id="atab-btn-settings" onclick="switchAdminTab('settings')">⚙️ 設定</button>
     </div>
     <div id="admin-global-alert" class="alert error"></div>
 
@@ -733,6 +734,10 @@ input[type="number"] { -moz-appearance: textfield; }
             <input type="number" id="gb-ship-fee" placeholder="例：60" min="0">
           </div>
         </div>
+        <div class="form-row" style="margin-bottom:14px;">
+          <label>🔗 團購連結（選填）</label>
+          <input type="text" id="gb-link" placeholder="例：https://kr.item.com/xxxxx">
+        </div>
         <div style="background:#e3f2fd;border:1px solid #90caf9;border-left:4px solid #1565c0;border-radius:var(--radius-sm);padding:9px 13px;margin-bottom:14px;font-size:12px;color:#0d47a1;line-height:1.7;">
           💡 <strong>分潤計算邏輯：</strong>廠商轉入金額 = Σ（每筆訂單金額 + 未達免運者加運費），你輸入廠商實際退款後系統直接入帳
         </div>
@@ -755,6 +760,39 @@ input[type="number"] { -moz-appearance: textfield; }
         </p>
         <div id="group-report-list"><div class="pending-empty">⏳ 載入中...</div></div>
         <div style="margin-top:14px;"><button class="btn btn-outline btn-sm" onclick="loadGroupReports()">🔄 重新整理</button></div>
+      </div>
+    </div>
+
+    <!-- ★ v14 廠商分潤記帳 -->
+    <div id="atab-vendor" class="tab-panel">
+
+      <!-- 廠商匯入紀錄 -->
+      <div class="card">
+        <div class="card-title admin-color">💰 廠商匯入登記</div>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">記錄廠商退款到你帳戶的資訊，與代理入帳分開追蹤。</p>
+        <div class="form-grid-2" style="margin-bottom:14px;">
+          <div class="form-row" style="margin:0;"><label>📅 廠商匯入日期</label><input type="date" id="vl-date"></div>
+          <div class="form-row" style="margin:0;"><label>💵 匯入金額（NT$）</label><input type="number" id="vl-amount" placeholder="例：1800" min="1"></div>
+        </div>
+        <div class="form-grid-2" style="margin-bottom:14px;">
+          <div class="form-row" style="margin:0;"><label>🏦 匯入銀行／平台</label><input type="text" id="vl-bank" placeholder="例：台新銀行、PayPal"></div>
+          <div class="form-row" style="margin:0;"><label>🎁 對應團購（選填）</label>
+            <select id="vl-gb-select"><option value="">不指定</option></select>
+          </div>
+        </div>
+        <div class="form-row"><label>📝 廠商 / 備註</label><input type="text" id="vl-vendor" placeholder="例：韓國OOOO廠商、米菲兔記事本分潤"></div>
+        <div id="vl-alert" class="alert error"></div>
+        <button class="btn btn-admin btn-full" onclick="addVendorPayment()">➕ 新增廠商匯入紀錄</button>
+      </div>
+
+      <!-- 廠商匯入紀錄清單 -->
+      <div class="card">
+        <div class="card-title admin-color">📋 廠商匯入紀錄</div>
+        <div id="vendor-ledger-list"><div class="pending-empty">⏳ 載入中...</div></div>
+        <div style="margin-top:14px;display:flex;gap:8px;align-items:center;">
+          <button class="btn btn-outline btn-sm" onclick="loadVendorLedger()">🔄 重新整理</button>
+          <span id="vl-total-display" style="font-size:13px;color:var(--text-muted);"></span>
+        </div>
       </div>
     </div>
 
@@ -889,7 +927,7 @@ input[type="number"] { -moz-appearance: textfield; }
 </div>
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxjvtKtCnMpNcNqEFzJssX_IEnQijI1RipojdBAr5XGdZlfE8yUA02Wh69ceAJKtzQMIg/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyyofpEJ75G3E_j-D7wCZp12cKzeXIXAPY_9RMTglwPxXRGvYsdjwIZLTOeI_hZmS6IjQ/exec';
 // ★ V7.1 安全性：管理員憑證已完全移至後端 GAS，前端不留存密碼
 
 let currentAgent        = null;
@@ -991,7 +1029,7 @@ function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
     sel.appendChild(opt);
   }
   const today = new Date().toISOString().slice(0, 10);
-  ['dep-date','ck-date','ck-transfer-date','batch-date','online-date'].forEach(id => { if (_$(id)) _$(id).value = today; });
+  ['dep-date','ck-date','ck-transfer-date','batch-date','online-date','vl-date'].forEach(id => { if (_$(id)) _$(id).value = today; });
   const session = loadSession();
   if (session) {
     currentAgent        = session.agentCode;
@@ -1496,8 +1534,8 @@ function switchAdminTab(tab) {
   clearAlert('admin-global-alert'); hide('admin-result-section');
   // ★ v10 切到出貨管理時載入資料
   if (tab === 'delivery') { syncDeliveryAgentSelect(); loadDeliveryList(); }
-  // ★ v11 切到團購管理時載入
-  if (tab === 'group') { loadAdminGroupList(); loadGroupReports(); }
+  if (tab === 'group')    { loadAdminGroupList(); loadGroupReports(); }
+  if (tab === 'vendor')   { syncVendorGbSelect(); loadVendorLedger(); } // ★ v14
 }
 
 /* ── 儲值待審 ── */
@@ -2051,6 +2089,7 @@ async function loadGroupBuyList() {
           onclick="selectGroupBuy('${g.gbId}', '${g.name}', ${g.pct}, ${g.freeShipMin}, ${g.shipFee})">
           📝 填寫此團購回報
         </button>
+        ${g.link ? `<a href="${g.link}" target="_blank" class="btn btn-outline btn-sm" style="width:100%;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:5px;">🛒 前往下單頁面</a>` : ''}
       </div>`;
     }).join('');
   } catch {
@@ -2144,16 +2183,17 @@ async function createGroupBuy() {
   const openDate    = _$('gb-open-date').value;
   const closeDate   = _$('gb-close-date').value;
   const pct         = Number(_$('gb-pct').value) || 0;
-  const freeShipMin = Number(_$('gb-free-ship-min').value) || 0; // ★ v12
-  const shipFee     = Number(_$('gb-ship-fee').value)      || 0; // ★ v12
+  const freeShipMin = Number(_$('gb-free-ship-min').value) || 0;
+  const shipFee     = Number(_$('gb-ship-fee').value)      || 0;
   const note        = _$('gb-note').value.trim();
+  const link        = _$('gb-link').value.trim(); // ★ v13
   if (!name) { showAlert('gb-create-alert', '⚠️ 請填寫品名'); return; }
   showLoading();
   try {
-    const data = await callScript({ action: 'createGroupBuy', name, vendor, openDate, closeDate, pct, freeShipMin, shipFee, note });
+    const data = await callScript({ action: 'createGroupBuy', name, vendor, openDate, closeDate, pct, freeShipMin, shipFee, note, link });
     if (data.success) {
       showAlert('gb-create-alert', `✅ 團購「${name}」已建立！代理可以開始回報。`, 'success');
-      ['gb-name','gb-vendor','gb-open-date','gb-close-date','gb-pct','gb-free-ship-min','gb-ship-fee','gb-note'].forEach(id => { if(_$(id)) _$(id).value = ''; });
+      ['gb-name','gb-vendor','gb-open-date','gb-close-date','gb-pct','gb-free-ship-min','gb-ship-fee','gb-note','gb-link'].forEach(id => { if(_$(id)) _$(id).value = ''; });
       loadAdminGroupList();
     } else { showAlert('gb-create-alert', '❌ ' + (data.message || '建立失敗')); }
   } catch { showAlert('gb-create-alert', '⚠️ 網路錯誤'); }
@@ -2171,28 +2211,60 @@ async function loadAdminGroupList() {
       el.innerHTML = '<div class="pending-empty">尚未建立任何團購</div>'; return;
     }
     el.innerHTML = data.list.map((g, i) => {
-      const isOpen   = g.status === '開放';
-      const badge    = isOpen
+      const isOpen = g.status === '開放';
+      const badge  = isOpen
         ? `<span style="background:var(--success-bg);color:var(--success);font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid #aed581;">✅ 開放</span>`
         : `<span style="background:#fbe9e7;color:var(--accent);font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid #ffccbc;">🔒 關閉</span>`;
+      const safeLink   = (g.link  || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      const safeName   = (g.name  || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      const safeVendor = (g.vendor|| '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      const safeNote   = (g.note  || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
       return `
-      <div class="pending-item" style="margin-bottom:8px;">
+      <div class="pending-item" style="margin-bottom:8px;" id="gb-item-${i}">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;">
-          <div>
+          <div style="flex:1;">
             <div class="pending-agent">🎁 ${g.name} ${badge}</div>
             <div class="pending-detail">
               ${g.vendor ? '廠商：' + g.vendor + '<br>' : ''}
               開團：${g.openDate || '－'}　截止：${g.closeDate || '－'}<br>
               預估分潤：<strong>${g.pct}%</strong>
-              ${g.freeShipMin > 0 ? `　🚚 免運門檻：NT$${fmtNum(g.freeShipMin)}／未達：NT$${fmtNum(g.shipFee)}` : ''}
+              ${g.freeShipMin > 0 ? `　🚚 免運 NT$${fmtNum(g.freeShipMin)}／未達+NT$${fmtNum(g.shipFee)}` : ''}
               ${g.note ? '<br>' + g.note : ''}
             </div>
+            ${g.link ? `<a href="${g.link}" target="_blank" class="screenshot-link" style="margin-top:5px;">🔗 團購連結</a>` : '<span style="font-size:11.5px;color:var(--text-light);margin-top:5px;display:block;">無連結</span>'}
           </div>
           <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;">
+            <button class="btn btn-outline btn-xs" onclick="toggleEditForm(${i})">✏️ 編輯</button>
             <button class="btn btn-${isOpen ? 'danger' : 'success'} btn-xs"
               onclick="toggleGroupStatus('${g.gbId}', '${isOpen ? '關閉' : '開放'}')">
               ${isOpen ? '🔒 關閉' : '✅ 開放'}
             </button>
+          </div>
+        </div>
+        <!-- 編輯表單（預設收起）-->
+        <div id="gb-edit-${i}" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+          <div class="form-grid-2" style="margin-bottom:10px;">
+            <div><label style="font-size:11px;">品名</label><input type="text" id="gbe-name-${i}" value="${safeName}" style="font-size:13px;padding:7px 10px;"></div>
+            <div><label style="font-size:11px;">廠商</label><input type="text" id="gbe-vendor-${i}" value="${safeVendor}" style="font-size:13px;padding:7px 10px;"></div>
+          </div>
+          <div class="form-grid-2" style="margin-bottom:10px;">
+            <div><label style="font-size:11px;">開團日期</label><input type="date" id="gbe-open-${i}" value="${g.openDate}" style="font-size:13px;padding:7px 10px;"></div>
+            <div><label style="font-size:11px;">截止日期</label><input type="date" id="gbe-close-${i}" value="${g.closeDate}" style="font-size:13px;padding:7px 10px;"></div>
+          </div>
+          <div class="form-grid-2" style="margin-bottom:10px;">
+            <div><label style="font-size:11px;">預估分潤%</label><input type="number" id="gbe-pct-${i}" value="${g.pct}" style="font-size:13px;padding:7px 10px;"></div>
+            <div><label style="font-size:11px;">備註</label><input type="text" id="gbe-note-${i}" value="${safeNote}" style="font-size:13px;padding:7px 10px;"></div>
+          </div>
+          <div class="form-grid-2" style="margin-bottom:10px;">
+            <div><label style="font-size:11px;">免運門檻（NT$）</label><input type="number" id="gbe-freeship-${i}" value="${g.freeShipMin}" style="font-size:13px;padding:7px 10px;"></div>
+            <div><label style="font-size:11px;">未達免運運費（NT$）</label><input type="number" id="gbe-shipfee-${i}" value="${g.shipFee}" style="font-size:13px;padding:7px 10px;"></div>
+          </div>
+          <div style="margin-bottom:10px;"><label style="font-size:11px;">🔗 團購連結</label><input type="text" id="gbe-link-${i}" value="${safeLink}" placeholder="https://..." style="font-size:13px;padding:7px 10px;"></div>
+          <div id="gbe-alert-${i}" class="alert error"></div>
+          <div style="display:flex;gap:7px;">
+            <button class="btn btn-admin btn-sm" style="flex:1;" onclick="saveGroupEdit('${g.gbId}', ${i})">💾 儲存修改</button>
+            <button class="btn btn-outline btn-sm" onclick="toggleEditForm(${i})">取消</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteGroupBuy('${g.gbId}', '${g.name}')">🗑️ 刪除</button>
           </div>
         </div>
       </div>`;
@@ -2200,6 +2272,39 @@ async function loadAdminGroupList() {
   } catch { el.innerHTML = '<div class="pending-empty">❌ 載入失敗</div>'; }
   finally  { hideLoading(); }
 }
+
+function toggleEditForm(i) {
+  const f = _$('gb-edit-' + i);
+  if (f) f.style.display = f.style.display === 'none' ? 'block' : 'none';
+}
+
+async function saveGroupEdit(gbId, i) {
+  clearAlert('gbe-alert-' + i);
+  const payload = {
+    action:      'updateGroupBuy',
+    gbId,
+    name:        _$('gbe-name-'    + i)?.value.trim()     || '',
+    vendor:      _$('gbe-vendor-'  + i)?.value.trim()     || '',
+    openDate:    _$('gbe-open-'    + i)?.value             || '',
+    closeDate:   _$('gbe-close-'   + i)?.value             || '',
+    pct:         Number(_$('gbe-pct-'      + i)?.value)   || 0,
+    note:        _$('gbe-note-'    + i)?.value.trim()     || '',
+    freeShipMin: Number(_$('gbe-freeship-' + i)?.value)   || 0,
+    shipFee:     Number(_$('gbe-shipfee-'  + i)?.value)   || 0,
+    link:        _$('gbe-link-'    + i)?.value.trim()     || '',
+  };
+  if (!payload.name) { showAlert('gbe-alert-' + i, '⚠️ 品名不能空白'); return; }
+  showLoading();
+  try {
+    const data = await callScript(payload);
+    if (data.success) {
+      showAlert('admin-global-alert', '✅ 團購資料已更新！', 'success');
+      loadAdminGroupList();
+    } else { showAlert('gbe-alert-' + i, '❌ ' + (data.message || '更新失敗')); }
+  } catch { showAlert('gbe-alert-' + i, '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
+}
+
 
 async function toggleGroupStatus(gbId, newStatus) {
   if (!confirm(`確定將此團購設為「${newStatus}」？`)) return;
@@ -2209,6 +2314,105 @@ async function toggleGroupStatus(gbId, newStatus) {
     if (data.success) { loadAdminGroupList(); showAlert('admin-global-alert', `✅ 狀態已更新為「${newStatus}」`, 'success'); }
     else { showAlert('admin-global-alert', '❌ ' + (data.message || '更新失敗')); }
   } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
+}
+
+// ★ v14 刪除團購
+async function deleteGroupBuy(gbId, name) {
+  if (!confirm(`確定刪除團購「${name}」？\n刪除後代理將無法再看到此團購。`)) return;
+  showLoading();
+  try {
+    const data = await callScript({ action: 'deleteGroupBuy', gbId });
+    if (data.success) {
+      showAlert('admin-global-alert', `✅ 團購「${name}」已刪除`, 'success');
+      loadAdminGroupList();
+    } else { showAlert('admin-global-alert', '❌ ' + (data.message || '刪除失敗')); }
+  } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
+}
+
+// ★ v14 廠商記帳：同步團購下拉
+function syncVendorGbSelect() {
+  const sel = _$('vl-gb-select');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">不指定</option>';
+  // 從已載入的 adminAgentData 同層取團購——直接重新拉
+  callScript({ action: 'getGroupBuyList', adminOnly: true }).then(data => {
+    if (!data.success) return;
+    data.list.forEach(g => {
+      const opt = document.createElement('option');
+      opt.value = g.gbId;
+      opt.textContent = g.name + (g.closeDate ? `（截止 ${g.closeDate}）` : '');
+      opt.dataset.name = g.name;
+      sel.appendChild(opt);
+    });
+  }).catch(() => {});
+}
+
+// ★ v14 新增廠商匯入
+async function addVendorPayment() {
+  clearAlert('vl-alert');
+  const date   = _$('vl-date').value;
+  const amount = Number(_$('vl-amount').value);
+  const bank   = _$('vl-bank').value.trim();
+  const vendor = _$('vl-vendor').value.trim();
+  const gbSel  = _$('vl-gb-select');
+  const gbId   = gbSel?.value   || '';
+  const gbName = gbSel?.options[gbSel.selectedIndex]?.dataset.name || '';
+  if (!date)   { showAlert('vl-alert', '⚠️ 請選擇匯入日期'); return; }
+  if (!amount) { showAlert('vl-alert', '⚠️ 請填寫匯入金額'); return; }
+  showLoading();
+  try {
+    const data = await callScript({ action: 'addVendorPayment', date, amount, bank, vendor, gbId, gbName });
+    if (data.success) {
+      showAlert('vl-alert', `✅ 已記錄廠商匯入 NT$${fmtNum(amount)}`, 'success');
+      ['vl-date','vl-amount','vl-bank','vl-vendor'].forEach(id => { if (_$(id)) _$(id).value = ''; });
+      if (gbSel) gbSel.value = '';
+      loadVendorLedger();
+    } else { showAlert('vl-alert', '❌ ' + (data.message || '記錄失敗')); }
+  } catch { showAlert('vl-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
+}
+
+// ★ v14 載入廠商匯入紀錄
+async function loadVendorLedger() {
+  const el = _$('vendor-ledger-list');
+  if (!el) return;
+  el.innerHTML = '<div class="pending-empty">⏳ 載入中...</div>';
+  showLoading();
+  try {
+    const data = await callScript({ action: 'getVendorLedger' });
+    if (!data.success || !data.list.length) {
+      el.innerHTML = '<div class="pending-empty">尚無廠商匯入紀錄</div>';
+      const tot = _$('vl-total-display'); if (tot) tot.textContent = '';
+      return;
+    }
+    let total = 0;
+    el.innerHTML = data.list.map(item => {
+      total += item.amount;
+      return `
+      <div style="background:#fff;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:11px 14px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;">
+        <div>
+          <div style="font-weight:700;font-size:13px;color:var(--primary-dark);">
+            💰 NT$${fmtNum(item.amount)}
+            <span style="font-weight:400;font-size:12px;color:var(--text-muted);">　${item.date}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px;line-height:1.7;">
+            ${item.bank ? '🏦 ' + item.bank + '　' : ''}
+            ${item.vendor ? '📝 ' + item.vendor : ''}
+            ${item.gbName ? '<br>🎁 ' + item.gbName : ''}
+          </div>
+        </div>
+        <span style="font-size:11px;color:var(--text-light);">${item.time}</span>
+      </div>`;
+    }).join('');
+    const tot = _$('vl-total-display');
+    if (tot) {
+      tot.textContent = `共 ${data.list.length} 筆・總計 NT$${fmtNum(total)}`;
+      tot.style.fontWeight = '700';
+      tot.style.color = 'var(--success)';
+    }
+  } catch { el.innerHTML = '<div class="pending-empty">❌ 載入失敗</div>'; }
   finally  { hideLoading(); }
 }
 
