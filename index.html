@@ -713,7 +713,11 @@ input[type="number"] { -moz-appearance: textfield; }
         </div>
         <div class="form-grid-2" style="margin-bottom:14px;">
           <div class="form-row" style="margin:0;"><label>📅 開團日期</label><input type="date" id="gb-open-date"></div>
-          <div class="form-row" style="margin:0;"><label>📅 截止日期</label><input type="date" id="gb-close-date"></div>
+          <div class="form-row" style="margin:0;">
+            <label>📅 截止日期</label>
+            <input type="date" id="gb-close-date">
+            <div style="font-size:11px;color:var(--text-light);margin-top:3px;">截止日當天 23:59 自動截止，不需另外設定時間</div>
+          </div>
         </div>
         <div class="form-grid-2" style="margin-bottom:14px;">
           <div class="form-row" style="margin:0;">
@@ -927,7 +931,7 @@ input[type="number"] { -moz-appearance: textfield; }
 </div>
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyyofpEJ75G3E_j-D7wCZp12cKzeXIXAPY_9RMTglwPxXRGvYsdjwIZLTOeI_hZmS6IjQ/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJNNyC22ZjwL7bW5lQlnxVImmPFWnf88jfVZt-0Cu9pnPElKW_SnLjr6B63TUsNMbBgQ/exec';
 // ★ V7.1 安全性：管理員憑證已完全移至後端 GAS，前端不留存密碼
 
 let currentAgent        = null;
@@ -2085,10 +2089,18 @@ async function loadGroupBuyList() {
             <div style="font-size:10.5px;color:var(--text-light);">預估分潤</div>
           </div>
         </div>
-        <button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%;"
-          onclick="selectGroupBuy('${g.gbId}', '${g.name}', ${g.pct}, ${g.freeShipMin}, ${g.shipFee})">
-          📝 填寫此團購回報
-        </button>
+        ${g.isDeadline
+          ? `<div style="margin-top:10px;padding:9px 13px;background:#f5f5f5;border-radius:var(--radius-sm);text-align:center;font-size:12.5px;color:var(--text-light);font-weight:600;">🔒 團購回報時間已截止</div>`
+          : g.isExpired
+            ? `<div style="font-size:11.5px;color:#e65100;font-weight:600;margin-top:6px;">⚠️ 團購已結束・截止日後 7 天內可補填</div>
+               <button class="btn btn-outline btn-sm" style="margin-top:6px;width:100%;"
+                 onclick="selectGroupBuy('${g.gbId}', '${g.name}', ${g.pct}, ${g.freeShipMin}, ${g.shipFee})">
+                 📝 補填回報
+               </button>`
+            : `<button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%;"
+                 onclick="selectGroupBuy('${g.gbId}', '${g.name}', ${g.pct}, ${g.freeShipMin}, ${g.shipFee})">
+                 📝 填寫此團購回報
+               </button>`}
         ${g.link ? `<a href="${g.link}" target="_blank" class="btn btn-outline btn-sm" style="width:100%;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:5px;">🛒 前往下單頁面</a>` : ''}
       </div>`;
     }).join('');
@@ -2142,7 +2154,7 @@ function calcEstPct() {
       shipStatus.textContent = `✅ 已達免運（NT$${fmtNum(currentGbFreeShip)}）！廠商計算：NT$${fmtNum(totalAmt)}`;
     } else if (amt > 0) {
       shipStatus.style.background = '#fff3e0'; shipStatus.style.border = '1px solid #ffcc80'; shipStatus.style.color = '#e65100';
-      shipStatus.textContent = `⚠️ 未達免運（差 NT$${fmtNum(currentGbFreeShip - amt)}），廠商計算：NT$${fmtNum(totalAmt)}（含運費 NT$${fmtNum(currentGbShipFee)}）`;
+      shipStatus.textContent = `⚠️ 未達免運門檻（NT$${fmtNum(currentGbFreeShip)}），廠商計算：NT$${fmtNum(totalAmt)}（含運費 NT$${fmtNum(currentGbShipFee)}）`;
     }
   } else if (shipStatus) { shipStatus.style.display = 'none'; }
   if (amt > 0 && currentGbPct > 0) {
