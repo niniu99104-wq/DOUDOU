@@ -223,16 +223,28 @@ input[type="number"] { -moz-appearance: textfield; }
 #img-modal img { max-width: 100%; max-height: 90vh; border-radius: 12px; }
 
 @media (max-width: 520px) {
-  .page-wrapper  { padding: 0 14px 60px; }
-  .card          { padding: 20px 16px 18px; }
+  body           { font-size: 13px; }
+  .page-wrapper  { padding: 0 12px 60px; }
+  .card          { padding: 16px 13px 15px; border-radius: 12px; }
+  .site-header h1{ font-size: 17px; letter-spacing: 1px; }
+  label          { font-size: 11.5px; }
+  input[type="text"], input[type="number"], input[type="date"],
+  input[type="password"], select, textarea { padding: 9px 10px; font-size: 13px; }
+  .btn           { padding: 10px 14px; font-size: 13px; }
+  .btn-sm        { padding: 6px 10px; font-size: 12px; }
+  .btn-xs        { padding: 4px 8px;  font-size: 11px; }
   .form-grid-2   { grid-template-columns: 1fr; gap: 0; }
-  .form-grid-3   { grid-template-columns: 1fr 1fr; }
+  .form-grid-3   { grid-template-columns: 1fr 1fr; gap: 6px; }
   .dash-top      { flex-direction: column; gap: 8px; }
   .dash-right    { text-align: left; }
   .calc-actions  { flex-direction: column; }
-  .admin-tab-btn { font-size: 11px; padding: 9px 4px; }
+  .admin-tab-btn { font-size: 10.5px; padding: 8px 3px; letter-spacing: -0.2px; }
   .type-toggle   { flex-direction: column; }
+  .type-btn      { padding: 9px 8px; font-size: 12.5px; }
   .pending-top   { flex-direction: column; }
+  .pending-agent { font-size: 13px; }
+  .tab-btn       { padding: 9px 6px; font-size: 12.5px; }
+  .modal-box     { padding: 20px 16px; }
 }
 </style>
 </head>
@@ -945,7 +957,7 @@ input[type="number"] { -moz-appearance: textfield; }
 </div>
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzK3o37YhaFPyiqVhWs3MTW15LcsD2L40cVj0-GcFirRM1h2N9iMR-vFovAhBZx7Vfyrw/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxBi7mf9qxRnspXtp-rMMUrXpAqF5Xy4nLXzysE2xWnDTt6Ppdl25eVISU7xKuyp8mrKQ/exec';
 // ★ V7.1 安全性：管理員憑證已完全移至後端 GAS，前端不留存密碼
 
 let currentAgent        = null;
@@ -2758,7 +2770,7 @@ async function checkMyDelivery() {
     banner.style.display = 'block';
     banner.innerHTML = pending.map(item => `
       <div style="background:linear-gradient(135deg,#e3f2fd,#e8f5e9);border:1.5px solid #90caf9;border-left:5px solid #1565c0;border-radius:10px;padding:13px 16px;margin-bottom:10px;">
-        <div style="font-size:13px;font-weight:700;color:#1565c0;margin-bottom:6px;">📦 出貨確認通知・${item.batchName}</div>
+        <div style="font-size:17px;font-weight:700;color:#1565c0;margin-bottom:6px;letter-spacing:0.3px;">📦 出貨確認通知</div><div style="font-size:14px;font-weight:600;color:#1565c0;margin-bottom:6px;">・${item.batchName}</div>
         <div style="font-size:12.5px;color:var(--text-muted);margin-bottom:10px;">到貨日期：${item.arrivalDate || '－'}</div>
         <button class="btn btn-primary btn-sm" onclick="openDeliveryModal(${item.row}, ${JSON.stringify(item).replace(/"/g, '&quot;')})">
           📋 查看明細並確認出貨方式
@@ -2783,7 +2795,23 @@ function openDeliveryModal(row, item) {
   // 照片
   const photoDiv = _$('dm-photos');
   photoDiv.innerHTML = '';
-  if (item.photo1Url) photoDiv.innerHTML += `<a href="${item.photo1Url}" target="_blank"><img src="${driveImg(item.photo1Url)}" style="width:100%;border-radius:8px;object-fit:cover;" alt="實秤照" onerror="this.style.display='none';this.nextSibling&&(this.nextSibling.style.display='block')"></a><a href="${item.photo1Url}" target="_blank" style="display:none;font-size:12px;color:#1565c0;">🔗 點擊查看實秤照</a>`;
+  if (item.photo1Url) {
+    const imgUrl = driveImg(item.photo1Url);
+    photoDiv.innerHTML += `
+      <div style="position:relative;">
+        <a href="${item.photo1Url}" target="_blank">
+          <img src="${imgUrl}" style="width:100%;border-radius:8px;object-fit:cover;display:block;" alt="實秤照"
+            onerror="this.style.display='none'; document.getElementById('photo-fallback-${item.row}').style.display='flex';">
+        </a>
+        <a id="photo-fallback-${item.row}" href="${item.photo1Url}" target="_blank"
+          style="display:none;align-items:center;justify-content:center;gap:8px;
+                 background:#e3f2fd;border:2px solid #90caf9;border-radius:8px;
+                 padding:14px 12px;font-size:13px;font-weight:700;color:#1565c0;
+                 text-decoration:none;text-align:center;">
+          🔗 實秤照片載入失敗？點此開啟新視窗查看原圖
+        </a>
+      </div>`;
+  }
   photoDiv.style.display = item.photo1Url ? 'block' : 'none';
 
   // 重置出貨方式按鈕
@@ -2824,7 +2852,16 @@ function selectShipMethod(method) {
     }
   } else {
     infoSec.style.display = 'block';
-    const hint = method === '賣貨便' ? '請填寫賣貨便取件門市（首次填寫後下次自動帶入）' : '請填寫新竹貨運收件資料（首次填寫後下次自動帶入）';
+    // ★ 動態提示字：有資料→提示私訊更換，無資料→提示首次填寫
+    const info = window._agentInfoCache;
+    const hasCvs  = info && info.cvsStore && info.cvsStore.trim();
+    const hasAddr = info && info.address  && info.address.trim();
+    let hint = '';
+    if (method === '賣貨便') {
+      hint = hasCvs  ? '若要更換取件門市，請私訊告知' : '請填寫賣貨便取件門市（首次填寫後下次自動帶入）';
+    } else {
+      hint = hasAddr ? '若要更換收件地址，請私訊告知' : '請填寫新竹貨運收件資料（首次填寫後下次自動帶入）';
+    }
     _$('dm-info-hint').textContent = hint;
     _$('dm-cvs-row').style.display     = method === '賣貨便'   ? 'block' : 'none';
     _$('dm-address-row').style.display = method === '新竹貨運' ? 'block' : 'none';
@@ -2833,6 +2870,11 @@ function selectShipMethod(method) {
 
 async function submitDeliveryConfirm() {
   clearAlert('dm-alert');
+  // ★ 欠款卡控：一般儲值金為負數時禁止確認出貨
+  if (currentBalance < 0) {
+    showAlert('dm-alert', '⚠️ 補齊欠款才會出貨，按出貨前請先將款項結清。');
+    return;
+  }
   if (!currentShipMethod) { showAlert('dm-alert', '⚠️ 請選擇出貨方式'); return; }
 
   // 若需要收件資料，驗證並儲存
