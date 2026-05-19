@@ -354,6 +354,7 @@ input[type="number"] { -moz-appearance: textfield; }
     <div class="tab-bar">
       <button class="tab-btn active" id="tab-btn-deposit"  onclick="switchTab('deposit')">💰 儲值回報</button>
       <button class="tab-btn"        id="tab-btn-checkout" onclick="switchTab('checkout')">🛒 結帳申請</button>
+      <button class="tab-btn"        id="tab-btn-group"    onclick="switchTab('group')">🎁 團購回報</button>
     </div>
     <div id="global-alert" class="alert error"></div>
 
@@ -510,6 +511,59 @@ input[type="number"] { -moz-appearance: textfield; }
         <p id="result-text" style="font-size:13px; color:var(--success); margin:0; line-height:1.7;"></p>
       </div>
     </div>
+
+    <!-- ── 團購回報 tab ── -->
+    <div id="tab-group" class="tab-panel">
+      <div class="card">
+        <div class="card-title">🎁 團購分潤回報</div>
+        <!-- ★ v12 跟團注意事項（固定顯示）-->
+        <div style="background:#fff3e0;border:1.5px solid #ffcc80;border-left:5px solid #e65100;border-radius:var(--radius-sm);padding:12px 15px;margin-bottom:14px;font-size:12.5px;color:#5d4037;line-height:1.85;">
+          <div style="font-weight:700;color:#e65100;margin-bottom:6px;">⚠️ 跟團注意事項</div>
+          公開平台售價即是網站團購價，<strong>不可直接低於團購金額</strong><br>
+          ✅ 可用「優惠券折抵」方式給客人<br>
+          📸 提供之素材請務必上<strong>自己的浮水印</strong><br>
+          以上開團規範請詳閱，如違規未來則不得再參與開團<br><br>
+          <strong>⚠️ 下單截圖需包含「訂單編號 &amp; 金額」</strong>，並登記填寫每一團的專屬表單
+        </div>
+
+        <!-- 開放中的團購列表 -->
+        <div id="group-list-area" style="margin-bottom:16px;">
+          <div style="font-size:12.5px;font-weight:600;color:var(--text-muted);margin-bottom:10px;">📋 目前開放回報的團購</div>
+          <div id="group-buy-list"><div class="history-empty" style="color:var(--text-light);">⏳ 載入中...</div></div>
+        </div>
+
+        <!-- 回報表單（選完團購後顯示）-->
+        <div id="group-report-form" style="display:none;">
+          <div style="background:var(--card-inner);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;font-size:13px;">
+            <div id="group-selected-name" style="font-weight:700;color:var(--primary-dark);"></div>
+            <div id="group-selected-pct" style="font-size:12px;color:var(--text-muted);margin-top:2px;"></div>
+            <div id="group-selected-ship" style="font-size:12px;margin-top:4px;"></div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-row"><label>🔢 訂單編號</label><input type="text" id="grp-order-no" placeholder="請輸入訂單編號"></div>
+            <div class="form-row"><label>💵 訂單總金額（NT$）</label><input type="number" id="grp-order-amt" placeholder="請輸入金額" min="1" oninput="calcEstPct()"></div>
+          </div>
+          <!-- 免運狀態 + 預估分潤顯示 -->
+          <div id="grp-ship-status" style="display:none;border-radius:var(--radius-sm);padding:9px 13px;margin-bottom:10px;font-size:13px;font-weight:600;"></div>
+          <div id="grp-est-display" style="display:none;background:var(--success-bg);border:1px solid #aed581;border-radius:var(--radius-sm);padding:9px 13px;margin-bottom:14px;font-size:13px;color:var(--success);font-weight:600;"></div>
+          <div class="form-row">
+            <label>📸 訂單截圖（必填・需包含訂單編號 &amp; 金額）</label>
+            <div class="upload-area" id="grp-upload-area">
+              <input type="file" id="grp-screenshot" accept="image/*" onchange="handleUpload('grp')">
+              <div class="upload-icon">🧾</div>
+              <div class="upload-text">點擊上傳訂單截圖</div>
+              <div class="upload-sub">截圖需包含「訂單編號 &amp; 金額」</div>
+              <img class="upload-preview" id="grp-preview" alt="預覽">
+            </div>
+          </div>
+          <div id="grp-alert" class="alert error"></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline" style="flex:0 0 auto;" onclick="cancelGroupSelect()">← 返回</button>
+            <button class="btn btn-primary" style="flex:1;" onclick="submitGroupReport()">📤 送出回報</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ── 管理員 ── -->
@@ -528,6 +582,7 @@ input[type="number"] { -moz-appearance: textfield; }
       <button class="admin-tab-btn active" id="atab-btn-deposit"  onclick="switchAdminTab('deposit')">📥 儲值審核</button>
       <button class="admin-tab-btn"        id="atab-btn-checkout" onclick="switchAdminTab('checkout')">💳 結帳審核</button>
       <button class="admin-tab-btn"        id="atab-btn-manual"   onclick="switchAdminTab('manual')">✏️ 手動扣帳</button>
+      <button class="admin-tab-btn"        id="atab-btn-group"    onclick="switchAdminTab('group')">🎁 團購管理</button>
       <button class="admin-tab-btn"        id="atab-btn-delivery" onclick="switchAdminTab('delivery')">📦 出貨管理</button>
       <button class="admin-tab-btn"        id="atab-btn-settings" onclick="switchAdminTab('settings')">⚙️ 系統設定</button>
     </div>
@@ -643,6 +698,63 @@ input[type="number"] { -moz-appearance: textfield; }
           <h3>✅ 結帳完成！</h3>
           <p id="admin-result-text" style="font-size:13px; color:var(--success); margin:0; line-height:1.7;"></p>
         </div>
+      </div>
+    </div>
+
+    <!-- ★ v11 團購管理 -->
+    <div id="atab-group" class="tab-panel">
+      <!-- 建立新團購 -->
+      <div class="card">
+        <div class="card-title admin-color">🎁 建立 / 管理團購</div>
+        <div class="form-grid-2" style="margin-bottom:14px;">
+          <div class="form-row" style="margin:0;"><label>🏷️ 品名</label><input type="text" id="gb-name" placeholder="例：米菲兔記事本"></div>
+          <div class="form-row" style="margin:0;"><label>🏭 廠商</label><input type="text" id="gb-vendor" placeholder="廠商名稱（選填）"></div>
+        </div>
+        <div class="form-grid-2" style="margin-bottom:14px;">
+          <div class="form-row" style="margin:0;"><label>📅 開團日期</label><input type="date" id="gb-open-date"></div>
+          <div class="form-row" style="margin:0;"><label>📅 截止日期</label><input type="date" id="gb-close-date"></div>
+        </div>
+        <div class="form-grid-2" style="margin-bottom:14px;">
+          <div class="form-row" style="margin:0;">
+            <label>💰 預估分潤%</label>
+            <input type="number" id="gb-pct" placeholder="例：15" min="0" max="100" step="0.1">
+            <div style="font-size:11px;color:var(--text-light);margin-top:4px;">代理看到的預估值，實際入帳以廠商退款為準</div>
+          </div>
+          <div class="form-row" style="margin:0;"><label>📝 備註</label><input type="text" id="gb-note" placeholder="選填"></div>
+        </div>
+        <!-- ★ v12 免運門檻 + 運費 -->
+        <div class="form-grid-2" style="margin-bottom:14px;">
+          <div class="form-row" style="margin:0;">
+            <label>🚚 免運門檻（NT$）</label>
+            <input type="number" id="gb-free-ship-min" placeholder="例：700（未填視為無免運）" min="0">
+          </div>
+          <div class="form-row" style="margin:0;">
+            <label>📦 未達免運運費（NT$）</label>
+            <input type="number" id="gb-ship-fee" placeholder="例：60" min="0">
+          </div>
+        </div>
+        <div style="background:#e3f2fd;border:1px solid #90caf9;border-left:4px solid #1565c0;border-radius:var(--radius-sm);padding:9px 13px;margin-bottom:14px;font-size:12px;color:#0d47a1;line-height:1.7;">
+          💡 <strong>分潤計算邏輯：</strong>廠商轉入金額 = Σ（每筆訂單金額 + 未達免運者加運費），你輸入廠商實際退款後系統直接入帳
+        </div>
+        <div id="gb-create-alert" class="alert error"></div>
+        <button class="btn btn-admin btn-full" onclick="createGroupBuy()">➕ 建立團購</button>
+      </div>
+
+      <!-- 現有團購清單 -->
+      <div class="card">
+        <div class="card-title admin-color">📋 團購清單</div>
+        <div id="admin-group-list"><div class="pending-empty">⏳ 載入中...</div></div>
+        <div style="margin-top:14px;"><button class="btn btn-outline btn-sm" onclick="loadAdminGroupList()">🔄 重新整理</button></div>
+      </div>
+
+      <!-- 分潤回報審核 -->
+      <div class="card">
+        <div class="card-title admin-color">💸 分潤回報清單</div>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">
+          廠商退款下來後，輸入實際分潤金額，系統自動入帳到代理一般儲值金。
+        </p>
+        <div id="group-report-list"><div class="pending-empty">⏳ 載入中...</div></div>
+        <div style="margin-top:14px;"><button class="btn btn-outline btn-sm" onclick="loadGroupReports()">🔄 重新整理</button></div>
       </div>
     </div>
 
@@ -777,7 +889,7 @@ input[type="number"] { -moz-appearance: textfield; }
 </div>
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwm8FxHuo8Q7SKcbfZk6TBgL3pAIWq68_gsZVHRJqfGU8ug6LX52hd0srJ741lyDinlIg/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxjvtKtCnMpNcNqEFzJssX_IEnQijI1RipojdBAr5XGdZlfE8yUA02Wh69ceAJKtzQMIg/exec';
 // ★ V7.1 安全性：管理員憑證已完全移至後端 GAS，前端不留存密碼
 
 let currentAgent        = null;
@@ -830,6 +942,7 @@ function handleUpload(prefix) {
     const b64 = canvas.toDataURL('image/jpeg', 0.75); // JPEG 75% 品質
 
     if (prefix === 'dep') depScreenshotB64 = b64;
+    else if (prefix === 'grp') grpScreenshotB64 = b64; // ★ v11
     else                  ckScreenshotB64  = b64;
 
     const area    = _$(prefix + '-upload-area');
@@ -1083,6 +1196,8 @@ function switchTab(tab) {
   document.querySelectorAll('#main-section .tab-btn').forEach(b => b.classList.remove('active'));
   _$('tab-' + tab).classList.add('active'); _$('tab-btn-' + tab).classList.add('active');
   clearAlert('global-alert'); hide('result-section');
+  // ★ v11 切到團購回報 tab 時載入清單
+  if (tab === 'group') loadGroupBuyList();
 }
 
 /* ── ★ Item 5: 清除結帳表單 ── */
@@ -1381,6 +1496,8 @@ function switchAdminTab(tab) {
   clearAlert('admin-global-alert'); hide('admin-result-section');
   // ★ v10 切到出貨管理時載入資料
   if (tab === 'delivery') { syncDeliveryAgentSelect(); loadDeliveryList(); }
+  // ★ v11 切到團購管理時載入
+  if (tab === 'group') { loadAdminGroupList(); loadGroupReports(); }
 }
 
 /* ── 儲值待審 ── */
@@ -1889,6 +2006,277 @@ async function saveAnnounceDates() {
   } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
   finally  { hideLoading(); }
 }
+/* ══════════════════════════════════════════
+   ★ v11 團購分潤系統
+══════════════════════════════════════════ */
+let currentGbId       = null; // 目前選中的團購 ID
+let currentGbPct      = 0;    // 目前選中的預估分潤%
+let currentGbFreeShip = 0;    // ★ v12 免運門檻
+let currentGbShipFee  = 0;    // ★ v12 未達免運運費
+let grpScreenshotB64  = null;
+
+// ── 代理：切換到團購 tab 時載入清單 ──
+async function loadGroupBuyList() {
+  const el = _$('group-buy-list');
+  el.innerHTML = '<div class="history-empty">⏳ 載入中...</div>';
+  try {
+    const data = await callScript({ action: 'getGroupBuyList', adminOnly: false });
+    if (!data.success || !data.list.length) {
+      el.innerHTML = '<div class="history-empty" style="color:var(--text-light);">目前沒有開放中的團購</div>';
+      return;
+    }
+    el.innerHTML = data.list.map(g => {
+      // ★ 免運資訊
+      const shipInfo = g.freeShipMin > 0
+        ? `🚚 滿 NT$${fmtNum(g.freeShipMin)} 免運，未滿加收 NT$${fmtNum(g.shipFee)}`
+        : '🚚 無免運門檻設定';
+      return `
+      <div style="background:#fff;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:13.5px;color:var(--primary-dark);margin-bottom:3px;">🎁 ${g.name}</div>
+            <div style="font-size:12px;color:var(--text-muted);">
+              ${g.vendor ? '廠商：' + g.vendor + '　' : ''}
+              ${g.closeDate ? '截止：' + g.closeDate : ''}
+            </div>
+            <div style="font-size:12px;color:#0d47a1;margin-top:3px;">${shipInfo}</div>
+            ${g.note ? `<div style="font-size:11.5px;color:var(--text-light);margin-top:3px;">${g.note}</div>` : ''}
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-size:16px;font-weight:800;color:var(--success);">${g.pct}%</div>
+            <div style="font-size:10.5px;color:var(--text-light);">預估分潤</div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%;"
+          onclick="selectGroupBuy('${g.gbId}', '${g.name}', ${g.pct}, ${g.freeShipMin}, ${g.shipFee})">
+          📝 填寫此團購回報
+        </button>
+      </div>`;
+    }).join('');
+  } catch {
+    el.innerHTML = '<div class="history-empty" style="color:var(--accent);">❌ 載入失敗</div>';
+  }
+}
+
+function selectGroupBuy(gbId, name, pct, freeShipMin, shipFee) {
+  currentGbId       = gbId;
+  currentGbPct      = pct;
+  currentGbFreeShip = freeShipMin || 0;
+  currentGbShipFee  = shipFee     || 0;
+  _$('group-selected-name').textContent = '🎁 ' + name;
+  _$('group-selected-pct').textContent  = '預估分潤：' + pct + '%（實際金額以廠商退款為準）';
+  const shipEl = _$('group-selected-ship');
+  if (shipEl) {
+    shipEl.textContent  = freeShipMin > 0 ? `🚚 滿 NT$${fmtNum(freeShipMin)} 免運，未滿加收 NT$${fmtNum(shipFee)}` : '';
+    shipEl.style.color  = '#1565c0'; shipEl.style.fontWeight = '600';
+  }
+  _$('group-list-area').style.display   = 'none';
+  _$('group-report-form').style.display = 'block';
+  _$('grp-order-no').value  = '';
+  _$('grp-order-amt').value = '';
+  const ss = _$('grp-ship-status'); if (ss) ss.style.display = 'none';
+  _$('grp-est-display').style.display = 'none';
+  grpScreenshotB64 = null;
+  _$('grp-upload-area').classList.remove('has-file');
+  _$('grp-preview').style.display = 'none';
+  _$('grp-upload-area').querySelector('.upload-text').textContent = '點擊上傳訂單截圖';
+  _$('grp-upload-area').querySelector('.upload-sub').textContent  = '截圖需包含「訂單編號 & 金額」';
+  clearAlert('grp-alert');
+}
+
+function cancelGroupSelect() {
+  currentGbId  = null;
+  _$('group-list-area').style.display   = 'block';
+  _$('group-report-form').style.display = 'none';
+}
+
+function calcEstPct() {
+  const amt        = Number(_$('grp-order-amt').value) || 0;
+  const estDisp    = _$('grp-est-display');
+  const shipStatus = _$('grp-ship-status');
+  if (shipStatus && currentGbFreeShip > 0) {
+    const reachFree = amt >= currentGbFreeShip;
+    const totalAmt  = reachFree ? amt : amt + currentGbShipFee;
+    shipStatus.style.display = amt > 0 ? 'block' : 'none';
+    if (reachFree) {
+      shipStatus.style.background = '#f1f8e9'; shipStatus.style.border = '1px solid #aed581'; shipStatus.style.color = 'var(--success)';
+      shipStatus.textContent = `✅ 已達免運（NT$${fmtNum(currentGbFreeShip)}）！廠商計算：NT$${fmtNum(totalAmt)}`;
+    } else if (amt > 0) {
+      shipStatus.style.background = '#fff3e0'; shipStatus.style.border = '1px solid #ffcc80'; shipStatus.style.color = '#e65100';
+      shipStatus.textContent = `⚠️ 未達免運（差 NT$${fmtNum(currentGbFreeShip - amt)}），廠商計算：NT$${fmtNum(totalAmt)}（含運費 NT$${fmtNum(currentGbShipFee)}）`;
+    }
+  } else if (shipStatus) { shipStatus.style.display = 'none'; }
+  if (amt > 0 && currentGbPct > 0) {
+    const est = Math.floor(amt * currentGbPct / 100);
+    estDisp.style.display = 'block';
+    estDisp.textContent   = `💡 預估分潤：NT$${fmtNum(amt)} × ${currentGbPct}% ≈ NT$${fmtNum(est)}（實際以廠商退款為準）`;
+  } else { estDisp.style.display = 'none'; }
+}
+
+async function submitGroupReport() {
+  clearAlert('grp-alert');
+  const orderNo  = _$('grp-order-no').value.trim();
+  const orderAmt = Number(_$('grp-order-amt').value);
+  if (!currentGbId)          { showAlert('grp-alert', '⚠️ 請先選擇團購'); return; }
+  if (!orderNo)               { showAlert('grp-alert', '⚠️ 請填寫訂單編號'); return; }
+  if (!orderAmt || orderAmt <= 0) { showAlert('grp-alert', '⚠️ 請填寫訂單金額'); return; }
+  if (!grpScreenshotB64)     { showAlert('grp-alert', '⚠️ 請上傳訂單截圖'); return; }
+  showLoading();
+  try {
+    const data = await callScript({
+      action: 'submitGroupReport', agentCode: currentAgent,
+      gbId: currentGbId, orderNo, orderAmt,
+      screenshot: grpScreenshotB64
+    });
+    if (data.success) {
+      cancelGroupSelect();
+      showAlert('global-alert', '✅ 團購回報已送出！廠商退款後我會入帳到你的儲值金。', 'success');
+    } else { showAlert('grp-alert', '❌ ' + (data.message || '送出失敗')); }
+  } catch { showAlert('grp-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
+}
+
+// ── 管理員：建立團購 ──
+async function createGroupBuy() {
+  clearAlert('gb-create-alert');
+  const name        = _$('gb-name').value.trim();
+  const vendor      = _$('gb-vendor').value.trim();
+  const openDate    = _$('gb-open-date').value;
+  const closeDate   = _$('gb-close-date').value;
+  const pct         = Number(_$('gb-pct').value) || 0;
+  const freeShipMin = Number(_$('gb-free-ship-min').value) || 0; // ★ v12
+  const shipFee     = Number(_$('gb-ship-fee').value)      || 0; // ★ v12
+  const note        = _$('gb-note').value.trim();
+  if (!name) { showAlert('gb-create-alert', '⚠️ 請填寫品名'); return; }
+  showLoading();
+  try {
+    const data = await callScript({ action: 'createGroupBuy', name, vendor, openDate, closeDate, pct, freeShipMin, shipFee, note });
+    if (data.success) {
+      showAlert('gb-create-alert', `✅ 團購「${name}」已建立！代理可以開始回報。`, 'success');
+      ['gb-name','gb-vendor','gb-open-date','gb-close-date','gb-pct','gb-free-ship-min','gb-ship-fee','gb-note'].forEach(id => { if(_$(id)) _$(id).value = ''; });
+      loadAdminGroupList();
+    } else { showAlert('gb-create-alert', '❌ ' + (data.message || '建立失敗')); }
+  } catch { showAlert('gb-create-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
+}
+
+// ── 管理員：載入團購清單 ──
+async function loadAdminGroupList() {
+  const el = _$('admin-group-list');
+  el.innerHTML = '<div class="pending-empty">⏳ 載入中...</div>';
+  showLoading();
+  try {
+    const data = await callScript({ action: 'getGroupBuyList', adminOnly: true });
+    if (!data.success || !data.list.length) {
+      el.innerHTML = '<div class="pending-empty">尚未建立任何團購</div>'; return;
+    }
+    el.innerHTML = data.list.map((g, i) => {
+      const isOpen   = g.status === '開放';
+      const badge    = isOpen
+        ? `<span style="background:var(--success-bg);color:var(--success);font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid #aed581;">✅ 開放</span>`
+        : `<span style="background:#fbe9e7;color:var(--accent);font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid #ffccbc;">🔒 關閉</span>`;
+      return `
+      <div class="pending-item" style="margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;">
+          <div>
+            <div class="pending-agent">🎁 ${g.name} ${badge}</div>
+            <div class="pending-detail">
+              ${g.vendor ? '廠商：' + g.vendor + '<br>' : ''}
+              開團：${g.openDate || '－'}　截止：${g.closeDate || '－'}<br>
+              預估分潤：<strong>${g.pct}%</strong>
+              ${g.freeShipMin > 0 ? `　🚚 免運門檻：NT$${fmtNum(g.freeShipMin)}／未達：NT$${fmtNum(g.shipFee)}` : ''}
+              ${g.note ? '<br>' + g.note : ''}
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;">
+            <button class="btn btn-${isOpen ? 'danger' : 'success'} btn-xs"
+              onclick="toggleGroupStatus('${g.gbId}', '${isOpen ? '關閉' : '開放'}')">
+              ${isOpen ? '🔒 關閉' : '✅ 開放'}
+            </button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch { el.innerHTML = '<div class="pending-empty">❌ 載入失敗</div>'; }
+  finally  { hideLoading(); }
+}
+
+async function toggleGroupStatus(gbId, newStatus) {
+  if (!confirm(`確定將此團購設為「${newStatus}」？`)) return;
+  showLoading();
+  try {
+    const data = await callScript({ action: 'updateGroupBuy', gbId, status: newStatus });
+    if (data.success) { loadAdminGroupList(); showAlert('admin-global-alert', `✅ 狀態已更新為「${newStatus}」`, 'success'); }
+    else { showAlert('admin-global-alert', '❌ ' + (data.message || '更新失敗')); }
+  } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
+}
+
+// ── 管理員：載入分潤回報並結算 ──
+async function loadGroupReports() {
+  const el = _$('group-report-list');
+  el.innerHTML = '<div class="pending-empty">⏳ 載入中...</div>';
+  showLoading();
+  try {
+    const data = await callScript({ action: 'getGroupReports' });
+    if (!data.success || !data.list.length) {
+      el.innerHTML = '<div class="pending-empty">✅ 目前沒有分潤回報</div>'; return;
+    }
+    el.innerHTML = data.list.map((item, i) => {
+      const isPending  = item.status === '待審核';
+      const statusBadge = isPending
+        ? `<span style="color:#e65100;font-size:11px;font-weight:700;">⏳ 待結算</span>`
+        : `<span style="color:var(--success);font-size:11px;font-weight:700;">✅ 已結算 NT$${fmtNum(item.actualAmt)}</span>`;
+      return `
+      <div class="pending-item ${isPending ? '' : 'approved'}" id="grpt-${i}" style="margin-bottom:8px;">
+        <div class="pending-top">
+          <div class="pending-info">
+            <div class="pending-agent">
+              👤 ${item.agentCode}${item.agentName ? '（' + item.agentName + '）' : ''}
+              　${statusBadge}
+            </div>
+            <div class="pending-detail">
+              🎁 ${item.gbName}<br>
+              🔢 訂單：${item.orderNo}　💵 NT$${fmtNum(item.orderAmt)}<br>
+              🕐 ${item.time}
+              ${item.settledAt ? '　入帳：' + item.settledAt : ''}
+            </div>
+            ${item.screenshotUrl ? `<a class="screenshot-link" href="${item.screenshotUrl}" target="_blank" onclick="openImg('${item.screenshotUrl}',event)">🧾 查看訂單截圖</a>` : ''}
+          </div>
+        </div>
+        ${isPending ? `
+        <div class="pending-actions" id="grpt-action-${i}">
+          <input type="number" id="grpt-amt-${i}" placeholder="輸入實際分潤金額 NT$"
+            style="flex:1;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;font-size:14px;"
+            value="${item.orderAmt && item.orderAmt > 0 ? Math.floor(item.orderAmt * 5 / 100) : ''}">
+          <button class="btn btn-success btn-sm" onclick="settleGroupReport(${item.row}, ${i})">💰 入帳</button>
+        </div>` : ''}
+      </div>`;
+    }).join('');
+  } catch { el.innerHTML = '<div class="pending-empty">❌ 載入失敗</div>'; }
+  finally  { hideLoading(); }
+}
+
+async function settleGroupReport(rowNum, idx) {
+  const amt = Number(_$('grpt-amt-' + idx)?.value);
+  if (!amt || amt <= 0) { showAlert('admin-global-alert', '⚠️ 請輸入實際分潤金額'); return; }
+  if (!confirm(`確認將 NT$${fmtNum(amt)} 入帳到代理一般儲值金？`)) return;
+  showLoading();
+  try {
+    const data = await callScript({ action: 'settleGroupReport', rowNum, actualAmt: amt });
+    if (data.success) {
+      const item = _$('grpt-' + idx);
+      if (item) {
+        item.classList.add('approved');
+        const actionDiv = _$('grpt-action-' + idx);
+        if (actionDiv) actionDiv.innerHTML = `<span style="color:var(--success);font-size:12px;font-weight:600;">✅ 已入帳 NT$${fmtNum(amt)}，代理一般儲值金剩 NT$${fmtNum(data.newBalance)}</span>`;
+      }
+      showAlert('admin-global-alert', `✅ 分潤 NT$${fmtNum(amt)} 已入帳！`, 'success');
+    } else { showAlert('admin-global-alert', '❌ ' + (data.message || '入帳失敗')); }
+  } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
+}
+
 function updateMarquee(wed, sun) {
   const wedStr = wed ? `週三（${wed}）` : '週三', sunStr = sun ? `週日（${sun}）` : '週日';
   const text = `📢 儲值入帳時間調整通知 ・ 🗓️ 下次入帳日：${wedStr} & ${sunStr} ・ ⚠️ 週三入帳→請週三前完成匯款 ・ ⚠️ 週日入帳→請週日前完成匯款 ・ 當天匯款將順延至下一個入帳日 ・ 請提前儲值，避免額度不足 🥹 ・ 謝謝大家的配合與理解 ♡`;
