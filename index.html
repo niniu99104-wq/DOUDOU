@@ -620,11 +620,11 @@ input[type="number"] { -moz-appearance: textfield; }
         </div>
         <div class="form-row">
           <label>結帳類型</label>
-          <div class="type-toggle" style="flex-wrap:wrap; gap:6px;">
-            <div class="type-btn active" id="type-btn-batch"    onclick="switchCheckoutType('batch')"    style="flex:1; min-width:100px;">🛍️ 批發網</div>
-            <div class="type-btn"        id="type-btn-online"   onclick="switchCheckoutType('online')"   style="flex:1; min-width:100px;">🌐 官網&amp;記事本</div>
-            <div class="type-btn"        id="type-btn-shipping" onclick="switchCheckoutType('shipping')" style="flex:1; min-width:100px;">📦 運費結算</div>
+          <div class="type-toggle" style="gap:8px;">
+            <div class="type-btn active" id="type-btn-batch"  onclick="switchCheckoutType('batch')"  style="flex:1;">🛍️ 批發網</div>
+            <div class="type-btn"        id="type-btn-online" onclick="switchCheckoutType('online')" style="flex:1;">🌐 官網&amp;記事本</div>
           </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">💡 運費結算請至「📦 出貨」tab 統一處理</div>
         </div>
         <div id="form-batch">
           <div class="form-grid-2" style="margin-bottom:14px;">
@@ -651,42 +651,7 @@ input[type="number"] { -moz-appearance: textfield; }
           <div class="form-row"><label>📋 整理費（NT$）</label><input type="number" id="online-sort-fee" placeholder="0" min="0" oninput="updateAfterBalance()"></div>
           <div class="form-row"><label>📝 備註</label><input type="text" id="online-note" placeholder="備註"></div>
         </div>
-        <!-- ★ 運費結算表單（扣一般儲值金）-->
-        <div id="form-shipping" style="display:none;">
-          <div style="background:#e8f5e9; border:1.5px solid #a5d6a7; border-left:4px solid var(--success); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:14px; font-size:12.5px; color:#2e7d32; font-weight:600;">
-            💰 此筆將從代理的<strong>一般儲值金</strong>扣除
-          </div>
-          <div class="form-grid-2" style="margin-bottom:14px;">
-            <div class="form-row" style="margin:0;"><label>📅 到貨日期</label><input type="date" id="ship-date"></div>
-            <div class="form-row" style="margin:0;"><label>🏷️ 批次／開團名稱</label><input type="text" id="ship-batch" placeholder="例：0507韓國批次、米菲兔記事本"></div>
-          </div>
-          <div class="form-grid-2" style="margin-bottom:14px;">
-            <div class="form-row" style="margin:0;"><label>⚖️ 重量（kg）</label><input type="number" id="ship-weight" placeholder="0.0" min="0" step="0.1" oninput="calcShipping()"></div>
-            <div class="form-row" style="margin:0;">
-              <label>🚢 國際運費單價（NT$/kg）</label>
-              <input type="number" id="ship-rate" placeholder="225" min="0" oninput="calcShipping()">
-              <div style="font-size:11px; color:var(--text-light); margin-top:4px;" id="ship-rate-hint">儲值帳號 225 ／ 非儲值 235 ／ 選物 220</div>
-            </div>
-          </div>
-          <!-- 國際運費小計（自動計算，唯讀） -->
-          <div class="form-row" style="margin-bottom:14px;">
-            <label>🚢 國際運費小計（NT$）</label>
-            <div id="ship-intl-display" style="padding:11px 13px; background:var(--card-inner); border:1.5px solid var(--border); border-radius:var(--radius-sm); font-weight:700; color:var(--success); font-size:15px;">NT$ 0</div>
-          </div>
-          <div class="form-grid-2" style="margin-bottom:14px;">
-            <div class="form-row" style="margin:0;"><label>🚚 國內運費（NT$）</label><input type="number" id="ship-local-fee" placeholder="0" min="0" oninput="calcShipping()"></div>
-            <div class="form-row" style="margin:0;"><label>📋 整理費（NT$）</label><input type="number" id="ship-sort-fee" placeholder="0" min="0" oninput="calcShipping()"></div>
-          </div>
-          <div class="form-row"><label>📝 備註</label><input type="text" id="ship-note" placeholder="選填"></div>
-          <!-- 總計 -->
-          <div style="background:linear-gradient(135deg,#f3e5f5,#ede7f6); border:1.5px solid #b39ddb; border-radius:var(--radius-sm); padding:14px 16px; margin-bottom:16px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:13px; color:var(--admin); font-weight:600;">📊 運費結算總計</span>
-              <span id="ship-total-display" style="font-size:20px; font-weight:800; color:var(--accent);">NT$ 0</span>
-            </div>
-            <div id="ship-breakdown" style="font-size:12px; color:var(--text-muted); margin-top:6px; line-height:1.7;"></div>
-          </div>
-        </div>
+
 
         <div class="after-balance-box" id="after-balance-box" style="display:none;">
           <span class="after-balance-label">結帳後預估餘額</span>
@@ -800,42 +765,91 @@ input[type="number"] { -moz-appearance: textfield; }
       </div>
     </div>
 
-    <!-- ★ v10 出貨管理 -->
+    <!-- ★ v15 出貨管理（整合運費結算）-->
     <div id="atab-delivery" class="tab-panel">
 
-      <!-- 建立出貨通知 -->
+      <!-- 建立出貨通知（整合運費結算）-->
       <div class="card">
-        <div class="card-title admin-color">📦 建立出貨確認通知</div>
-        <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">
-          填寫完成後，代理登入系統即可看到明細，並在系統內選擇出貨方式。
-        </p>
+        <div class="card-title admin-color">📦 運費結算 &amp; 出貨通知</div>
+
+        <!-- 代理 + 日期 + 批次 -->
         <div class="form-grid-2" style="margin-bottom:14px;">
           <div class="form-row" style="margin:0;"><label>選擇代理</label>
-            <select id="dv-agent-select"><option value="">請選擇代理</option></select>
+            <select id="dv-agent-select" onchange="onDvAgentChange()"><option value="">請選擇代理</option></select>
           </div>
           <div class="form-row" style="margin:0;"><label>📅 到貨日期</label>
             <input type="date" id="dv-arrival-date">
           </div>
         </div>
         <div class="form-row"><label>🏷️ 批次／開團名稱</label>
-          <input type="text" id="dv-batch-name" placeholder="例：0507韓國批次">
+          <input type="text" id="dv-batch-name" placeholder="例：0507韓國批次、米菲兔記事本">
         </div>
-        <div class="form-row"><label>📋 運費明細（代理看到的文字說明）</label>
-          <textarea id="dv-fee-detail" rows="4" placeholder="例：重量 1.2kg × $225 = NT$270&#10;國內運費 NT$100&#10;整理費 NT$50&#10;合計 NT$420" style="resize:vertical;"></textarea>
-        </div>
-        <div class="form-row" style="margin-bottom:14px;">
-          <div class="form-row" style="margin:0;"><label>📷 實秤照</label>
-            <div class="upload-area" id="dv-photo1-area">
-              <input type="file" id="dv-photo1" accept="image/*" onchange="handleDeliveryUpload('photo1')">
-              <div class="upload-icon">⚖️</div>
-              <div class="upload-text">點擊上傳實秤照</div>
-              <div class="upload-sub">選填</div>
-              <img class="upload-preview" id="dv-photo1-prev" alt="">
+
+        <!-- 運費計算 -->
+        <div style="background:var(--card-inner);border-radius:var(--radius-sm);padding:14px;margin-bottom:14px;">
+          <div style="font-size:12.5px;font-weight:700;color:var(--primary-dark);margin-bottom:12px;">📊 運費計算</div>
+          <div class="form-grid-2" style="margin-bottom:10px;">
+            <div class="form-row" style="margin:0;"><label>⚖️ 重量（kg）</label>
+              <input type="number" id="dv-weight" placeholder="0.0" min="0" step="0.1" oninput="calcDvShipping()">
+            </div>
+            <div class="form-row" style="margin:0;">
+              <label>🚢 單價（NT$/kg）</label>
+              <input type="number" id="dv-rate" placeholder="225" min="0" oninput="calcDvShipping()">
+              <div style="font-size:11px;color:var(--text-light);margin-top:3px;" id="dv-rate-hint">儲值帳號 $225 ／ 非儲值 $235</div>
             </div>
           </div>
+          <div class="form-grid-2" style="margin-bottom:10px;">
+            <div class="form-row" style="margin:0;"><label>🚚 國內運費（NT$）</label>
+              <input type="number" id="dv-local-fee" placeholder="0" min="0" oninput="calcDvShipping()">
+            </div>
+            <div class="form-row" style="margin:0;"><label>📋 整理費（NT$）</label>
+              <input type="number" id="dv-sort-fee" placeholder="0" min="0" oninput="calcDvShipping()">
+            </div>
+          </div>
+          <div class="form-row" style="margin-bottom:0;"><label>📝 備註</label>
+            <input type="text" id="dv-ship-note" placeholder="選填">
+          </div>
+          <!-- 總計顯示 -->
+          <div style="margin-top:10px;background:linear-gradient(135deg,#f3e5f5,#ede7f6);border:1.5px solid #b39ddb;border-radius:var(--radius-sm);padding:12px 14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:13px;color:var(--admin);font-weight:600;">📊 運費總計</span>
+              <span id="dv-total-display" style="font-size:20px;font-weight:800;color:var(--accent);">NT$ 0</span>
+            </div>
+            <div id="dv-breakdown" style="font-size:12px;color:var(--text-muted);margin-top:5px;line-height:1.7;"></div>
+          </div>
         </div>
+
+        <!-- 實秤照 -->
+        <div class="form-row">
+          <label>📷 實秤照（選填）</label>
+          <div class="upload-area" id="dv-photo1-area">
+            <input type="file" id="dv-photo1" accept="image/*" onchange="handleDeliveryUpload('photo1')">
+            <div class="upload-icon">⚖️</div>
+            <div class="upload-text">點擊上傳實秤照</div>
+            <div class="upload-sub">選填</div>
+            <img class="upload-preview" id="dv-photo1-prev" alt="">
+          </div>
+        </div>
+
+        <!-- 模式選擇 -->
+        <div class="form-row">
+          <label>📌 作業模式</label>
+          <div class="type-toggle" style="flex-wrap:wrap;gap:6px;">
+            <div class="type-btn active" id="dv-mode-btn-both"   onclick="switchDvMode('charge_and_notify')" style="flex:1;min-width:110px;font-size:12.5px;">💰📤 扣帳並通知</div>
+            <div class="type-btn"        id="dv-mode-btn-charge" onclick="switchDvMode('charge_only')"       style="flex:1;min-width:110px;font-size:12.5px;">💰 只扣帳</div>
+            <div class="type-btn"        id="dv-mode-btn-notify" onclick="switchDvMode('notify_only')"       style="flex:1;min-width:110px;font-size:12.5px;">📤 只通知</div>
+          </div>
+          <div id="dv-mode-hint" style="font-size:12px;color:var(--text-muted);margin-top:6px;">扣款並發通知給代理確認出貨方式</div>
+        </div>
+
+        <!-- 預估餘額 -->
+        <div id="dv-after-balance" style="display:none;background:linear-gradient(135deg,#f3e5f5,#ede7f6);border:1.5px solid #b39ddb;border-radius:var(--radius-sm);padding:11px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:var(--admin);font-weight:600;">扣款後一般儲值金</span>
+          <span id="dv-after-balance-val" style="font-size:18px;font-weight:800;color:var(--accent);">NT$ 0</span>
+        </div>
+
         <div id="dv-create-alert" class="alert error"></div>
-        <button class="btn btn-admin btn-full" onclick="createDelivery()">📤 發送出貨確認通知</button>
+        <button class="btn btn-admin btn-full" onclick="createDeliveryWithShipping()">✅ 送出</button>
       </div>
 
       <!-- 出貨確認清單 -->
@@ -931,7 +945,7 @@ input[type="number"] { -moz-appearance: textfield; }
 </div>
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJNNyC22ZjwL7bW5lQlnxVImmPFWnf88jfVZt-0Cu9pnPElKW_SnLjr6B63TUsNMbBgQ/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzK3o37YhaFPyiqVhWs3MTW15LcsD2L40cVj0-GcFirRM1h2N9iMR-vFovAhBZx7Vfyrw/exec';
 // ★ V7.1 安全性：管理員憑證已完全移至後端 GAS，前端不留存密碼
 
 let currentAgent        = null;
@@ -959,6 +973,14 @@ async function callScript(payload) {
   return res.json();
 }
 function fmtNum(n) { return Number(n || 0).toLocaleString(); }
+
+// ★ v15 Fix: Convert Drive view URL to embeddable URL
+function driveImg(url) {
+  if (!url) return '';
+  const m = url.match(/\/file\/d\/([^\/]+)\/view/);
+  if (m) return 'https://drive.google.com/uc?export=view&id=' + m[1];
+  return url;
+}
 
 /* ── 截圖上傳（含壓縮）── */
 function handleUpload(prefix) {
@@ -1618,7 +1640,7 @@ async function loadCheckoutPending() {
 /* ── 圖片放大 ── */
 function openImg(url, e) {
   if (e) e.preventDefault();
-  _$('img-modal-src').src = url;
+  _$('img-modal-src').src = driveImg(url); // ★ v15 Fix
   _$('img-modal').classList.add('active');
 }
 function closeImgModal() { _$('img-modal').classList.remove('active'); }
@@ -2538,38 +2560,124 @@ function handleDeliveryUpload(which) {
 }
 
 // ── 管理員：建立出貨通知 ──
-async function createDelivery() {
+// ── ★ v15 出貨模式狀態 ──
+let currentDvMode = 'charge_and_notify';
+
+function switchDvMode(mode) {
+  currentDvMode = mode;
+  ['both','charge','notify'].forEach(k => _$('dv-mode-btn-' + k)?.classList.remove('active'));
+  const map = { charge_and_notify: 'both', charge_only: 'charge', notify_only: 'notify' };
+  _$('dv-mode-btn-' + map[mode])?.classList.add('active');
+  const hints = {
+    charge_and_notify: '扣款並發通知給代理確認出貨方式',
+    charge_only:       '只扣款，不發通知（適合特殊結算）',
+    notify_only:       '只發通知，不扣款（費用已另外處理）',
+  };
+  const hint = _$('dv-mode-hint');
+  if (hint) hint.textContent = hints[mode];
+  calcDvShipping(); // 更新餘額預覽
+}
+
+function onDvAgentChange() {
+  const sel = _$('dv-agent-select');
+  const opt = sel?.options[sel.selectedIndex];
+  if (!opt || !opt.value) { hide('dv-after-balance'); return; }
+  // 預填運費單價
+  const accountType = opt.dataset.accountType || '非儲值帳號';
+  const rateEl = _$('dv-rate');
+  if (rateEl) rateEl.value = accountType === '儲值帳號' ? 225 : 235;
+  const hintEl = _$('dv-rate-hint');
+  if (hintEl) hintEl.textContent = accountType === '儲值帳號' ? '✅ 儲值帳號 $225/kg' : '📦 非儲值帳號 $235/kg';
+  calcDvShipping();
+}
+
+function calcDvShipping() {
+  const weight   = Number(_$('dv-weight')?.value)    || 0;
+  const rate     = Number(_$('dv-rate')?.value)      || 0;
+  const localFee = Number(_$('dv-local-fee')?.value) || 0;
+  const sortFee  = Number(_$('dv-sort-fee')?.value)  || 0;
+  const intlFee  = Math.ceil(weight * rate);
+  const total    = intlFee + localFee + sortFee;
+
+  const totalEl = _$('dv-total-display');
+  if (totalEl) totalEl.textContent = 'NT$ ' + fmtNum(total);
+
+  const breakdown = _$('dv-breakdown');
+  if (breakdown) {
+    const parts = [];
+    if (intlFee)  parts.push(`國際運費 ${weight}kg × NT$${rate} = NT$${fmtNum(intlFee)}`);
+    if (localFee) parts.push(`國內運費 NT$${fmtNum(localFee)}`);
+    if (sortFee)  parts.push(`整理費 NT$${fmtNum(sortFee)}`);
+    breakdown.textContent = parts.join('　＋　') || '請填寫重量和費用';
+  }
+
+  // 更新預估餘額（僅扣帳模式才顯示）
+  const balBox = _$('dv-after-balance');
+  const balVal = _$('dv-after-balance-val');
+  const sel    = _$('dv-agent-select');
+  const opt    = sel?.options[sel.selectedIndex];
+  if (opt && opt.value && total > 0 && currentDvMode !== 'notify_only') {
+    const generalBal = Number(opt.dataset.balance || 0);
+    const after      = generalBal - total;
+    if (balBox) balBox.style.display = 'flex';
+    if (balVal) { balVal.textContent = 'NT$ ' + fmtNum(after); balVal.style.color = after >= 0 ? 'var(--success)' : 'var(--accent)'; }
+  } else {
+    if (balBox) balBox.style.display = 'none';
+  }
+}
+
+// ── ★ v15 合併版：送出（運費結算 + 出貨通知）──
+async function createDeliveryWithShipping() {
   clearAlert('dv-create-alert');
   const agentCode   = _$('dv-agent-select').value;
   const arrivalDate = _$('dv-arrival-date').value;
   const batchName   = _$('dv-batch-name').value.trim();
-  const feeDetail   = _$('dv-fee-detail').value.trim();
-  if (!agentCode)   { showAlert('dv-create-alert', '⚠️ 請選擇代理'); return; }
-  if (!batchName)   { showAlert('dv-create-alert', '⚠️ 請填寫批次名稱'); return; }
-  if (!feeDetail)   { showAlert('dv-create-alert', '⚠️ 請填寫運費明細'); return; }
+  const weight      = Number(_$('dv-weight')?.value)    || 0;
+  const shipRate    = Number(_$('dv-rate')?.value)      || 0;
+  const localFee    = Number(_$('dv-local-fee')?.value) || 0;
+  const sortFee     = Number(_$('dv-sort-fee')?.value)  || 0;
+  const note        = _$('dv-ship-note')?.value.trim()  || '';
+  const total       = Math.ceil(weight * shipRate) + localFee + sortFee;
+
+  if (!agentCode) { showAlert('dv-create-alert', '⚠️ 請選擇代理'); return; }
+  if (!batchName) { showAlert('dv-create-alert', '⚠️ 請填寫批次名稱'); return; }
+  if (currentDvMode !== 'notify_only' && total <= 0) {
+    showAlert('dv-create-alert', '⚠️ 請填寫運費資訊（或選擇「只通知」模式）'); return;
+  }
   showLoading();
   try {
     const data = await callScript({
-      action: 'createDelivery', agentCode, arrivalDate, batchName, feeDetail,
-      photo1: dvPhoto1B64 || '', photo2: dvPhoto2B64 || ''
+      action: 'createDeliveryWithShipping',
+      agentCode, arrivalDate, batchName,
+      weight, shipRate, localFee, sortFee, note,
+      photo1: dvPhoto1B64 || '',
+      mode:   currentDvMode,
     });
     if (data.success) {
-      showAlert('dv-create-alert', '✅ 通知已發送！代理登入後即可看到。', 'success');
-      _$('dv-batch-name').value = ''; _$('dv-fee-detail').value = ''; _$('dv-arrival-date').value = '';
-      dvPhoto1B64 = null; dvPhoto2B64 = null;
-      ['dv-photo1-area'].forEach(id => {
-        const a = _$(id); if (!a) return;
-        a.classList.remove('has-file');
-        a.querySelector('.upload-text').textContent = '點擊上傳實秤照';
-        const p = a.querySelector('.upload-preview'); if (p) p.style.display = 'none';
-      });
-      loadDeliveryList();
+      const modeLabel = { charge_and_notify: '扣帳並發送通知', charge_only: '扣帳完成', notify_only: '通知已發送' }[currentDvMode];
+      showAlert('dv-create-alert',
+        `✅ ${modeLabel}！運費 NT$${fmtNum(data.total)}${currentDvMode !== 'notify_only' ? '，已從一般儲值金扣除' : ''}`, 'success');
+      // 清空表單
+      ['dv-batch-name','dv-arrival-date','dv-weight','dv-rate','dv-local-fee','dv-sort-fee','dv-ship-note'].forEach(id => { if(_$(id)) _$(id).value = ''; });
+      dvPhoto1B64 = null;
+      const area = _$('dv-photo1-area');
+      if (area) { area.classList.remove('has-file'); area.querySelector('.upload-text').textContent = '點擊上傳實秤照'; const pv = area.querySelector('.upload-preview'); if(pv) pv.style.display='none'; }
+      _$('dv-total-display').textContent = 'NT$ 0';
+      _$('dv-breakdown').textContent = '';
+      hide('dv-after-balance');
+      // 更新管理員代理餘額 dataset
+      const sel = _$('dv-agent-select');
+      const opt = sel?.options[sel.selectedIndex];
+      if (opt && data.total > 0 && currentDvMode !== 'notify_only') {
+        opt.dataset.balance = (Number(opt.dataset.balance || 0) - data.total).toString();
+      }
+      if (currentDvMode !== 'charge_only') loadDeliveryList();
     } else { showAlert('dv-create-alert', '❌ ' + (data.message || '送出失敗')); }
   } catch { showAlert('dv-create-alert', '⚠️ 網路錯誤'); }
   finally  { hideLoading(); }
 }
 
-// ── 管理員：載入出貨清單 ──
+// ── 管理員：載入出貨清單（加封存按鈕）──
 async function loadDeliveryList() {
   const el = _$('delivery-list');
   el.innerHTML = '<div class="pending-empty">⏳ 載入中...</div>';
@@ -2578,6 +2686,7 @@ async function loadDeliveryList() {
     const data = await callScript({ action: 'getDeliveryList' });
     if (data.success && data.list.length > 0) {
       el.innerHTML = data.list.map((item, i) => {
+        if (item.status === '已封存') return ''; // 已封存不顯示
         const info     = item.agentInfo;
         const infoHtml = info
           ? `<div style="font-size:11.5px;color:var(--text-muted);margin-top:4px;line-height:1.7;">
@@ -2585,15 +2694,16 @@ async function loadDeliveryList() {
               ${item.shipMethod === '賣貨便'   ? '🏪 ' + (info.cvsStore || '未填') : ''}
               ${item.shipMethod === '新竹貨運' ? '🏠 ' + (info.address  || '未填') : ''}
              </div>`
-          : '<div style="font-size:11.5px;color:var(--text-light);margin-top:4px;">尚未填寫收件資料</div>';
+          : '<div style="font-size:11.5px;color:var(--text-light);margin-top:4px;">代理尚未確認</div>';
 
-        const statusColor = item.status === '已確認' ? 'var(--success)' : '#e65100';
+        const isConfirmed = item.status === '已確認';
+        const statusColor = isConfirmed ? 'var(--success)' : '#e65100';
         const shipBadge   = item.shipMethod
           ? `<span style="background:#e3f2fd;color:#0d47a1;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px;">${item.shipMethod}</span>`
           : '';
 
         return `
-        <div class="pending-item">
+        <div class="pending-item" id="dv-item-${item.row}">
           <div class="pending-top">
             <div class="pending-info">
               <div class="pending-agent">
@@ -2605,14 +2715,33 @@ async function loadDeliveryList() {
                 🏷️ ${item.batchName}　📅 ${item.arrivalDate || '－'}<br>
                 ${item.feeDetail ? item.feeDetail.replace(/\n/g, '<br>') : ''}
               </div>
-              ${item.photo1Url ? `<a class="screenshot-link" href="${item.photo1Url}" target="_blank">⚖️ 實秤照</a>` : ''}
+              ${item.photo1Url ? `<a class="screenshot-link" href="${item.photo1Url}" target="_blank" onclick="openImg('${item.photo1Url}',event)">⚖️ 查看實秤照</a>` : ''}
               ${infoHtml}
             </div>
           </div>
+          ${isConfirmed ? `
+          <div class="pending-actions">
+            <button class="btn btn-success btn-sm" onclick="archiveDelivery(${item.row})">📁 完成出貨・封存</button>
+          </div>` : ''}
         </div>`;
       }).join('');
     } else { el.innerHTML = '<div class="pending-empty">✅ 目前沒有出貨確認紀錄</div>'; }
   } catch { el.innerHTML = '<div class="pending-empty">❌ 載入失敗，請重試</div>'; }
+  finally  { hideLoading(); }
+}
+
+// ── ★ v15 封存出貨 ──
+async function archiveDelivery(rowNum) {
+  if (!confirm('確認出貨完成並封存此筆？封存後將移入出貨封存紀錄。')) return;
+  showLoading();
+  try {
+    const data = await callScript({ action: 'archiveDelivery', rowNum });
+    if (data.success) {
+      const item = _$('dv-item-' + rowNum);
+      if (item) { item.classList.add('approved'); item.querySelector('.pending-actions').innerHTML = '<span style="font-size:12px;color:var(--success);font-weight:600;">📁 已封存</span>'; }
+      showAlert('admin-global-alert', '✅ 已封存！資料已存入出貨封存工作表。', 'success');
+    } else { showAlert('admin-global-alert', '❌ ' + (data.message || '封存失敗')); }
+  } catch { showAlert('admin-global-alert', '⚠️ 網路錯誤'); }
   finally  { hideLoading(); }
 }
 
@@ -2654,7 +2783,7 @@ function openDeliveryModal(row, item) {
   // 照片
   const photoDiv = _$('dm-photos');
   photoDiv.innerHTML = '';
-  if (item.photo1Url) photoDiv.innerHTML += `<a href="${item.photo1Url}" target="_blank"><img src="${item.photo1Url}" style="width:100%;border-radius:8px;object-fit:cover;" alt="實秤照"></a>`;
+  if (item.photo1Url) photoDiv.innerHTML += `<a href="${item.photo1Url}" target="_blank"><img src="${driveImg(item.photo1Url)}" style="width:100%;border-radius:8px;object-fit:cover;" alt="實秤照" onerror="this.style.display='none';this.nextSibling&&(this.nextSibling.style.display='block')"></a><a href="${item.photo1Url}" target="_blank" style="display:none;font-size:12px;color:#1565c0;">🔗 點擊查看實秤照</a>`;
   photoDiv.style.display = item.photo1Url ? 'block' : 'none';
 
   // 重置出貨方式按鈕
@@ -2753,8 +2882,13 @@ function syncDeliveryAgentSelect() {
     const opt = document.createElement('option');
     opt.value = a.code;
     opt.textContent = a.code + (a.name ? '（' + a.name + '）' : '');
+    opt.dataset.balance     = a.balance;
+    opt.dataset.accountType = a.accountType || '非儲值帳號';
     dest.appendChild(opt);
   });
+  // 預設今天日期
+  const today = new Date().toISOString().slice(0, 10);
+  if (_$('dv-arrival-date') && !_$('dv-arrival-date').value) _$('dv-arrival-date').value = today;
 }
 </script>
 </body>
