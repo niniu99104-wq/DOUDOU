@@ -1615,10 +1615,6 @@ async function loadCheckoutPending() {
         const deductMatch = (item.note || '').match(/扣餘額NT\$(\d+)/);
         const deductAmt   = deductMatch ? Number(deductMatch[1]) : item.amount;
         const balOk       = item.agentBalance >= deductAmt;
-        // deductAmount：note 欄位裡若有「補匯」代表是補差款，只扣餘額部分
-        // 直接從 note 解析扣款金額，若解析不到就用全額
-        const deductMatch = (item.note || '').match(/扣餘額NT\$(\d+)/);
-        const deductAmt   = deductMatch ? Number(deductMatch[1]) : item.amount;
         return `
         <div class="pending-item" id="ck-pending-${i}">
           <div class="pending-top">
