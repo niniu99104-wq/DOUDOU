@@ -598,6 +598,7 @@ input[type="number"] { -moz-appearance: textfield; }
       <button class="admin-tab-btn"        id="atab-btn-vendor"   onclick="switchAdminTab('vendor')">💰 記帳</button>
       <button class="admin-tab-btn"        id="atab-btn-delivery" onclick="switchAdminTab('delivery')">📦 出貨</button>
       <button class="admin-tab-btn"        id="atab-btn-settings" onclick="switchAdminTab('settings')">⚙️ 設定</button>
+      <button class="admin-tab-btn" id="atab-btn-refund" onclick="switchAdminTab('refund')">💸 退款</button>
     </div>
     <div id="admin-global-alert" class="alert error"></div>
 
@@ -869,6 +870,50 @@ input[type="number"] { -moz-appearance: textfield; }
         <div class="card-title admin-color">📋 出貨確認清單</div>
         <div id="delivery-list" class="pending-list"><div class="pending-empty">⏳ 載入中...</div></div>
         <div style="margin-top:14px;"><button class="btn btn-outline btn-sm" onclick="loadDeliveryList()">🔄 重新整理</button></div>
+      </div>
+    </div>
+
+    <!-- 退款工作區 -->
+    <div id="atab-refund" class="tab-panel">
+      <div class="card">
+        <div class="card-title admin-color">💸 退款入帳</div>
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:14px; line-height:1.6;">
+          缺貨 / 斷貨退款，選擇退回的錢包，系統自動入帳至代理餘額。
+        </p>
+        <div class="form-grid-2" style="margin-bottom:14px;">
+          <div class="form-row" style="margin:0;"><label>👤 選擇代理</label>
+            <select id="refund-agent-select" onchange="onRefundAgentChange()"><option value="">請選擇代理</option></select>
+          </div>
+          <div class="form-row" style="margin:0;"><label>目前餘額</label>
+            <div id="refund-agent-balance" class="balance-display" style="font-size:12.5px;line-height:1.6;">－</div>
+          </div>
+        </div>
+        <div class="form-row"><label>💼 退款目標錢包</label>
+          <div class="type-toggle">
+            <div class="type-btn active" id="refund-wallet-btn-general" onclick="switchRefundWallet('general')">💰 一般儲值金<br><span style="font-size:11px;font-weight:400;">官網 / 記事本用</span></div>
+            <div class="type-btn" id="refund-wallet-btn-batch" onclick="switchRefundWallet('batch')">🛍️ 批發網儲值金<br><span style="font-size:11px;font-weight:400;">批發網下單專用</span></div>
+          </div>
+        </div>
+        <div class="form-grid-2" style="margin-bottom:14px;">
+          <div class="form-row" style="margin:0;"><label>📅 退款日期</label><input type="date" id="refund-date"></div>
+          <div class="form-row" style="margin:0;"><label>💵 退款金額（NT$）</label>
+            <input type="number" id="refund-amount" placeholder="請輸入退款金額" min="1" oninput="updateRefundAfterBalance()">
+          </div>
+        </div>
+        <div class="form-row"><label>📝 退款原因（必填）</label>
+          <input type="text" id="refund-note" placeholder="例：米菲兔缺貨退款、批網訂單 #12345 斷貨退回">
+        </div>
+        <div id="refund-after-box" style="display:none; background:linear-gradient(135deg,#e8f5e9,#f1f8e9); border:1.5px solid #a5d6a7; border-radius:var(--radius-sm); padding:13px 16px; margin-bottom:14px; flex-direction:row; justify-content:space-between; align-items:center;">
+          <span style="font-size:13px; color:var(--success); font-weight:600;" id="refund-after-label">退款後一般儲值金</span>
+          <span style="font-size:18px; font-weight:800; color:var(--success);" id="refund-after-value">NT$ 0</span>
+        </div>
+        <div id="refund-alert" class="alert error"></div>
+        <button class="btn btn-admin btn-full" onclick="submitRefund()">💸 確認退款入帳</button>
+      </div>
+      <div class="card">
+        <div class="card-title admin-color">📋 退款紀錄</div>
+        <div id="refund-history-list"><div class="pending-empty">點擊重新整理載入</div></div>
+        <div style="margin-top:14px;"><button class="btn btn-outline btn-sm" onclick="loadRefundHistory()">🔄 重新整理</button></div>
       </div>
     </div>
 
@@ -1571,6 +1616,7 @@ function switchAdminTab(tab) {
   if (tab === 'delivery') { syncDeliveryAgentSelect(); loadDeliveryList(); }
   if (tab === 'group')    { loadAdminGroupList(); loadGroupReports(); }
   if (tab === 'vendor')   { syncVendorGbSelect(); loadVendorLedger(); } // ★ v14
+  if (tab === 'refund')   { syncRefundAgentSelect(); loadRefundHistory(); }
 }
 
 /* ── 儲值待審 ── */
@@ -1838,7 +1884,7 @@ function onAdminAgentChange() {
       : (Number(opt.dataset.batchBalance) || 0);  // 批發網儲值金
     const rate  = Number(opt.dataset.rate) || 40;
     const label = isBatch ? '批發網儲值金' : '一般儲值金';
-    balEl.textContent = `NT$ ${fmtNum(bal)}　${label}（匯率 ×${rate}）`;
+    balEl.textContent = `NT$ ${fmtNum(bal)}　${label}${isBatch ? '（匯率 ×' + rate + '）' : ''}`;
     balEl.style.color = bal >= 0 ? 'var(--success)' : 'var(--accent)';
     // ★ 運費結算：預填單價
     if (isShipping) prefillShippingRate(opt);
@@ -2927,6 +2973,115 @@ function syncDeliveryAgentSelect() {
   const today = new Date().toISOString().slice(0, 10);
   if (_$('dv-arrival-date') && !_$('dv-arrival-date').value) _$('dv-arrival-date').value = today;
 }
+
+/* ══════════════════════════════════════════
+   💸 退款系統
+══════════════════════════════════════════ */
+let currentRefundWallet = 'general';
+
+function syncRefundAgentSelect() {
+  const dest = _$('refund-agent-select');
+  if (!dest || !adminAgentData.length) return;
+  dest.innerHTML = '<option value="">請選擇代理</option>';
+  adminAgentData.forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a.code;
+    opt.textContent = a.code + (a.name ? '（' + a.name + '）' : '');
+    opt.dataset.balance      = a.balance;
+    opt.dataset.batchBalance = a.batchBalance || 0;
+    dest.appendChild(opt);
+  });
+  const today = new Date().toISOString().slice(0, 10);
+  if (_$('refund-date') && !_$('refund-date').value) _$('refund-date').value = today;
+}
+
+function onRefundAgentChange() {
+  const sel = _$('refund-agent-select'), opt = sel?.options[sel.selectedIndex];
+  const balEl = _$('refund-agent-balance');
+  if (opt && opt.value) {
+    const g = Number(opt.dataset.balance || 0), b = Number(opt.dataset.batchBalance || 0);
+    balEl.innerHTML = '<span style="font-weight:700;">一般：NT$ ' + fmtNum(g) + '</span><br><span style="color:#085041;font-size:12px;">批發：NT$ ' + fmtNum(b) + '</span>';
+    updateRefundAfterBalance();
+  } else { balEl.textContent = '－'; _$('refund-after-box').style.display = 'none'; }
+}
+
+function switchRefundWallet(wallet) {
+  currentRefundWallet = wallet;
+  _$('refund-wallet-btn-general').classList.toggle('active', wallet === 'general');
+  _$('refund-wallet-btn-batch').classList.toggle('active',   wallet === 'batch');
+  updateRefundAfterBalance();
+}
+
+function updateRefundAfterBalance() {
+  const sel = _$('refund-agent-select'), opt = sel?.options[sel.selectedIndex];
+  const amount = Number(_$('refund-amount')?.value) || 0;
+  const box    = _$('refund-after-box');
+  if (!opt || !opt.value || !amount) { if(box) box.style.display = 'none'; return; }
+  const curBal  = currentRefundWallet === 'batch' ? Number(opt.dataset.batchBalance||0) : Number(opt.dataset.balance||0);
+  const after   = curBal + amount;
+  const wName   = currentRefundWallet === 'batch' ? '批發網儲值金' : '一般儲值金';
+  const label   = _$('refund-after-label'), val = _$('refund-after-value');
+  if (label) label.textContent = '退款後' + wName;
+  if (val)   { val.textContent = 'NT$ ' + fmtNum(after); val.style.color = after >= 0 ? 'var(--success)' : 'var(--accent)'; }
+  if (box)   box.style.display = 'flex';
+}
+
+async function submitRefund() {
+  clearAlert('refund-alert');
+  const agentCode = _$('refund-agent-select')?.value;
+  const date      = _$('refund-date')?.value;
+  const amount    = Number(_$('refund-amount')?.value);
+  const note      = _$('refund-note')?.value.trim();
+  const wName     = currentRefundWallet === 'batch' ? '批發網儲值金' : '一般儲值金';
+  if (!agentCode)             { showAlert('refund-alert', '⚠️ 請選擇代理'); return; }
+  if (!date)                  { showAlert('refund-alert', '⚠️ 請選擇退款日期'); return; }
+  if (!amount || amount <= 0) { showAlert('refund-alert', '⚠️ 請輸入退款金額'); return; }
+  if (!note)                  { showAlert('refund-alert', '⚠️ 請填寫退款原因'); return; }
+  if (!confirm('確認退款 NT$' + fmtNum(amount) + ' 至 ' + agentCode + ' 的' + wName + '？\n原因：' + note)) return;
+  showLoading();
+  try {
+    const data = await callScript({
+      action: 'adminRefund', agentCode, date, amount, note,
+      walletType: currentRefundWallet === 'batch' ? '批發網' : '一般'
+    });
+    if (data.success) {
+      const sel = _$('refund-agent-select'), opt = sel?.options[sel.selectedIndex];
+      if (opt) {
+        if (currentRefundWallet === 'batch') opt.dataset.batchBalance = String(data.newBatchBalance);
+        else                                 opt.dataset.balance      = String(data.newBalance);
+      }
+      showAlert('refund-alert', '✅ 退款成功！NT$' + fmtNum(amount) + ' 已入帳至' + wName, 'success');
+      _$('refund-amount').value = ''; _$('refund-note').value = '';
+      _$('refund-after-box').style.display = 'none';
+      onRefundAgentChange(); loadRefundHistory();
+    } else { showAlert('refund-alert', '❌ ' + (data.message || '退款失敗')); }
+  } catch { showAlert('refund-alert', '⚠️ 網路錯誤'); }
+  finally  { hideLoading(); }
+}
+
+async function loadRefundHistory() {
+  const el = _$('refund-history-list');
+  if (!el) return;
+  el.innerHTML = '<div class="pending-empty">⏳ 載入中...</div>';
+  try {
+    const data = await callScript({ action: 'getRefundHistory' });
+    if (!data.success || !data.list || !data.list.length) {
+      el.innerHTML = '<div class="pending-empty">尚無退款紀錄</div>'; return;
+    }
+    el.innerHTML = data.list.map(item =>
+      '<div style="background:#fff;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:11px 14px;margin-bottom:7px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;">' +
+      '<div><div style="font-weight:700;font-size:13px;color:var(--primary-dark);">👤 ' + item.agentCode +
+      (item.agentName ? '（' + item.agentName + '）' : '') +
+      '<span style="font-size:11.5px;font-weight:400;color:var(--text-muted);">　' + item.date + '</span></div>' +
+      '<div style="font-size:12px;color:var(--text-muted);margin-top:3px;line-height:1.7;">💼 ' +
+      (item.walletType === '批發網' ? '批發網儲值金' : '一般儲值金') + '<br>📝 ' + (item.note||'－') + '</div></div>' +
+      '<div style="font-size:17px;font-weight:800;color:var(--success);white-space:nowrap;">+NT$' + fmtNum(item.amount) + '</div>' +
+      '</div></div>'
+    ).join('');
+  } catch { el.innerHTML = '<div class="pending-empty">❌ 載入失敗</div>'; }
+}
+
 </script>
 </body>
 </html>
